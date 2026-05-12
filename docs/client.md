@@ -1,13 +1,35 @@
-# Client
+# Client (`@kaleido/client`)
 
-`@kaleido/client` is a thin browser/client-side interop layer for generated Stellar CLI TypeScript bindings. It connects:
+`@kaleido/client` is the alpha browser/client-side interop layer for generated Stellar CLI TypeScript bindings. It connects:
 
 - generated contract bindings
 - `kaleido.artifacts.json`
 - RPC URL and network passphrase
 - a wallet adapter
 
-It does not replace the Stellar SDK, reimplement generated bindings, serialize SCVal manually, parse XDR manually, or store secret keys.
+It does not replace Stellar CLI, Stellar SDK, Soroban SDK, generated bindings, or wallet signing. It does not serialize SCVal manually, parse XDR manually, or store secret keys.
+
+## Scope
+
+Included in alpha:
+
+- artifact-based `contractId` lookup
+- generated binding registration
+- `KaleidoWalletAdapter`
+- Freighter adapter
+- `invoke()`
+- `buildXdr()`
+- explicit `debugXdr` and `debugRaw`
+- `KALEIDO_XDR_*`, binding, wallet, and artifact errors
+
+Not included:
+
+- React hooks
+- CLI XDR commands
+- `kaleido generate --interop`
+- custom SCVal serialization
+- multisig orchestration
+- backend signing
 
 ## Install
 
@@ -39,6 +61,18 @@ const client = createKaleidoClient({
 });
 
 const result = await client.contract("counter").invoke("increment");
+```
+
+Minimal successful result:
+
+```json
+{
+  "status": "confirmed",
+  "contract": "counter",
+  "method": "increment",
+  "contractId": "C...",
+  "transactionHash": "..."
+}
 ```
 
 If a contract ID is not passed explicitly, the client resolves it from:
@@ -76,7 +110,7 @@ await client.contract("token").invoke("transfer", {
 
 ## XDR Debug
 
-XDR is omitted by default.
+XDR is omitted by default and only returned when `debugXdr` is enabled.
 
 ```ts
 const result = await client.contract("counter").invoke("increment", {
@@ -108,7 +142,7 @@ console.log(tx.unsignedXdr);
 console.log(tx.preparedXdr);
 ```
 
-`buildXdr()` does not call `wallet.signTransaction()`.
+`buildXdr()` creates the generated binding client, so it may call `wallet.getPublicKey()`. It does not call `wallet.signTransaction()`.
 
 ## Wallet Adapter
 
@@ -140,3 +174,17 @@ The default binding adapter expects generated bindings to:
 5. expose `signAndSend()` or `send()` for signed submission
 
 If Stellar CLI changes this generated shape, the compatibility fix belongs in the binding adapter, not in application code.
+
+## Failure behavior
+
+Client failures use public `KALEIDO_*` codes. The most common are:
+
+- `KALEIDO_CONTRACT_ARTIFACT_NOT_FOUND`
+- `KALEIDO_BINDING_CLIENT_NOT_FOUND`
+- `KALEIDO_BINDING_METHOD_NOT_FOUND`
+- `KALEIDO_WALLET_NOT_CONNECTED`
+- `KALEIDO_XDR_BUILD_FAILED`
+- `KALEIDO_XDR_SIGN_FAILED`
+- `KALEIDO_XDR_SUBMIT_FAILED`
+
+See [`errors.md`](./errors.md) for the full table.
