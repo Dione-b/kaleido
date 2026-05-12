@@ -24,6 +24,7 @@ export { resolveNetwork, type ResolvedNetwork } from "./networks/resolve-network
 export { runCommand, type RunCommandResult } from "./shell/run-command.js";
 export { checkBinary } from "./shell/check-binary.js";
 export { parseContractId } from "./stellar-cli/parse-contract-id.js";
+export * from "./stellar-cli/version.js";
 
 export { resolveContract, type ResolvedContract } from "./contracts/resolve-contract.js";
 export { buildContract, type BuildContractOptions } from "./contracts/build-contract.js";
