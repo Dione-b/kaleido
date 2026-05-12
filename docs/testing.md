@@ -10,6 +10,10 @@ packages/core/test/fixtures/stellar-cli/
 
 Use versioned directories such as `v26.0.0` when the output came from a known CLI version. Use `unknown` only for minimal parser edge cases.
 
+New Stellar CLI version fixtures should include the CLI semver in the filename, for example `version.v22.0.1.fixture.txt`. Existing legacy `version.txt` fixtures remain valid until touched by parser fixture work. Other command-output fixtures may continue using existing names inside versioned directories.
+
+See [Stellar CLI Version Contract](./stellar-cli-version-contract.md) for the supported version range and upgrade process.
+
 When adding parser behavior:
 
 1. Add the raw CLI output fixture.

@@ -24,6 +24,8 @@ Generates TypeScript bindings from the deployed contract ID.
 
 Invokes a deployed contract method. Extra args are forwarded to the Stellar implicit contract CLI.
 
+Use `--allow-untested-stellar-cli` only for local experiments. CI and release workflows must run a supported Stellar CLI version. See [Stellar CLI Version Contract](./stellar-cli-version-contract.md).
+
 ## Current limits
 
 - `--source` accepts a Stellar CLI identity alias or public account address, not a secret key.
