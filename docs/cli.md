@@ -1,5 +1,7 @@
 # CLI
 
+The CLI is intentionally thin. It delegates config, artifacts, command execution, and parser behavior to `@kaleido/core`.
+
 ## `kaleido init <projectName>`
 
 Creates a project from a bundled template and writes `kaleido.artifacts.json`.
@@ -22,6 +24,12 @@ Generates TypeScript bindings from the deployed contract ID.
 
 Invokes a deployed contract method. Extra args are forwarded to the Stellar implicit contract CLI.
 
+## Current limits
+
+- `--source` accepts a Stellar CLI identity alias or public account address, not a secret key.
+- `kaleido dev` is present as a placeholder, not a full dev server.
+- `kaleido doctor`, CLI XDR commands, `generate --interop`, and multi-contract dependency deploy are not part of the alpha CLI.
+
 ## Error codes
 
 Kaleido emits public `KALEIDO_*` error codes for automation. Common examples:
@@ -33,5 +41,7 @@ Kaleido emits public `KALEIDO_*` error codes for automation. Common examples:
 - `KALEIDO_SOURCE_ACCOUNT_REQUIRED`
 - `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`
 - `KALEIDO_TEMPLATE_INCOMPATIBLE`
+- `KALEIDO_XDR_BUILD_FAILED`
+- `KALEIDO_XDR_SIGN_FAILED`
 
 See `docs/errors.md` for the full table.

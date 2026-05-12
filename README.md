@@ -1,18 +1,32 @@
 # Kaleido
 
-**Kaleido** is a developer toolkit and CLI for building dApps on **Stellar / Soroban**. It keeps a **predictable workflow**—create a project, build contracts, deploy, generate TypeScript bindings, and invoke—while **isolating Stellar CLI** details (flags, stdout, subprocess layout) inside [`@kaleido/core`](./packages/core).
+**Kaleido** is an alpha developer toolkit for building dApps on **Stellar / Soroban**. It keeps a **predictable workflow**—create a project, build contracts, deploy, generate TypeScript bindings, invoke, and wire a browser client—while isolating Stellar CLI details inside [`@kaleido/core`](./packages/core).
 
-Kaleido does **not** replace the Soroban SDK, Stellar SDK, or Stellar CLI. It **orchestrates** them and adds conventions: `kaleido.config.ts`, `kaleido.artifacts.json` per network, and templates tuned for JS/TS teams.
+Kaleido does **not** replace Stellar CLI, Stellar SDK, Soroban SDK, generated bindings, or wallet signing. It **orchestrates** them and adds conventions: `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, templates tuned for JS/TS teams, and a thin `@kaleido/client` layer for artifact lookup, wallet signing, and XDR visibility.
+
+Current release target: **internal `v0.1.0-alpha`**. It is intended for repository validation and template smoke tests, not npm publication yet.
 
 ## Features
 
 - **Stable CLI surface:** `init`, `build`, `deploy`, `generate`, `invoke` (plus `dev` as a placeholder until the opinionated dev server lands).
 - **Artifacts per network:** deployed `contractId`, WASM hash, and paths—no manual copy-paste into the frontend for the happy path.
+- **Client interop:** `@kaleido/client` connects generated bindings, artifacts, network config, and wallet adapters without manually serializing SCVal or storing private keys.
+- **XDR observability:** `buildXdr()` and explicit `debugXdr` expose unsigned/prepared/signed XDR only when requested.
 - **Template compatibility:** official templates ship a `kaleido.template.json` manifest and are checked against the current core version before copy.
 - **Stellar CLI parser hardening:** fragile CLI output parsing is isolated in `@kaleido/core` and covered by versioned fixtures.
 - **Public error codes:** failures expose documented `KALEIDO_*` codes that are safe for CI parsing.
 - **Official template:** `react-vite-counter` (Vite + React + Soroban counter contract).
 - **Security by default:** no private key storage, no telemetry in core; deploy/invoke use `--source` (Stellar CLI identity alias or public address only—secrets rejected).
+
+## Not in alpha
+
+- npm package publication
+- `kaleido doctor`
+- CLI XDR commands
+- `kaleido generate --interop`
+- React hooks
+- multi-contract dependency deploy
+- live testnet CI
 
 ## Monorepo
 
@@ -20,10 +34,10 @@ Kaleido does **not** replace the Soroban SDK, Stellar SDK, or Stellar CLI. It **
 |---------|------|
 | [`@kaleido/cli`](./packages/cli) | Argument parsing, terminal output, delegates to core. |
 | [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), networks/contracts resolution, Stellar CLI orchestration (`execa` only here). |
-| [`@kaleido/client`](./packages/client) | Thin interop layer for generated bindings, artifacts, XDR visibility, and wallet signing. |
+| [`@kaleido/client`](./packages/client) | Thin browser/client interop layer for generated bindings, artifacts, XDR visibility, and wallet signing. |
 | [`packages/templates`](./packages/templates) | Templates copied by `kaleido init`. |
 
-Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84.0+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for deploy/invoke.
+Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84.0+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for CLI deploy/invoke.
 
 ## Quick start (contributors)
 
@@ -65,6 +79,30 @@ npx kaleido invoke counter.increment --network testnet --source <identity-or-G-a
 
 Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address for `--source`. Secret keys and seed phrases are refused.
 
+For browser-side calls, use `@kaleido/client` with generated bindings, `kaleido.artifacts.json`, and a wallet adapter:
+
+```ts
+import { createKaleidoClient } from "@kaleido/client";
+import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import * as Counter from "./contracts/generated/counter";
+import artifacts from "../kaleido.artifacts.json";
+
+const client = createKaleidoClient({
+  network: {
+    name: "testnet",
+    rpcUrl: "https://soroban-testnet.stellar.org",
+    networkPassphrase: "Test SDF Network ; September 2015"
+  },
+  artifacts,
+  wallet: freighterWalletAdapter,
+  contracts: {
+    counter: { binding: Counter }
+  }
+});
+
+await client.contract("counter").invoke("increment");
+```
+
 ## Documentation
 
 - **[Architecture & product stance](./docs/architecture.md)** — promise, boundaries, roadmap, ADR index.
@@ -79,7 +117,7 @@ Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address fo
 | Command | Description |
 |---------|-------------|
 | `pnpm build` | Turbo build for all packages. |
-| `pnpm test` | Turbo test (`@kaleido/core`, `@kaleido/cli`). |
+| `pnpm test` | Turbo test (`@kaleido/core`, `@kaleido/client`, `@kaleido/cli`). |
 | `pnpm typecheck` | Typecheck across the workspace. |
 | `pnpm dev` | Run `@kaleido/cli` in dev mode (`tsx`). |
 

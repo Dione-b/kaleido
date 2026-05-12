@@ -4,25 +4,25 @@ This document is the **canonical product and architecture stance** for Kaleido. 
 
 ## One-sentence promise
 
-**Kaleido keeps a predictable, reproducible workflow to create, compile, deploy, generate bindings, and invoke Soroban contracts—even when the Stellar CLI changes operational details.**
+**Kaleido keeps a predictable, reproducible workflow to create, compile, deploy, generate bindings, invoke, and wire browser clients for Soroban contracts—even when Stellar tooling changes operational details.**
 
-That does not mean hiding Stellar reality. Users keep a **stable Kaleido surface** (`kaleido build`, `kaleido deploy`, `kaleido generate`, `kaleido invoke`). Changes in flags, stdout, paths, and subprocess composition are absorbed inside `@kaleido/core`, not scattered across user scripts.
+That does not mean hiding Stellar reality. Users keep a **stable Kaleido surface** (`kaleido build`, `kaleido deploy`, `kaleido generate`, `kaleido invoke`, `@kaleido/client`). Changes in flags, stdout, paths, transaction/XDR workflow, and subprocess composition are absorbed behind small adapters, not scattered across user scripts.
 
 ## What Kaleido is (and is not)
 
 | Kaleido is | Kaleido is not |
 |------------|----------------|
-| Convention + orchestration + artifacts + frontend integration | A second Soroban/Stellar SDK |
+| Convention + orchestration + artifacts + frontend/client integration | A second Soroban/Stellar SDK |
 | A thin CLI over `@kaleido/core` | A place to store private keys or run silent signing |
 | Template-driven project scaffolding | A hosted registry required for core workflows (future registries are optional) |
 
 **Primary competitor today:** ad-hoc `package.json` scripts. **Possible later overlap:** meta-frameworks in other ecosystems (e.g. Scaffold-ETH-style), only if the workflow and template story mature.
 
-**What Kaleido should do unusually well:** standardize Stellar/Soroban steps, persist **per-network** deployment facts, generate frontend integration from deployed contracts, avoid manual `contractId` wiring in the app, support **multi-contract** reproducible deploys, and lower friction for JS/TS teams.
+**What Kaleido should do unusually well:** standardize Stellar/Soroban steps, persist **per-network** deployment facts, generate frontend integration from deployed contracts, avoid manual `contractId` wiring in the app, make XDR visible when debugging, support **multi-contract** reproducible deploys later, and lower friction for JS/TS teams.
 
 ## Validation roadmap (flows)
 
-1. **MVP flow (proven):** `init → build → deploy → generate → invoke` (e.g. counter).
+1. **Alpha flow (current):** `init → build → deploy → generate → invoke` plus `@kaleido/client` for browser-side binding/artifact/wallet interop.
 2. **Next architectural proof:** **multi-contract deploy with dependencies** (e.g. deploy token, then marketplace that depends on token’s `contractId`, then generate bindings for both, then invoke across that dependency).
 3. **After that:** upgrade / redeploy with **artifacts history** and clear migration story.
 
@@ -32,15 +32,16 @@ Until (2) is real in the product, treat single-contract demos as necessary but n
 
 - **`@kaleido/cli`:** argument parsing, terminal UX, delegation to core—no subprocess orchestration except through core APIs.
 - **`@kaleido/core`:** load `kaleido.config.ts`, validate schemas, resolve networks/contracts, read/write `kaleido.artifacts.json`, run Stellar CLI and related tools via a **single shell layer** (`run-command.ts`). **All `execa` usage stays here.**
+- **`@kaleido/client`:** thin client/browser interop over generated bindings, artifacts, wallet adapters, `invoke()`, `buildXdr()`, and explicit XDR/raw debug output. It does not own signing keys or serialize SCVal manually.
 - **`packages/templates`:** official templates consumed by `kaleido init` and validated through `kaleido.template.json` before copy.
 
-Deferred unless explicitly rescoped: full `@kaleido/react` SDK surface, plugin system, RWA-only templates, visual dashboard, custom test runner as **required** core dependencies.
+Deferred unless explicitly rescoped: `kaleido doctor`, CLI XDR commands, `kaleido generate --interop`, full `@kaleido/react` SDK surface, plugin system, RWA-only templates, visual dashboard, custom test runner as **required** core dependencies.
 
 ## Meta-framework boundary: orchestrate workflow, not mental model
 
-**May abstract:** build/deploy/bindings flow, artifact lookup, network config from the project, template layout, command composition, and stable CLI commands.
+**May abstract:** build/deploy/bindings flow, artifact lookup, network config from the project, template layout, command composition, stable CLI commands, wallet adapter handoff, and generated-binding transaction workflow.
 
-**Should not hide** (users and docs should keep these visible): `contractId`, network passphrase, RPC choice, accounts, signing, XDR, fees, simulation, Soroban data model as understood via official SDKs and generated bindings.
+**Should not hide** (users and docs should keep these visible): `contractId`, network passphrase, RPC choice, accounts, wallet signing, XDR, fees, simulation, Soroban data model as understood via official SDKs and generated bindings.
 
 **Red flags (avoid):** Kaleido-owned contract models, hand-rolled Soroban serialization, replacing generated bindings as the primary API, custom signing runtimes parallel to the Stellar ecosystem, or “smart” behavior that obscures what actually hit the network.
 
@@ -90,13 +91,13 @@ Deploy order **should** be supported in core for declared dependencies (DAG / to
 
 Kaleido does **not** manage long-lived private keys. CI provides identities (`--source ci-deployer`), secrets via the platform, and a configured Stellar CLI on the runner. Kaleido validates config, runs deploy/generate/invoke, updates artifacts, and fails with **clear, stable error codes** (see below).
 
-## Frontend SDK (`@kaleido/react`)
+## Client and frontend SDK
 
-Start as **thin hooks** over **generated bindings** and artifacts: wallet wiring, loading/error helpers, network context. Avoid a parallel generic Soroban client that bypasses generated types.
+Alpha starts with **`@kaleido/client`**, not React hooks. The client composes generated bindings, artifacts, network config, and wallet adapters. A future `@kaleido/react` should be thin hooks over this layer and generated bindings: wallet wiring, loading/error helpers, and network context. Avoid a parallel generic Soroban client that bypasses generated types.
 
 ## DX beyond CLI
 
-Prefer **`kaleido doctor`** (bins, config/artifact sanity, optional staleness hints) before investing in VS Code/LSP. LSP remains a future option for config/autocomplete diagnostics.
+Prefer **`kaleido doctor`** later (bins, config/artifact sanity, optional staleness hints) before investing in VS Code/LSP. Doctor is intentionally outside the alpha release.
 
 ## Errors as public API
 
@@ -142,6 +143,7 @@ Semver applies to monorepo packages **and** to serialized formats (`kaleido.arti
 
 - [`getting-started.md`](./getting-started.md)
 - [`cli.md`](./cli.md)
+- [`client.md`](./client.md)
 - [`config.md`](./config.md)
 - [`templates.md`](./templates.md)
 - [`errors.md`](./errors.md)
