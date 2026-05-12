@@ -20,9 +20,10 @@ Kaleido does **not** replace the Soroban SDK, Stellar SDK, or Stellar CLI. It **
 |---------|------|
 | [`@kaleido/cli`](./packages/cli) | Argument parsing, terminal output, delegates to core. |
 | [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), networks/contracts resolution, Stellar CLI orchestration (`execa` only here). |
+| [`@kaleido/client`](./packages/client) | Thin interop layer for generated bindings, artifacts, XDR visibility, and wallet signing. |
 | [`packages/templates`](./packages/templates) | Templates copied by `kaleido init`. |
 
-Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for deploy/invoke.
+Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84.0+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for deploy/invoke.
 
 ## Quick start (contributors)
 
@@ -68,9 +69,10 @@ Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address fo
 
 - **[Architecture & product stance](./docs/architecture.md)** — promise, boundaries, roadmap, ADR index.
 - **[Getting started](./docs/getting-started.md)** — prerequisites and commands.
-- **[CLI](./docs/cli.md)** · **[Config](./docs/config.md)** · **[Templates](./docs/templates.md)**
+- **[CLI](./docs/cli.md)** · **[Client](./docs/client.md)** · **[Config](./docs/config.md)** · **[Templates](./docs/templates.md)**
 - **[Errors](./docs/errors.md)** — public `KALEIDO_*` codes.
 - **[Testing](./docs/testing.md)** — fixture strategy and no-testnet default CI policy.
+- **[v0.1.0-alpha release notes](./docs/release/v0.1.0-alpha.md)** — internal alpha scope and verification gates.
 
 ## Scripts
 
