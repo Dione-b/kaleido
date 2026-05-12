@@ -12,7 +12,9 @@
     "kaleido:generate": "kaleido generate counter"
   },
   "dependencies": {
+    "@kaleido/client": "^0.1.0",
     "@kaleido/core": "^0.1.0",
+    "@stellar/freighter-api": "^4.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.0.6",
     "react": "^18.3.1",
