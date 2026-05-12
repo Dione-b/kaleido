@@ -54,17 +54,17 @@ async function readTemplateManifest(templateDir: string): Promise<TemplateManife
 
     if (manifest.kaleido.templateVersion !== CURRENT_TEMPLATE_VERSION) {
       throw new KaleidoError(
-        `Template manifest version ${manifest.kaleido.templateVersion} is not supported.`,
+        "Template is not compatible with this Kaleido version.",
         KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-        `Use a template with templateVersion ${CURRENT_TEMPLATE_VERSION}.`
+        "Use a compatible template version or upgrade Kaleido."
       );
     }
 
     if (!isCoreVersionCompatible(manifest.kaleido.compatibleCore)) {
       throw new KaleidoError(
-        `Template "${manifest.name}" is not compatible with this Kaleido core version.`,
+        "Template is not compatible with this Kaleido version.",
         KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-        `Template requires @kaleido/core ${manifest.kaleido.compatibleCore}.`
+        "Use a compatible template version or upgrade Kaleido."
       );
     }
 
@@ -72,9 +72,9 @@ async function readTemplateManifest(templateDir: string): Promise<TemplateManife
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       throw new KaleidoError(
-        "kaleido.template.json was not found.",
+        "Template manifest was not found.",
         KaleidoErrorCode.TEMPLATE_MANIFEST_NOT_FOUND,
-        "Templates must declare compatibility before they can be copied."
+        "Add a kaleido.template.json file to the template root."
       );
     }
 
@@ -84,9 +84,9 @@ async function readTemplateManifest(templateDir: string): Promise<TemplateManife
 
     if (error instanceof SyntaxError || error instanceof z.ZodError) {
       throw new KaleidoError(
-        "kaleido.template.json is invalid.",
+        "Template is not compatible with this Kaleido version.",
         KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-        "Fix the template manifest schema before running kaleido init."
+        "Use a compatible template version or upgrade Kaleido."
       );
     }
 

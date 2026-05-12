@@ -75,4 +75,29 @@ describe("deployContract", () => {
     expect(saved.networks.testnet.contracts.counter.contractId).toBe(CONTRACT_ID);
     expect(saved.networks.testnet.contracts.counter.wasmHash).toMatch(/^[a-f0-9]{64}$/);
   });
+
+  it("should_parse_contract_id_from_stdout_when_combined_output_is_empty", async () => {
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "deploy") {
+        return { stdout: `deployed ${CONTRACT_ID}\n`, stderr: "", all: "" };
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
+    await mkdir(path.dirname(wasmPath), { recursive: true });
+    await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
+    await writeArtifacts(createInitialArtifacts("app"), tmpDir);
+
+    const result = await deployContract({
+      config: baseConfig,
+      contractName: "counter",
+      networkName: "testnet",
+      source: "alice",
+      cwd: tmpDir
+    });
+
+    expect(result.contractId).toBe(CONTRACT_ID);
+  });
 });

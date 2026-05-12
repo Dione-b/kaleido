@@ -4,7 +4,7 @@
 
 - Node.js 20+
 - pnpm 9+ for repository development
-- Rust 1.84+
+- Rust 1.84.0+
 - `wasm32v1-none` Rust target
 - Stellar CLI
 - A local Stellar CLI identity for deploy and invoke, for example `alice`
