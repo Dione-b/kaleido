@@ -93,7 +93,7 @@ describe("generateBindings", () => {
     );
   });
 
-  it("should_throw_CONTRACT_ARTIFACT_NOT_FOUND_when_not_deployed", async () => {
+  it("should_throw_KALEIDO_ARTIFACT_NOT_FOUND_when_not_deployed", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-"));
     await writeArtifacts(createInitialArtifacts("app"), tmpDir);
 
@@ -104,6 +104,6 @@ describe("generateBindings", () => {
         networkName: "testnet",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: "CONTRACT_ARTIFACT_NOT_FOUND" });
+    ).rejects.toMatchObject({ code: "KALEIDO_ARTIFACT_NOT_FOUND" });
   });
 });

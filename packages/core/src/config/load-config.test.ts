@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { loadConfig } from "./load-config.js";
 
 describe("loadConfig", () => {
@@ -13,10 +14,10 @@ describe("loadConfig", () => {
     }
   });
 
-  it("should_throw_CONFIG_NOT_FOUND_when_config_missing", async () => {
+  it("should_throw_KALEIDO_CONFIG_NOT_FOUND_when_config_missing", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
     await expect(loadConfig({ cwd: tmpDir })).rejects.toMatchObject({
-      code: "CONFIG_NOT_FOUND"
+      code: KaleidoErrorCode.CONFIG_NOT_FOUND
     });
   });
 
@@ -48,7 +49,7 @@ describe("loadConfig", () => {
     expect(config.contracts.counter.path).toBe("./contracts/counter");
   });
 
-  it("should_throw_CONFIG_INVALID_when_zod_validation_fails", async () => {
+  it("should_throw_KALEIDO_INVALID_CONFIG_when_zod_validation_fails", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
     await writeFile(
       path.join(tmpDir, "kaleido.config.ts"),
@@ -58,7 +59,7 @@ describe("loadConfig", () => {
     );
 
     await expect(loadConfig({ cwd: tmpDir })).rejects.toMatchObject({
-      code: "CONFIG_INVALID"
+      code: KaleidoErrorCode.INVALID_CONFIG
     });
   });
 

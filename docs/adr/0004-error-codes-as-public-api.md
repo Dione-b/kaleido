@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft (planned)
+Accepted
 
 ## Date
 
@@ -12,18 +12,22 @@ Draft (planned)
 
 CI pipelines, support playbooks, and programmatic wrappers need **stable identifiers** for failure modes. Ad-hoc messages change; opaque `Error` strings do not compose.
 
-## Decision (planned)
+## Decision
 
-1. Expose **stable machine codes** for Kaleido failures (e.g. prefixed `KALEIDO_*` or a single documented namespace).
-2. Document the mapping in `docs/cli.md` or a dedicated reference.
-3. **Migrate existing codes** (e.g. `CONFIG_NOT_FOUND`) with a **changelog** and, if needed, a **transition window** (duplicate old + new in output) before removing old codes.
+1. Expose **stable machine codes** for Kaleido failures using the `KALEIDO_*` namespace.
+2. Keep codes centralized in `KaleidoErrorCode`.
+3. Document the mapping in `docs/errors.md`.
+4. Tests assert error codes for public failure paths.
+5. New public error codes must be prefixed before they are exposed.
 
 ## Consequences
 
-- Breaking change for anyone parsing legacy codes—must be semver and communicated.
+- Breaking change for anyone parsing legacy pre-`KALEIDO_*` codes; this must be communicated in release notes.
 - Enables fixture-based tests that assert on `code` fields, not full English strings.
+- Makes stderr/message text easier to improve without breaking CI consumers.
 
 ## Related
 
 - [`architecture.md`](../architecture.md) — errors as public API.
+- [`errors.md`](../errors.md) — public code reference.
 - [ADR 0001](./0001-stable-workflow-over-stellar-cli.md) — wrapped Stellar failures still need stable outer codes.

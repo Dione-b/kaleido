@@ -1,0 +1,36 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
+import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { parseContractId } from "./parse-contract-id.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const fixturesDir = path.resolve(__dirname, "../../test/fixtures/stellar-cli");
+const CONTRACT_ID = `C${"A".repeat(55)}`;
+
+async function fixture(relativePath: string): Promise<string> {
+  return readFile(path.join(fixturesDir, relativePath), "utf8");
+}
+
+describe("parseContractId", () => {
+  it("should_parse_contract_id_from_v26_deploy_success_fixture", async () => {
+    const output = await fixture("v26.0.0/deploy-success.txt");
+
+    expect(parseContractId(output)).toBe(CONTRACT_ID);
+  });
+
+  it("should_parse_contract_id_from_minimal_unknown_fixture", async () => {
+    const output = await fixture("unknown/deploy-success-minimal.txt");
+
+    expect(parseContractId(output)).toBe(CONTRACT_ID);
+  });
+
+  it("should_throw_when_output_has_no_contract_id", async () => {
+    const output = await fixture("unknown/deploy-success-no-contract-id.txt");
+
+    expect(() => parseContractId(output)).toThrow(expect.objectContaining({
+      code: KaleidoErrorCode.CONTRACT_ID_NOT_FOUND
+    }));
+  });
+});

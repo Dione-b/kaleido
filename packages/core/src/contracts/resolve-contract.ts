@@ -1,5 +1,5 @@
 import path from "node:path";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import type { ContractConfig, KaleidoConfig } from "../config/config.schema.js";
 
 export type ResolvedContract = {
@@ -19,7 +19,7 @@ export function resolveContract(
   if (!contract) {
     throw new KaleidoError(
       `Contract "${contractName}" is not configured.`,
-      "CONTRACT_NOT_FOUND",
+      KaleidoErrorCode.CONTRACT_NOT_FOUND,
       `Add "${contractName}" to kaleido.config.ts contracts, or pass a configured contract name.`
     );
   }

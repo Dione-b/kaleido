@@ -1,9 +1,31 @@
 # Getting Started
 
+## Prerequisites
+
+- Node.js 20+
+- pnpm 9+ for repository development
+- Rust 1.84+
+- `wasm32v1-none` Rust target
+- Stellar CLI
+- A local Stellar CLI identity for deploy and invoke, for example `alice`
+
+```bash
+rustc --version
+rustup target add wasm32v1-none
+stellar --version
+```
+
+## From the repository
+
 ```bash
 pnpm install
 pnpm build
 pnpm --filter @kaleido/cli dev init my-dapp
+```
+
+## Generated app flow
+
+```bash
 cd my-dapp
 npm install
 npx kaleido build counter
@@ -12,9 +34,12 @@ npx kaleido generate counter --network testnet
 npx kaleido invoke counter.increment --network testnet --source alice
 ```
 
-Prerequisites:
+Use a Stellar CLI identity alias or a public `G...` account for `--source`. Kaleido rejects likely secret keys and seed phrases.
 
-- Rust
-- `wasm32-unknown-unknown` Rust target
-- Stellar CLI
-- A local Stellar CLI identity for deploy and invoke
+Default local checks:
+
+```bash
+pnpm typecheck
+pnpm build
+pnpm test
+```

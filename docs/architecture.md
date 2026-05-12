@@ -32,7 +32,7 @@ Until (2) is real in the product, treat single-contract demos as necessary but n
 
 - **`@kaleido/cli`:** argument parsing, terminal UX, delegation to core—no subprocess orchestration except through core APIs.
 - **`@kaleido/core`:** load `kaleido.config.ts`, validate schemas, resolve networks/contracts, read/write `kaleido.artifacts.json`, run Stellar CLI and related tools via a **single shell layer** (`run-command.ts`). **All `execa` usage stays here.**
-- **`packages/templates`:** official templates consumed by `kaleido init` (and eventually validated via template manifest—see ADRs below).
+- **`packages/templates`:** official templates consumed by `kaleido init` and validated through `kaleido.template.json` before copy.
 
 Deferred unless explicitly rescoped: full `@kaleido/react` SDK surface, plugin system, RWA-only templates, visual dashboard, custom test runner as **required** core dependencies.
 
@@ -64,7 +64,7 @@ No central cache or remote artifact registry is assumed in the core MVP. Optiona
 ## Extensibility
 
 - **Templates:** start as **opinionated snapshots** (`react-vite-counter`, etc.). Parameterized generators (`--tailwind`, wallet flavor, i18n) come later—they expand the test matrix quickly.
-- **Template contract:** introduce a **`kaleido.template.json` manifest** (name, version, `compatibleCore`, paths) so templates and core semver can be validated at `init`—see [ADR 0003](./adr/0003-template-manifest-compatibility.md) when implemented.
+- **Template contract:** every template includes a **`kaleido.template.json` manifest** (name, version, `compatibleCore`, paths) so templates and core semver are validated at `init`—see [ADR 0003](./adr/0003-template-manifest-compatibility.md).
 - **Plugins:** defer until a concrete need templates cannot cover (e.g. **post-deploy hooks**, CI presets, indexer hooks). First strong candidate is often `postDeploy`; still wait until multi-contract flow is validated.
 
 ## Ecosystem: official vs community templates
@@ -100,14 +100,14 @@ Prefer **`kaleido doctor`** (bins, config/artifact sanity, optional staleness hi
 
 ## Errors as public API
 
-Stable **`KALEIDO_*` (or prefixed) codes** are part of the contract for CI, support, and docs. Today’s codes may still be short names; **normalization and a changelog-backed migration** are planned—see [ADR 0004](./adr/0004-error-codes-as-public-api.md).
+Stable **`KALEIDO_*` codes** are part of the contract for CI, support, and docs. New public errors must be added through the central `KaleidoErrorCode` object and documented in [`errors.md`](./errors.md)—see [ADR 0004](./adr/0004-error-codes-as-public-api.md).
 
 ## Testing strategy vs Stellar CLI drift
 
 Layered approach:
 
 1. Unit tests in `@kaleido/core`.
-2. **Fixtures** of Stellar CLI stdout/stderr per supported CLI generation (parsing is the fragile seam).
+2. **Fixtures** of Stellar CLI stdout/stderr per supported CLI generation (parsing is the fragile boundary).
 3. Contract tests with **pinned** Stellar CLI versions in CI.
 4. Optional scheduled smoke against testnet.
 
@@ -132,11 +132,11 @@ Semver applies to monorepo packages **and** to serialized formats (`kaleido.arti
 |-----|--------|--------|
 | [0001](./adr/0001-stable-workflow-over-stellar-cli.md) | Accepted | Stable Kaleido workflow while encapsulating Stellar CLI churn |
 | [0002](./adr/0002-local-artifacts-as-source-of-truth.md) | Accepted | Local artifacts and config as source of truth; no central registry in MVP |
-| [0003](./adr/0003-template-manifest-compatibility.md) | Draft | Template manifest and core compatibility |
-| [0004](./adr/0004-error-codes-as-public-api.md) | Draft | Stable `KALEIDO_*` error codes and migration |
+| [0003](./adr/0003-template-manifest-compatibility.md) | Accepted | Template manifest and core compatibility |
+| [0004](./adr/0004-error-codes-as-public-api.md) | Accepted | Stable `KALEIDO_*` error codes and migration |
 | [0005](./adr/0005-multi-contract-dependency-deploy.md) | Draft | Multi-contract `dependsOn` and contractId injection |
 
-**0001** and **0002** are ratified. **0003–0005** are draft placeholders so links stay valid until those decisions are finalized during implementation.
+**0001–0004** are ratified. **0005** remains a draft until dependency deploy sequencing is implemented.
 
 ## Related docs
 
@@ -144,3 +144,5 @@ Semver applies to monorepo packages **and** to serialized formats (`kaleido.arti
 - [`cli.md`](./cli.md)
 - [`config.md`](./config.md)
 - [`templates.md`](./templates.md)
+- [`errors.md`](./errors.md)
+- [`testing.md`](./testing.md)

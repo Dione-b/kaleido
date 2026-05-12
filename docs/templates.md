@@ -4,6 +4,36 @@ The MVP ships one template:
 
 - `react-vite-counter`
 
+Every template must include `kaleido.template.json`:
+
+```json
+{
+  "name": "react-vite-counter",
+  "version": "0.1.0",
+  "description": "Minimal Vite + React + Soroban counter dApp.",
+  "kaleido": {
+    "compatibleCore": "^0.1.0",
+    "templateVersion": 1
+  },
+  "frontend": {
+    "framework": "vite-react",
+    "packageManager": "npm"
+  },
+  "contracts": {
+    "path": "contracts",
+    "default": "counter"
+  },
+  "files": {
+    "config": "kaleido.config.ts",
+    "artifacts": "kaleido.artifacts.json"
+  }
+}
+```
+
+`compatibleCore` is checked against the current `@kaleido/core` version before files are copied. Missing manifests fail with `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`; invalid or incompatible manifests fail with `KALEIDO_TEMPLATE_INCOMPATIBLE`.
+
+Official templates are maintained in this repository. Community templates should be treated as executable source code: inspect the files before running install scripts or connecting wallets.
+
 Generated projects include:
 
 - `contracts/counter`

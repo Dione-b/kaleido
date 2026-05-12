@@ -8,6 +8,9 @@ Kaleido does **not** replace the Soroban SDK, Stellar SDK, or Stellar CLI. It **
 
 - **Stable CLI surface:** `init`, `build`, `deploy`, `generate`, `invoke` (plus `dev` as a placeholder until the opinionated dev server lands).
 - **Artifacts per network:** deployed `contractId`, WASM hash, and paths—no manual copy-paste into the frontend for the happy path.
+- **Template compatibility:** official templates ship a `kaleido.template.json` manifest and are checked against the current core version before copy.
+- **Stellar CLI parser hardening:** fragile CLI output parsing is isolated in `@kaleido/core` and covered by versioned fixtures.
+- **Public error codes:** failures expose documented `KALEIDO_*` codes that are safe for CI parsing.
 - **Official template:** `react-vite-counter` (Vite + React + Soroban counter contract).
 - **Security by default:** no private key storage, no telemetry in core; deploy/invoke use `--source` (Stellar CLI identity alias or public address only—secrets rejected).
 
@@ -19,7 +22,7 @@ Kaleido does **not** replace the Soroban SDK, Stellar SDK, or Stellar CLI. It **
 | [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), networks/contracts resolution, Stellar CLI orchestration (`execa` only here). |
 | [`packages/templates`](./packages/templates) | Templates copied by `kaleido init`. |
 
-Requirements: **Node 20+**, **pnpm 9+**, **Rust** + `wasm32-unknown-unknown`, **Stellar CLI**, and a local Stellar identity for deploy/invoke.
+Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for deploy/invoke.
 
 ## Quick start (contributors)
 
@@ -36,6 +39,14 @@ Run the CLI from source:
 ```bash
 pnpm --filter @kaleido/cli dev -- --help
 pnpm --filter @kaleido/cli dev init my-dapp
+```
+
+CI runs the same default checks:
+
+```bash
+pnpm typecheck
+pnpm build
+pnpm test
 ```
 
 ## Quick start (generated app)
@@ -58,6 +69,8 @@ Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address fo
 - **[Architecture & product stance](./docs/architecture.md)** — promise, boundaries, roadmap, ADR index.
 - **[Getting started](./docs/getting-started.md)** — prerequisites and commands.
 - **[CLI](./docs/cli.md)** · **[Config](./docs/config.md)** · **[Templates](./docs/templates.md)**
+- **[Errors](./docs/errors.md)** — public `KALEIDO_*` codes.
+- **[Testing](./docs/testing.md)** — fixture strategy and no-testnet default CI policy.
 
 ## Scripts
 
@@ -70,7 +83,7 @@ Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address fo
 
 ## Contributing
 
-Read [`docs/architecture.md`](./docs/architecture.md) and the ADRs under [`docs/adr/`](./docs/adr/) before large changes—especially anything that touches Stellar CLI parsing, artifact shape, or template contracts.
+Read [`docs/architecture.md`](./docs/architecture.md) and the ADRs under [`docs/adr/`](./docs/adr/) before large changes—especially anything that touches Stellar CLI parsing, public error codes, artifact shape, or template contracts.
 
 ## Repository
 

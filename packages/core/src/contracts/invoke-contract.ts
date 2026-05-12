@@ -1,6 +1,6 @@
 import { readArtifacts } from "../artifacts/read-artifacts.js";
 import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
@@ -26,7 +26,7 @@ export function parseInvokeTarget(target: string): InvokeTarget {
   if (!contractName || !method || extra) {
     throw new KaleidoError(
       `Invalid invoke target "${target}".`,
-      "INVOKE_TARGET_INVALID",
+      KaleidoErrorCode.INVOKE_TARGET_INVALID,
       "Use the format contract.method, for example counter.increment."
     );
   }
@@ -45,7 +45,7 @@ export async function invokeContract(options: InvokeContractOptions) {
   if (!contractArtifact) {
     throw new KaleidoError(
       `No deployed artifact found for "${target.contractName}" on "${network.name}".`,
-      "CONTRACT_ARTIFACT_NOT_FOUND",
+      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
       "Run kaleido deploy for this contract and network before invoking it."
     );
   }

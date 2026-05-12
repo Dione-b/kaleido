@@ -2,10 +2,10 @@ import { readArtifacts } from "../artifacts/read-artifacts.js";
 import { updateArtifact } from "../artifacts/update-artifact.js";
 import { writeArtifacts } from "../artifacts/write-artifacts.js";
 import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError } from "../errors/KaleidoError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
+import { parseContractId } from "../stellar-cli/parse-contract-id.js";
 import { assertSafeSourceAccount } from "./source-account.js";
 import { resolveContract } from "./resolve-contract.js";
 import { assertWasmExists, hashWasm } from "./wasm.js";
@@ -59,18 +59,4 @@ export async function deployContract(options: DeployContractOptions) {
     artifactsPath,
     output: result.all || result.stdout
   };
-}
-
-function parseContractId(output: string): string {
-  const match = output.match(/\bC[A-Z0-9]{55,}\b/);
-
-  if (!match) {
-    throw new KaleidoError(
-      "Stellar CLI did not return a contract ID.",
-      "CONTRACT_ID_NOT_FOUND",
-      "Check the Stellar CLI output and deployment status before retrying."
-    );
-  }
-
-  return match[0];
 }

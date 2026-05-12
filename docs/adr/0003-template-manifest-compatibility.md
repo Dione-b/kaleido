@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft (planned)
+Accepted
 
 ## Date
 
@@ -12,22 +12,26 @@ Draft (planned)
 
 Official and community templates need a **declared contract** against `@kaleido/core` / CLI versions. Without a manifest, `kaleido init` relies on implicit directory layout and human documentation, which drifts and breaks semver intent.
 
-## Decision (planned)
+## Decision
 
-Introduce **`kaleido.template.json`** (name TBD) on each template, including at minimum:
+Each template must include **`kaleido.template.json`**, including:
 
 - Template name and semver.
 - **`kaleido.compatibleCore`** (or equivalent) range for supported `@kaleido/core` versions.
 - Declared paths: contracts root, `kaleido.config.ts`, `kaleido.artifacts.json`, frontend kind (`vite-react`, etc.).
 
-`kaleido init` (or core) will **validate compatibility before copy** and fail with a clear error if unsupported.
+`kaleido init` validates compatibility before copy and fails with:
+
+- `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND` when the manifest is missing.
+- `KALEIDO_TEMPLATE_INCOMPATIBLE` when the manifest is invalid or incompatible with the current core version.
 
 ## Consequences
 
 - Enables CI matrix: template × core versions.
 - Requires release discipline: bump template when core breaks layout contract.
+- Makes template copy fail earlier, before partial project creation from an incompatible template.
 
 ## Related
 
 - [`architecture.md`](../architecture.md) — extensibility section.
-- Implementation ticket: validate manifest on `init` after this ADR is accepted.
+- [`templates.md`](../templates.md) — manifest schema and compatibility behavior.

@@ -1,7 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { KaleidoError } from "@kaleido/core";
+import { KaleidoError, KaleidoErrorCode } from "@kaleido/core";
 
 export async function resolveTemplateDir(templateName: string): Promise<string> {
   const envTemplatesDir = process.env.KALEIDO_TEMPLATES_DIR;
@@ -22,7 +22,7 @@ export async function resolveTemplateDir(templateName: string): Promise<string> 
 
   throw new KaleidoError(
     `Template "${templateName}" was not found.`,
-    "TEMPLATE_NOT_FOUND",
+    KaleidoErrorCode.TEMPLATE_NOT_FOUND,
     "Set KALEIDO_TEMPLATES_DIR or run from a Kaleido checkout that includes packages/templates."
   );
 }

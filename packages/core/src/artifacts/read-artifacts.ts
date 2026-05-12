@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { KaleidoArtifactsSchema, type KaleidoArtifacts } from "./artifact.schema.js";
 
 export async function readArtifacts(cwd = process.cwd()): Promise<KaleidoArtifacts> {
@@ -14,7 +14,7 @@ export async function readArtifacts(cwd = process.cwd()): Promise<KaleidoArtifac
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       throw new KaleidoError(
         "kaleido.artifacts.json was not found.",
-        "ARTIFACTS_NOT_FOUND",
+        KaleidoErrorCode.ARTIFACT_NOT_FOUND,
         "Run kaleido init, or create the artifacts file before deploying or generating bindings."
       );
     }
@@ -22,7 +22,7 @@ export async function readArtifacts(cwd = process.cwd()): Promise<KaleidoArtifac
     if (error instanceof SyntaxError || error instanceof z.ZodError) {
       throw new KaleidoError(
         "kaleido.artifacts.json is invalid.",
-        "ARTIFACTS_INVALID",
+        KaleidoErrorCode.ARTIFACT_INVALID,
         "Fix the JSON shape before running Kaleido commands."
       );
     }

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 export async function assertWasmExists(wasmPath: string): Promise<void> {
   try {
@@ -8,7 +8,7 @@ export async function assertWasmExists(wasmPath: string): Promise<void> {
   } catch {
     throw new KaleidoError(
       `WASM output was not found at ${wasmPath}.`,
-      "WASM_NOT_FOUND",
+      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
       "Run kaleido build before deploy or generate."
     );
   }

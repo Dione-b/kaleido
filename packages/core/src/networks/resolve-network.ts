@@ -1,4 +1,4 @@
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import type { KaleidoConfig, NetworkConfig } from "../config/config.schema.js";
 
 export type ResolvedNetwork = {
@@ -13,7 +13,7 @@ export function resolveNetwork(config: KaleidoConfig, networkName?: string): Res
   if (!network) {
     throw new KaleidoError(
       `Network "${name}" is not configured.`,
-      "NETWORK_NOT_FOUND",
+      KaleidoErrorCode.NETWORK_NOT_FOUND,
       `Add "${name}" to kaleido.config.ts networks, or pass a configured --network value.`
     );
   }

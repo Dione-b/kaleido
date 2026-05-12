@@ -1,7 +1,14 @@
 import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { z } from "zod";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
+import {
+  CURRENT_TEMPLATE_VERSION,
+  TemplateManifestSchema,
+  isCoreVersionCompatible,
+  type TemplateManifest
+} from "./template-manifest.schema.js";
 
 export type CreateProjectFromTemplateOptions = {
   projectName: string;
@@ -18,10 +25,12 @@ export async function createProjectFromTemplate(options: CreateProjectFromTempla
   } catch {
     throw new KaleidoError(
       `Template directory was not found: ${templateDir}`,
-      "TEMPLATE_NOT_FOUND",
+      KaleidoErrorCode.TEMPLATE_NOT_FOUND,
       "Use a bundled Kaleido template or set KALEIDO_TEMPLATES_DIR for local development."
     );
   }
+
+  const manifest = await readTemplateManifest(templateDir);
 
   await mkdir(targetDir, { recursive: true });
   await cp(templateDir, targetDir, {
@@ -33,7 +42,56 @@ export async function createProjectFromTemplate(options: CreateProjectFromTempla
   await replaceTemplateVariables(targetDir, options.projectName);
   await writeArtifacts(createInitialArtifacts(options.projectName), targetDir);
 
-  return { targetDir };
+  return { targetDir, template: manifest };
+}
+
+async function readTemplateManifest(templateDir: string): Promise<TemplateManifest> {
+  const manifestPath = path.join(templateDir, "kaleido.template.json");
+
+  try {
+    const rawManifest = await readFile(manifestPath, "utf8");
+    const manifest = TemplateManifestSchema.parse(JSON.parse(rawManifest));
+
+    if (manifest.kaleido.templateVersion !== CURRENT_TEMPLATE_VERSION) {
+      throw new KaleidoError(
+        `Template manifest version ${manifest.kaleido.templateVersion} is not supported.`,
+        KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
+        `Use a template with templateVersion ${CURRENT_TEMPLATE_VERSION}.`
+      );
+    }
+
+    if (!isCoreVersionCompatible(manifest.kaleido.compatibleCore)) {
+      throw new KaleidoError(
+        `Template "${manifest.name}" is not compatible with this Kaleido core version.`,
+        KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
+        `Template requires @kaleido/core ${manifest.kaleido.compatibleCore}.`
+      );
+    }
+
+    return manifest;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new KaleidoError(
+        "kaleido.template.json was not found.",
+        KaleidoErrorCode.TEMPLATE_MANIFEST_NOT_FOUND,
+        "Templates must declare compatibility before they can be copied."
+      );
+    }
+
+    if (error instanceof KaleidoError) {
+      throw error;
+    }
+
+    if (error instanceof SyntaxError || error instanceof z.ZodError) {
+      throw new KaleidoError(
+        "kaleido.template.json is invalid.",
+        KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
+        "Fix the template manifest schema before running kaleido init."
+      );
+    }
+
+    throw error;
+  }
 }
 
 async function replaceTemplateVariables(dir: string, projectName: string): Promise<void> {

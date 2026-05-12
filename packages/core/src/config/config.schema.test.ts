@@ -7,7 +7,7 @@ const minimalValid = {
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./target/wasm32-unknown-unknown/release/counter.wasm"
+      wasm: "./target/wasm32v1-none/release/counter.wasm"
     }
   },
   networks: {

@@ -11,7 +11,7 @@ export default defineConfig({
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./contracts/counter/target/wasm32-unknown-unknown/release/counter.wasm"
+      wasm: "./contracts/counter/target/wasm32v1-none/release/counter.wasm"
     }
   },
   networks: {
@@ -27,4 +27,20 @@ export default defineConfig({
 });
 ```
 
-Artifacts are network-scoped so `counter` can have different contract IDs on testnet and mainnet.
+## Artifacts
+
+Artifacts are network-scoped in schema `version: 1` so `counter` can have different contract IDs on testnet and mainnet. Environments are intentionally not modeled yet; a future artifact schema can distinguish `dev -> testnet`, `staging -> testnet`, and `production -> mainnet`.
+
+Current shape:
+
+```json
+{
+  "project": "my-dapp",
+  "version": 1,
+  "networks": {
+    "testnet": {
+      "contracts": {}
+    }
+  }
+}
+```

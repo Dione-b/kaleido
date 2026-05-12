@@ -2,7 +2,7 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { readArtifacts } from "../artifacts/read-artifacts.js";
 import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
@@ -23,7 +23,7 @@ export async function generateBindings(options: GenerateBindingsOptions) {
   if (!contractArtifact) {
     throw new KaleidoError(
       `No deployed artifact found for "${options.contractName}" on "${network.name}".`,
-      "CONTRACT_ARTIFACT_NOT_FOUND",
+      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
       "Run kaleido deploy for this contract and network before generating bindings."
     );
   }

@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { readArtifacts } from "./read-artifacts.js";
 import { createInitialArtifacts, writeArtifacts } from "./write-artifacts.js";
 
@@ -30,22 +31,22 @@ describe("writeArtifacts and readArtifacts", () => {
     expect(JSON.parse(raw).version).toBe(1);
   });
 
-  it("should_throw_ARTIFACTS_NOT_FOUND_when_file_missing", async () => {
+  it("should_throw_KALEIDO_ARTIFACT_NOT_FOUND_when_file_missing", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
     await expect(readArtifacts(tmpDir)).rejects.toMatchObject({
-      code: "ARTIFACTS_NOT_FOUND"
+      code: KaleidoErrorCode.ARTIFACT_NOT_FOUND
     });
   });
 
-  it("should_throw_ARTIFACTS_INVALID_when_json_malformed", async () => {
+  it("should_throw_KALEIDO_ARTIFACT_INVALID_when_json_malformed", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
     await writeFile(path.join(tmpDir, "kaleido.artifacts.json"), "{", "utf8");
     await expect(readArtifacts(tmpDir)).rejects.toMatchObject({
-      code: "ARTIFACTS_INVALID"
+      code: KaleidoErrorCode.ARTIFACT_INVALID
     });
   });
 
-  it("should_throw_ARTIFACTS_INVALID_when_shape_invalid", async () => {
+  it("should_throw_KALEIDO_ARTIFACT_INVALID_when_shape_invalid", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
     await writeFile(
       path.join(tmpDir, "kaleido.artifacts.json"),
@@ -53,7 +54,7 @@ describe("writeArtifacts and readArtifacts", () => {
       "utf8"
     );
     await expect(readArtifacts(tmpDir)).rejects.toMatchObject({
-      code: "ARTIFACTS_INVALID"
+      code: KaleidoErrorCode.ARTIFACT_INVALID
     });
   });
 });

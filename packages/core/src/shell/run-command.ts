@@ -1,5 +1,5 @@
 import { execa, type Options } from "execa";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 export type RunCommandResult = {
   stdout: string;
@@ -29,8 +29,9 @@ export async function runCommand(
     const output = typeof error === "object" && error && "all" in error ? String(error.all) : undefined;
     throw new KaleidoError(
       `Command failed: ${command} ${args.join(" ")}`,
-      "COMMAND_FAILED",
-      output || "Re-run the command with the underlying tool directly for full diagnostics."
+      KaleidoErrorCode.COMMAND_FAILED,
+      output || "Re-run the command with the underlying tool directly for full diagnostics.",
+      error
     );
   }
 }

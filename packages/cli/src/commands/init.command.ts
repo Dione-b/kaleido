@@ -15,7 +15,7 @@ export function registerInitCommand(program: Command): void {
       const templateDir = await resolveTemplateDir(options.template);
       const targetDir = path.resolve(process.cwd(), projectName);
 
-      await createProjectFromTemplate({
+      const result = await createProjectFromTemplate({
         projectName,
         targetDir,
         templateDir
@@ -24,7 +24,7 @@ export function registerInitCommand(program: Command): void {
       logger.success("Project created");
       logger.info("");
       logger.info(`Project: ${projectName}`);
-      logger.info(`Template: ${options.template}`);
+      logger.info(`Template: ${result.template.name}@${result.template.version}`);
       logger.info(`Path: ${targetDir}`);
       logger.info("");
       logger.info("Next steps:");
