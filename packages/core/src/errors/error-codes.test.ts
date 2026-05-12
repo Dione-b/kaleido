@@ -14,6 +14,14 @@ describe("KaleidoErrorCode", () => {
     expect(Object.values(KaleidoErrorCode).every((code) => code.startsWith("KALEIDO_"))).toBe(true);
   });
 
+  it("should_document_every_public_error_code", async () => {
+    const docsPath = path.resolve(coreSrcDir, "../../../docs/errors.md");
+    const docs = await readFile(docsPath, "utf8");
+    const missingCodes = Object.values(KaleidoErrorCode).filter((code) => !docs.includes(`\`${code}\``));
+
+    expect(missingCodes).toEqual([]);
+  });
+
   it("should_not_construct_public_errors_with_inline_unprefixed_codes", async () => {
     const files = [
       "artifacts/read-artifacts.ts",

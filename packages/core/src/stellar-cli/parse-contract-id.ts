@@ -1,9 +1,9 @@
 import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
-const CONTRACT_ID_PATTERN = /\bC[A-Z0-9]{55}\b/;
+const CONTRACT_ID_REGEX = /\bC[A-Z0-9]{55}\b/;
 
 export function parseContractId(output: string): string {
-  const match = output.match(CONTRACT_ID_PATTERN);
+  const match = output.match(CONTRACT_ID_REGEX);
 
   if (!match) {
     throw new KaleidoError(

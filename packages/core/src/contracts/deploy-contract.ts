@@ -40,7 +40,8 @@ export async function deployContract(options: DeployContractOptions) {
     network.config.networkPassphrase
   ], { cwd });
 
-  const contractId = parseContractId(result.stdout || result.all);
+  const output = result.all || `${result.stdout}\n${result.stderr}`;
+  const contractId = parseContractId(output);
   const artifacts = await readArtifacts(cwd);
   const wasmHash = await hashWasm(contract.wasmPath);
   const nextArtifacts = updateArtifact(artifacts, network.name, contract.name, {
@@ -57,6 +58,6 @@ export async function deployContract(options: DeployContractOptions) {
     network,
     contractId,
     artifactsPath,
-    output: result.all || result.stdout
+    output
   };
 }

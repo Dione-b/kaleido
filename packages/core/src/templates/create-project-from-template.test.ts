@@ -87,4 +87,37 @@ describe("createProjectFromTemplate", () => {
       code: KaleidoErrorCode.TEMPLATE_INCOMPATIBLE
     });
   });
+
+  it("should_fail_when_template_manifest_schema_is_invalid", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
+    const templateDir = path.join(tmpDir, "template");
+    await mkdir(templateDir);
+    await writeFile(path.join(templateDir, "kaleido.template.json"), JSON.stringify({
+      name: "",
+      version: "1.0.0"
+    }), "utf8");
+
+    await expect(createProjectFromTemplate({
+      projectName: "my-dapp",
+      targetDir: path.join(tmpDir, "my-dapp"),
+      templateDir
+    })).rejects.toMatchObject({
+      code: KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
+      message: "Template is not compatible with this Kaleido version."
+    });
+  });
+
+  it("should_include_client_dependencies_in_react_vite_counter_template", async () => {
+    const templatePackageJsonPath = path.resolve(
+      __dirname,
+      "../../../templates/react-vite-counter/package.json"
+    );
+    const packageJson = JSON.parse(await readFile(templatePackageJsonPath, "utf8")) as {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    };
+
+    expect(packageJson.dependencies?.["@kaleido/client"]).toBe("^0.1.0");
+    expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
+  });
 });
