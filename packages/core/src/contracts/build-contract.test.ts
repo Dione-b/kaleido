@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { KaleidoConfig } from "../config/config.schema.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -60,6 +61,54 @@ describe("buildContract", () => {
 
     expect(runCommand).toHaveBeenCalledWith("stellar", ["contract", "build"], {
       cwd: sourceDir
+    });
+  });
+
+  it("passes the untested Stellar CLI override into the preflight version check", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    const sourceDir = path.join(tmpDir, "contracts", "counter");
+    const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
+    await mkdir(sourceDir, { recursive: true });
+    await mkdir(path.dirname(wasmPath), { recursive: true });
+    await writeFile(wasmPath, Buffer.from([0x00, 0x61, 0x73, 0x6d]), "binary");
+
+    await buildContract({
+      config: baseConfig,
+      contractName: "counter",
+      cwd: tmpDir,
+      allowUntestedStellarCli: true
+    });
+
+    expect(runCommand).toHaveBeenCalledWith("stellar", ["--version"], {
+      allowUntestedStellarCli: true
+    });
+    expect(runCommand).toHaveBeenCalledWith("stellar", ["contract", "build"], {
+      cwd: sourceDir,
+      allowUntestedStellarCli: true
+    });
+  });
+
+  it("does not mask Stellar CLI version errors from the preflight check", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    const sourceDir = path.join(tmpDir, "contracts", "counter");
+    await mkdir(sourceDir, { recursive: true });
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "--version") {
+        throw new KaleidoError(
+          "Stellar CLI 99.0.0 is newer than the tested maximum.",
+          KaleidoErrorCode.UNTESTED_CLI_VERSION
+        );
+      }
+
+      return { stdout: "ok", stderr: "", all: "ok" };
+    });
+
+    await expect(buildContract({
+      config: baseConfig,
+      contractName: "counter",
+      cwd: tmpDir
+    })).rejects.toMatchObject({
+      code: KaleidoErrorCode.UNTESTED_CLI_VERSION
     });
   });
 });

@@ -12,6 +12,7 @@ export type GenerateBindingsOptions = {
   contractName: string;
   networkName?: string;
   cwd?: string;
+  allowUntestedStellarCli?: boolean;
 };
 
 export async function generateBindings(options: GenerateBindingsOptions) {
@@ -28,7 +29,9 @@ export async function generateBindings(options: GenerateBindingsOptions) {
     );
   }
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido generate.");
+  await checkBinary("stellar", "Install Stellar CLI before running kaleido generate.", {
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
 
   const outputDir = path.resolve(cwd, options.config.frontend.bindingsOutput, options.contractName);
   await mkdir(outputDir, { recursive: true });
@@ -46,7 +49,10 @@ export async function generateBindings(options: GenerateBindingsOptions) {
     network.config.rpcUrl,
     "--network-passphrase",
     network.config.networkPassphrase
-  ], { cwd });
+  ], {
+    cwd,
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
 
   return {
     contractName: options.contractName,

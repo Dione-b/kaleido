@@ -8,9 +8,14 @@ export function registerBuildCommand(program: Command): void {
     .command("build")
     .description("Build a configured Soroban contract")
     .argument("[contract]", "Contract name", "counter")
-    .action((contractName: string) => runCliAction(async () => {
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+    .action((contractName: string, options: { allowUntestedStellarCli?: boolean }) => runCliAction(async () => {
       const config = await loadConfig();
-      const result = await buildContract({ config, contractName });
+      const result = await buildContract({
+        config,
+        contractName,
+        allowUntestedStellarCli: options.allowUntestedStellarCli === true
+      });
 
       logger.success("Contract built");
       logger.info("");

@@ -18,6 +18,7 @@ export type InvokeContractOptions = {
   networkName?: string;
   source?: string;
   cwd?: string;
+  allowUntestedStellarCli?: boolean;
 };
 
 export function parseInvokeTarget(target: string): InvokeTarget {
@@ -50,7 +51,9 @@ export async function invokeContract(options: InvokeContractOptions) {
     );
   }
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido invoke.");
+  await checkBinary("stellar", "Install Stellar CLI before running kaleido invoke.", {
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
 
   const result = await runCommand("stellar", [
     "contract",
@@ -66,7 +69,10 @@ export async function invokeContract(options: InvokeContractOptions) {
     "--",
     target.method,
     ...(options.args ?? [])
-  ], { cwd });
+  ], {
+    cwd,
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
 
   return {
     target,

@@ -10,13 +10,19 @@ export function registerDeployCommand(program: Command): void {
     .argument("<contract>", "Contract name")
     .option("-n, --network <network>", "Configured network name")
     .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
-    .action((contractName: string, options: { network?: string; source: string }) => runCliAction(async () => {
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+    .action((contractName: string, options: {
+      network?: string;
+      source: string;
+      allowUntestedStellarCli?: boolean;
+    }) => runCliAction(async () => {
       const config = await loadConfig();
       const result = await deployContract({
         config,
         contractName,
         networkName: options.network,
-        source: options.source
+        source: options.source,
+        allowUntestedStellarCli: options.allowUntestedStellarCli === true
       });
 
       logger.success("Contract deployed");

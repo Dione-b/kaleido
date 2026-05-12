@@ -8,6 +8,7 @@ export type BuildContractOptions = {
   config: KaleidoConfig;
   contractName: string;
   cwd?: string;
+  allowUntestedStellarCli?: boolean;
 };
 
 export async function buildContract(options: BuildContractOptions) {
@@ -15,10 +16,13 @@ export async function buildContract(options: BuildContractOptions) {
   const contract = resolveContract(options.config, options.contractName, cwd);
 
   await checkBinary("rustc", "Install Rust before running kaleido build.");
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido build.");
+  await checkBinary("stellar", "Install Stellar CLI before running kaleido build.", {
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
 
   const result = await runCommand("stellar", ["contract", "build"], {
-    cwd: contract.sourcePath
+    cwd: contract.sourcePath,
+    allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
   await assertWasmExists(contract.wasmPath);

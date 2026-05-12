@@ -16,6 +16,7 @@ export type DeployContractOptions = {
   networkName?: string;
   source?: string;
   cwd?: string;
+  allowUntestedStellarCli?: boolean;
 };
 
 export async function deployContract(options: DeployContractOptions) {
@@ -24,7 +25,9 @@ export async function deployContract(options: DeployContractOptions) {
   const network = resolveNetwork(options.config, options.networkName);
   const source = assertSafeSourceAccount(options.source);
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido deploy.");
+  await checkBinary("stellar", "Install Stellar CLI before running kaleido deploy.", {
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
   await assertWasmExists(contract.wasmPath);
 
   const result = await runCommand("stellar", [
@@ -38,7 +41,10 @@ export async function deployContract(options: DeployContractOptions) {
     network.config.rpcUrl,
     "--network-passphrase",
     network.config.networkPassphrase
-  ], { cwd });
+  ], {
+    cwd,
+    allowUntestedStellarCli: options.allowUntestedStellarCli
+  });
 
   const output = result.all || `${result.stdout}\n${result.stderr}`;
   const contractId = parseContractId(output);

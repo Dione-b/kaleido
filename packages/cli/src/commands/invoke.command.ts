@@ -11,16 +11,22 @@ export function registerInvokeCommand(program: Command): void {
     .argument("[args...]", "Arguments forwarded to Stellar CLI after the method name")
     .option("-n, --network <network>", "Configured network name")
     .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
     .allowUnknownOption(true)
     .allowExcessArguments(true)
-    .action((target: string, args: string[], options: { network?: string; source: string }) => runCliAction(async () => {
+    .action((target: string, args: string[], options: {
+      network?: string;
+      source: string;
+      allowUntestedStellarCli?: boolean;
+    }) => runCliAction(async () => {
       const config = await loadConfig();
       const result = await invokeContract({
         config,
         target,
         args,
         networkName: options.network,
-        source: options.source
+        source: options.source,
+        allowUntestedStellarCli: options.allowUntestedStellarCli === true
       });
 
       logger.success("Invoke complete");
