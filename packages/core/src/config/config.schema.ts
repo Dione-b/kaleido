@@ -1,0 +1,32 @@
+import { z } from "zod";
+
+export const ContractConfigSchema = z.object({
+  path: z.string().min(1),
+  wasm: z.string().min(1)
+});
+
+export const NetworkConfigSchema = z.object({
+  rpcUrl: z.string().url(),
+  networkPassphrase: z.string().min(1)
+});
+
+export const KaleidoConfigSchema = z.object({
+  project: z.string().min(1),
+  defaultNetwork: z.string().min(1).default("testnet"),
+  contracts: z.record(z.string().min(1), ContractConfigSchema).refine(
+    (contracts) => Object.keys(contracts).length > 0,
+    "At least one contract must be configured."
+  ),
+  networks: z.record(z.string().min(1), NetworkConfigSchema).refine(
+    (networks) => Object.keys(networks).length > 0,
+    "At least one network must be configured."
+  ),
+  frontend: z.object({
+    framework: z.enum(["vite-react", "next", "astro"]).default("vite-react"),
+    bindingsOutput: z.string().min(1)
+  })
+});
+
+export type KaleidoConfig = z.infer<typeof KaleidoConfigSchema>;
+export type ContractConfig = z.infer<typeof ContractConfigSchema>;
+export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;

@@ -1,0 +1,47 @@
+import { describe, expect, it } from "vitest";
+import type { KaleidoConfig } from "../config/config.schema.js";
+import { KaleidoError } from "../errors/KaleidoError.js";
+import { resolveNetwork } from "./resolve-network.js";
+
+const baseConfig: KaleidoConfig = {
+  project: "app",
+  defaultNetwork: "testnet",
+  contracts: {
+    counter: { path: "./c", wasm: "./w.wasm" }
+  },
+  networks: {
+    testnet: {
+      rpcUrl: "https://soroban-testnet.stellar.org",
+      networkPassphrase: "Test SDF Network ; September 2015"
+    },
+    mainnet: {
+      rpcUrl: "https://mainnet.sorobanrpc.com",
+      networkPassphrase: "Public Global Stellar Network ; September 2015"
+    }
+  },
+  frontend: { framework: "vite-react", bindingsOutput: "./out" }
+};
+
+describe("resolveNetwork", () => {
+  it("should_resolve_default_network_when_name_omitted", () => {
+    const r = resolveNetwork(baseConfig);
+    expect(r.name).toBe("testnet");
+    expect(r.config.rpcUrl).toContain("testnet");
+  });
+
+  it("should_resolve_explicit_network_when_configured", () => {
+    const r = resolveNetwork(baseConfig, "mainnet");
+    expect(r.name).toBe("mainnet");
+    expect(r.config.rpcUrl).toContain("mainnet");
+  });
+
+  it("should_throw_NETWORK_NOT_FOUND_when_name_missing", () => {
+    try {
+      resolveNetwork(baseConfig, "futurenet");
+      expect.fail("expected throw");
+    } catch (error) {
+      expect(error).toBeInstanceOf(KaleidoError);
+      expect((error as KaleidoError).code).toBe("NETWORK_NOT_FOUND");
+    }
+  });
+});

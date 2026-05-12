@@ -1,0 +1,114 @@
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { KaleidoConfig } from "../config/config.schema.js";
+import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
+import { KaleidoError } from "../errors/KaleidoError.js";
+
+const runCommand = vi.hoisted(() => vi.fn());
+
+vi.mock("../shell/run-command.js", () => ({
+  runCommand
+}));
+
+import { invokeContract, parseInvokeTarget } from "./invoke-contract.js";
+
+const CONTRACT_ID = `C${"3".repeat(55)}`;
+
+const baseConfig: KaleidoConfig = {
+  project: "app",
+  defaultNetwork: "testnet",
+  contracts: {
+    counter: {
+      path: "./contracts/counter",
+      wasm: "./rel/counter.wasm"
+    }
+  },
+  networks: {
+    testnet: {
+      rpcUrl: "https://soroban-testnet.stellar.org",
+      networkPassphrase: "Test SDF Network ; September 2015"
+    }
+  },
+  frontend: { framework: "vite-react", bindingsOutput: "./out" }
+};
+
+describe("parseInvokeTarget", () => {
+  it("parses contract.method targets", () => {
+    expect(parseInvokeTarget("counter.increment")).toEqual({
+      contractName: "counter",
+      method: "increment"
+    });
+  });
+
+  it("rejects invalid target shapes", () => {
+    expect(() => parseInvokeTarget("counter")).toThrow(KaleidoError);
+    expect(() => parseInvokeTarget("counter.increment.extra")).toThrow(KaleidoError);
+  });
+});
+
+describe("invokeContract", () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    runCommand.mockReset();
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "invoke") {
+        return { stdout: "42\n", stderr: "", all: "42\n" };
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+  });
+
+  afterEach(async () => {
+    if (tmpDir) {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it("should_forward_method_and_args_to_stellar_when_artifact_exists", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-invoke-"));
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "abc",
+          deployedAt: "2026-05-11T12:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm"
+        }
+      }
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    const result = await invokeContract({
+      config: baseConfig,
+      target: "counter.increment",
+      args: ["--arg1", "x"],
+      networkName: "testnet",
+      source: "alice",
+      cwd: tmpDir
+    });
+
+    expect(result.result).toContain("42");
+    expect(runCommand).toHaveBeenCalledWith(
+      "stellar",
+      expect.arrayContaining([
+        "contract",
+        "invoke",
+        "--id",
+        CONTRACT_ID,
+        "--source-account",
+        "alice",
+        "--",
+        "increment",
+        "--arg1",
+        "x"
+      ]),
+      { cwd: tmpDir }
+    );
+  });
+});

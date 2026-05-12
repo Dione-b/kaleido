@@ -1,0 +1,101 @@
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import { loadConfig } from "./load-config.js";
+
+describe("loadConfig", () => {
+  let tmpDir: string;
+
+  afterEach(async () => {
+    if (tmpDir) {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it("should_throw_CONFIG_NOT_FOUND_when_config_missing", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    await expect(loadConfig({ cwd: tmpDir })).rejects.toMatchObject({
+      code: "CONFIG_NOT_FOUND"
+    });
+  });
+
+  it("should_load_and_validate_exported_default_config", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    const configPath = path.join(tmpDir, "kaleido.config.ts");
+    await writeFile(
+      configPath,
+      `export default {
+  project: "tmp-app",
+  defaultNetwork: "testnet",
+  contracts: {
+    counter: { path: "./contracts/counter", wasm: "./target/counter.wasm" }
+  },
+  networks: {
+    testnet: {
+      rpcUrl: "https://soroban-testnet.stellar.org",
+      networkPassphrase: "Test SDF Network ; September 2015"
+    }
+  },
+  frontend: { bindingsOutput: "./src/gen" }
+};
+`,
+      "utf8"
+    );
+
+    const config = await loadConfig({ cwd: tmpDir });
+    expect(config.project).toBe("tmp-app");
+    expect(config.contracts.counter.path).toBe("./contracts/counter");
+  });
+
+  it("should_throw_CONFIG_INVALID_when_zod_validation_fails", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    await writeFile(
+      path.join(tmpDir, "kaleido.config.ts"),
+      `export default { project: "" };
+`,
+      "utf8"
+    );
+
+    await expect(loadConfig({ cwd: tmpDir })).rejects.toMatchObject({
+      code: "CONFIG_INVALID"
+    });
+  });
+
+  it("should_resolve_custom_config_path_relative_to_cwd", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    await mkdir(path.join(tmpDir, "cfg"), { recursive: true });
+    await writeFile(
+      path.join(tmpDir, "cfg", "k.custom.ts"),
+      `export default {
+  project: "nested",
+  defaultNetwork: "testnet",
+  contracts: { c: { path: "./p", wasm: "./w.wasm" } },
+  networks: {
+    testnet: {
+      rpcUrl: "https://soroban-testnet.stellar.org",
+      networkPassphrase: "Test SDF Network ; September 2015"
+    }
+  },
+  frontend: { bindingsOutput: "./out" }
+};
+`,
+      "utf8"
+    );
+
+    const config = await loadConfig({ cwd: tmpDir, configPath: "cfg/k.custom.ts" });
+    expect(config.project).toBe("nested");
+  });
+
+  it("should_rethrow_non_zod_errors_from_loader", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    await writeFile(
+      path.join(tmpDir, "kaleido.config.ts"),
+      `throw new Error("syntax boom");
+`,
+      "utf8"
+    );
+
+    await expect(loadConfig({ cwd: tmpDir })).rejects.toThrow("syntax boom");
+  });
+});

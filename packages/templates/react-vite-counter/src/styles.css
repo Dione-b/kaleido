@@ -1,0 +1,155 @@
+:root {
+  color: #20232a;
+  background: #f4f2ec;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 16px;
+  background: #1d6154;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #174d44;
+}
+
+.app-shell {
+  width: min(960px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.topbar h1,
+.counter-panel h2 {
+  margin: 0;
+  color: #16181d;
+  letter-spacing: 0;
+}
+
+.topbar h1 {
+  font-size: clamp(2rem, 8vw, 4rem);
+  line-height: 1;
+}
+
+.counter-panel h2 {
+  font-size: 1.35rem;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #697076;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wallet-button,
+.network-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #a9afb4;
+}
+
+.status-dot--on {
+  background: #66c887;
+}
+
+.counter-panel {
+  border: 1px solid #d9d5ca;
+  border-radius: 8px;
+  padding: clamp(20px, 5vw, 40px);
+  background: #fffdf7;
+  box-shadow: 0 18px 60px rgba(32, 35, 42, 0.08);
+}
+
+.counter-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.network-pill {
+  min-height: 32px;
+  border: 1px solid #d9d5ca;
+  border-radius: 999px;
+  padding: 0 12px;
+  color: #45515a;
+  font-weight: 700;
+}
+
+.counter-value {
+  margin: 48px 0;
+  color: #111318;
+  font-size: clamp(5rem, 24vw, 12rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.counter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.secondary-button {
+  border: 1px solid #d9d5ca;
+  background: #ffffff;
+  color: #20232a;
+}
+
+.secondary-button:hover {
+  background: #f4f2ec;
+}
+
+@media (max-width: 560px) {
+  .topbar,
+  .counter-panel__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .wallet-button,
+  .counter-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}
