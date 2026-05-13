@@ -1,8 +1,12 @@
 import { z } from "zod";
 
+const DeployArgValueSchema = z.union([z.string(), z.number(), z.boolean()]);
+
 export const ContractConfigSchema = z.object({
   path: z.string().min(1),
-  wasm: z.string().min(1)
+  wasm: z.string().min(1),
+  dependsOn: z.array(z.string().min(1)).default([]),
+  deployArgs: z.record(z.string().min(1), DeployArgValueSchema).default({})
 });
 
 export const NetworkConfigSchema = z.object({

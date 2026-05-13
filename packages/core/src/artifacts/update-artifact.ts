@@ -4,15 +4,20 @@ export function updateArtifact(
   artifacts: KaleidoArtifacts,
   networkName: string,
   contractName: string,
-  contractArtifact: ContractArtifact
+  contractArtifact: ContractArtifact,
+  networkExtras?: { dependencyGraph?: Record<string, string[]> }
 ): KaleidoArtifacts {
+  const existingNetwork = artifacts.networks[networkName] ?? { contracts: {}, dependencyGraph: {} };
+
   return {
     ...artifacts,
     networks: {
       ...artifacts.networks,
       [networkName]: {
+        ...existingNetwork,
+        dependencyGraph: networkExtras?.dependencyGraph ?? existingNetwork.dependencyGraph ?? {},
         contracts: {
-          ...(artifacts.networks[networkName]?.contracts ?? {}),
+          ...existingNetwork.contracts,
           [contractName]: contractArtifact
         }
       }

@@ -1,8 +1,9 @@
 # Templates
 
-The MVP ships one template:
+The MVP ships official templates:
 
-- `react-vite-counter`
+- `react-vite-counter` — single Soroban counter dApp.
+- `marketplace-with-token` — **experimental** two-contract layout demonstrating `dependsOn` and `${contracts.token.contractId}` deploy args.
 
 Every template must include `kaleido.template.json`:
 

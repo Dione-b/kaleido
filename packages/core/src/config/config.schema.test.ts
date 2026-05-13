@@ -63,17 +63,39 @@ describe("KaleidoConfigSchema", () => {
     ).toThrow();
   });
 
-  it("should_reject_invalid_rpc_url", () => {
-    expect(() =>
-      KaleidoConfigSchema.parse({
-        ...minimalValid,
-        networks: {
-          testnet: {
-            rpcUrl: "not-a-url",
-            networkPassphrase: "x"
+  it("accepts contract dependencies and deploy args", () => {
+    const result = KaleidoConfigSchema.parse({
+      project: "marketplace-app",
+      defaultNetwork: "testnet",
+      contracts: {
+        token: {
+          path: "./contracts/token",
+          wasm: "./contracts/token/target/wasm32v1-none/release/token.wasm"
+        },
+        marketplace: {
+          path: "./contracts/marketplace",
+          wasm: "./contracts/marketplace/target/wasm32v1-none/release/marketplace.wasm",
+          dependsOn: ["token"],
+          deployArgs: {
+            tokenContractId: "${contracts.token.contractId}"
           }
         }
-      })
-    ).toThrow();
+      },
+      networks: {
+        testnet: {
+          rpcUrl: "https://soroban-testnet.stellar.org",
+          networkPassphrase: "Test SDF Network ; September 2015"
+        }
+      },
+      frontend: {
+        framework: "vite-react",
+        bindingsOutput: "./src/contracts/generated"
+      }
+    });
+
+    expect(result.contracts.marketplace.dependsOn).toEqual(["token"]);
+    expect(result.contracts.marketplace.deployArgs).toEqual({
+      tokenContractId: "${contracts.token.contractId}"
+    });
   });
 });

@@ -1,35 +1,51 @@
 import { Command } from "commander";
-import { deployContract, loadConfig } from "@kaleido/core";
+import { deployContractGraph, KaleidoError, KaleidoErrorCode, loadConfig } from "@kaleido/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
 export function registerDeployCommand(program: Command): void {
   program
     .command("deploy")
-    .description("Deploy a built Soroban contract")
-    .argument("<contract>", "Contract name")
+    .description("Deploy one or all configured Soroban contracts")
+    .argument("[contract]", "Contract name")
     .option("-n, --network <network>", "Configured network name")
     .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
+    .option("--force", "Redeploy contracts even if artifacts already contain contract IDs")
+    .option("--no-deps", "Do not deploy missing dependencies for a selected contract")
     .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
-    .action((contractName: string, options: {
+    .action((contractName: string | undefined, options: {
       network?: string;
       source: string;
+      force?: boolean;
+      deps?: boolean;
       allowUntestedStellarCli?: boolean;
     }) => runCliAction(async () => {
+      if (options.deps === false && !contractName) {
+        throw new KaleidoError(
+          "`--no-deps` requires a contract name.",
+          KaleidoErrorCode.INVALID_CONFIG,
+          "Select a single contract or omit `--no-deps` to deploy the full graph."
+        );
+      }
+
       const config = await loadConfig();
-      const result = await deployContract({
+      const result = await deployContractGraph({
         config,
         contractName,
         networkName: options.network,
         source: options.source,
+        includeDependencies: options.deps !== false,
+        force: options.force === true,
         allowUntestedStellarCli: options.allowUntestedStellarCli === true
       });
 
-      logger.success("Contract deployed");
+      logger.success("Deploy complete");
       logger.info("");
       logger.info(`Network: ${result.network.name}`);
-      logger.info(`Contract: ${result.contract.name}`);
-      logger.info(`Contract ID: ${result.contractId}`);
+      for (const contract of result.deployedContracts) {
+        logger.info(`Contract: ${contract.name}`);
+        logger.info(`Contract ID: ${contract.contractId}`);
+      }
       logger.info("Artifacts updated: kaleido.artifacts.json");
     }));
 }

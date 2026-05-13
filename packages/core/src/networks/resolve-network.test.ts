@@ -7,7 +7,7 @@ const baseConfig: KaleidoConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
-    counter: { path: "./c", wasm: "./w.wasm" }
+    counter: { path: "./c", wasm: "./w.wasm", dependsOn: [], deployArgs: {} }
   },
   networks: {
     testnet: {

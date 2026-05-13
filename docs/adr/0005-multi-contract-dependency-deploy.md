@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft (planned)
+Accepted
 
 ## Date
 
@@ -10,20 +10,22 @@ Draft (planned)
 
 ## Context
 
+Multi-contract deployment is the first Kaleido workflow that is materially more useful than ad-hoc package scripts. Dependents need upstream `contractId`s without unsafe shell interpolation or environment mutation.
+
 After single-contract MVP, Kaleido must prove **multi-contract** workflows: build and deploy order, dependency edges, binding generation for multiple contracts, and invocations that rely on more than one deployed ID.
 
-The **hard part is not topological sort** of deploys—it is **how** a dependent contract receives the **`contractId`** of its dependencies (env injection, generated config slice, CLI args to Stellar, or templated metadata) without turning Kaleido into a secret store or a second SDK.
+## Decision
 
-## Decision (planned)
+Kaleido core owns `dependsOn`, topological deploy order, and `${contracts.<contractName>.contractId}` placeholder resolution. The placeholder language is intentionally narrow and reads only from `kaleido.artifacts.json`.
 
-Accept **`dependsOn`** (or equivalent) in `kaleido.config.ts`. Core resolves **deploy order** via a DAG.
-
-**ContractId injection** for dependents must be designed explicitly in a follow-up revision of this ADR (options: Stellar CLI env, temporary generated `.env.kaleido`, manifest fragment consumed by contracts—each has trade-offs for security and reproducibility).
+Stellar CLI constructor arguments are passed after `--` using `--snake_case` flags derived from `deployArgs` keys.
 
 ## Consequences
 
-- Unblocks “token then marketplace” validation flow from the architecture doc.
-- Requires tests for cycle detection, missing artifacts, and partial deploy resume semantics (TBD).
+- Dependency deploy order is deterministic and testable.
+- Artifact schema version remains `1` because new fields are optional and backward-compatible.
+- Environment variables and shell interpolation are rejected for deploy arg placeholders.
+- The feature is experimental until at least one real multi-contract template is validated.
 
 ## Related
 

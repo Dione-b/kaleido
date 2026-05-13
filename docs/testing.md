@@ -2,6 +2,8 @@
 
 Default CI does not require testnet access, Freighter, or private keys. Tests use mocked command execution, mocked generated bindings, and checked-in Stellar CLI output fixtures.
 
+Live testnet smoke uses `KALEIDO_CI_IDENTITY_ALIAS` and `KALEIDO_CI_STELLAR_CONFIG_B64`. Kaleido receives only the identity alias through `--source`; secret material is restored into Stellar CLI config and deleted after the job.
+
 Stellar CLI fixtures live under:
 
 ```txt

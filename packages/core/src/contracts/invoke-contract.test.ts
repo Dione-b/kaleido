@@ -22,7 +22,9 @@ const baseConfig: KaleidoConfig = {
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./rel/counter.wasm"
+      wasm: "./rel/counter.wasm",
+      dependsOn: [],
+      deployArgs: {}
     }
   },
   networks: {
@@ -78,9 +80,12 @@ describe("invokeContract", () => {
           wasmHash: "abc",
           deployedAt: "2026-05-11T12:00:00.000Z",
           sourcePath: "./contracts/counter",
-          wasmPath: "./rel/counter.wasm"
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
         }
-      }
+      },
+      dependencyGraph: {}
     };
     await writeArtifacts(artifacts, tmpDir);
 

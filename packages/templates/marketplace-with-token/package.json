@@ -1,0 +1,17 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "kaleido:build": "kaleido build token && kaleido build marketplace",
+    "kaleido:deploy": "kaleido deploy --network testnet"
+  },
+  "dependencies": {
+    "@kaleido/core": "^0.1.0"
+  },
+  "devDependencies": {
+    "@kaleido/cli": "^0.1.0",
+    "typescript": "^5.7.2"
+  }
+}

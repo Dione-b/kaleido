@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - main
+      - developer
   pull_request:
 
 jobs:
@@ -37,3 +38,6 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Consumer isolation
+        run: pnpm test:consumer

@@ -8,15 +8,17 @@ export type RunCommandResult = {
   all: string;
 };
 
+export type RunCommandOptions = {
+  cwd?: string;
+  env?: NodeJS.ProcessEnv;
+  allowUntestedStellarCli?: boolean;
+  skipStellarVersionCheck?: boolean;
+};
+
 export async function runCommand(
   command: string,
   args: string[],
-  options: {
-    cwd?: string;
-    env?: NodeJS.ProcessEnv;
-    allowUntestedStellarCli?: boolean;
-    skipStellarVersionCheck?: boolean;
-  } = {}
+  options: RunCommandOptions = {}
 ): Promise<RunCommandResult> {
   try {
     if (command === "stellar" && !options.skipStellarVersionCheck) {

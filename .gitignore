@@ -1,5 +1,6 @@
 node_modules
 .worktrees
+packed
 dist
 .turbo
 *.log

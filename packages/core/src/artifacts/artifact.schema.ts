@@ -5,11 +5,14 @@ export const ContractArtifactSchema = z.object({
   wasmHash: z.string().min(1),
   deployedAt: z.string().datetime(),
   sourcePath: z.string().min(1),
-  wasmPath: z.string().min(1)
+  wasmPath: z.string().min(1),
+  dependencies: z.array(z.string().min(1)).default([]),
+  resolvedDeployArgs: z.record(z.string().min(1), z.union([z.string(), z.number(), z.boolean()])).default({})
 });
 
 export const NetworkArtifactsSchema = z.object({
-  contracts: z.record(z.string().min(1), ContractArtifactSchema).default({})
+  contracts: z.record(z.string().min(1), ContractArtifactSchema).default({}),
+  dependencyGraph: z.record(z.string().min(1), z.array(z.string().min(1))).default({})
 });
 
 export const KaleidoArtifactsSchema = z.object({

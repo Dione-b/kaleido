@@ -12,9 +12,9 @@ Creates a project from a bundled template and writes `kaleido.artifacts.json`.
 
 Builds the configured contract with `stellar contract build`.
 
-## `kaleido deploy <contract> --source <identity> [--network testnet]`
+## `kaleido deploy [contract] --source <identity> [--network testnet] [--force] [--no-deps]`
 
-Deploys a built WASM through Stellar CLI and records the contract ID under the selected network in `kaleido.artifacts.json`.
+Deploys one contract (or the full configured graph when `contract` is omitted) through Stellar CLI and records contract IDs per network in `kaleido.artifacts.json`. Dependencies deploy first when the selected contract lists `dependsOn`, unless `--no-deps` is passed (requires a single contract name). Use `--force` to redeploy when an artifact already stores a contract ID.
 
 ## `kaleido generate <contract> [--network testnet]`
 
@@ -30,7 +30,7 @@ Use `--allow-untested-stellar-cli` only for local experiments. CI and release wo
 
 - `--source` accepts a Stellar CLI identity alias or public account address, not a secret key.
 - `kaleido dev` is present as a placeholder, not a full dev server.
-- `kaleido doctor`, CLI XDR commands, `generate --interop`, and multi-contract dependency deploy are not part of the alpha CLI.
+- `kaleido doctor`, CLI XDR commands, and `kaleido generate --interop` are not implemented yet.
 
 ## Error codes
 

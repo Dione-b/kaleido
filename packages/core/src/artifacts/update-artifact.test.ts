@@ -15,9 +15,12 @@ describe("updateArtifact", () => {
               wasmHash: "main",
               deployedAt: "2026-05-11T00:00:00.000Z",
               sourcePath: "./contracts/counter",
-              wasmPath: "./target/main.wasm"
+              wasmPath: "./target/main.wasm",
+              dependencies: [],
+              resolvedDeployArgs: {}
             }
-          }
+          },
+          dependencyGraph: {}
         }
       }
     };
@@ -27,7 +30,9 @@ describe("updateArtifact", () => {
       wasmHash: "test",
       deployedAt: "2026-05-11T00:00:00.000Z",
       sourcePath: "./contracts/counter",
-      wasmPath: "./target/test.wasm"
+      wasmPath: "./target/test.wasm",
+      dependencies: [],
+      resolvedDeployArgs: {}
     });
 
     expect(updated.networks.mainnet.contracts.counter.contractId).toBe("CMAIN");

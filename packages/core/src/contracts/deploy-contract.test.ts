@@ -21,7 +21,9 @@ const baseConfig: KaleidoConfig = {
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./rel/counter.wasm"
+      wasm: "./rel/counter.wasm",
+      dependsOn: [],
+      deployArgs: {}
     }
   },
   networks: {

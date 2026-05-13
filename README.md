@@ -4,7 +4,7 @@
 
 Kaleido does **not** replace Stellar CLI, Stellar SDK, Soroban SDK, generated bindings, or wallet signing. It **orchestrates** them and adds conventions: `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, templates tuned for JS/TS teams, and a thin `@kaleido/client` layer for artifact lookup, wallet signing, and XDR visibility.
 
-Current release target: **internal `v0.1.0-alpha`**. It is intended for repository validation and template smoke tests, not npm publication yet.
+Current release target: **pre-v1** (`0.x` / `next`). Publication layout and CI gates are aligned with [v1 readiness](./docs/release/v1-readiness.md); `latest` remains intentionally strict.
 
 ## Features
 
@@ -18,15 +18,14 @@ Current release target: **internal `v0.1.0-alpha`**. It is intended for reposito
 - **Official template:** `react-vite-counter` (Vite + React + Soroban counter contract).
 - **Security by default:** no private key storage, no telemetry in core; deploy/invoke use `--source` (Stellar CLI identity alias or public address only—secrets rejected).
 
-## Not in alpha
+## Not in scope (yet)
 
-- npm package publication
 - `kaleido doctor`
 - CLI XDR commands
 - `kaleido generate --interop`
-- React hooks
-- multi-contract dependency deploy
-- live testnet CI
+- React hooks in `@kaleido/client`
+
+Experimental multi-contract deploy, Stellar CLI version gating, consumer isolation packaging checks, and live testnet smoke CI exist in-repo; tagging `v1.0.0` still follows [v1 readiness](./docs/release/v1-readiness.md).
 
 ## Monorepo
 
@@ -110,6 +109,8 @@ await client.contract("counter").invoke("increment");
 - **[CLI](./docs/cli.md)** · **[Client](./docs/client.md)** · **[Config](./docs/config.md)** · **[Templates](./docs/templates.md)**
 - **[Errors](./docs/errors.md)** — public `KALEIDO_*` codes.
 - **[Testing](./docs/testing.md)** — fixture strategy and no-testnet default CI policy.
+- **[Stellar CLI version contract](./docs/stellar-cli-version-contract.md)** — supported Stellar CLI range and override policy.
+- **[v1 readiness](./docs/release/v1-readiness.md)** — release gates before `v1.0.0`.
 - **[v0.1.0-alpha release notes](./docs/release/v0.1.0-alpha.md)** — internal alpha scope and verification gates.
 
 ## Scripts
@@ -119,6 +120,7 @@ await client.contract("counter").invoke("increment");
 | `pnpm build` | Turbo build for all packages. |
 | `pnpm test` | Turbo test (`@kaleido/core`, `@kaleido/client`, `@kaleido/cli`). |
 | `pnpm typecheck` | Typecheck across the workspace. |
+| `pnpm test:consumer` | Pack tarballs, install outside the monorepo, and smoke-import CLI and client. |
 | `pnpm dev` | Run `@kaleido/cli` in dev mode (`tsx`). |
 
 ## Contributing

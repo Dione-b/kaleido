@@ -107,6 +107,17 @@ describe("createProjectFromTemplate", () => {
     });
   });
 
+  it("ships marketplace-with-token as a multi-contract dependency template", async () => {
+    const templateRoot = path.resolve(__dirname, "../../../templates");
+    const templatePath = path.join(templateRoot, "marketplace-with-token");
+    const manifest = JSON.parse(await readFile(path.join(templatePath, "kaleido.template.json"), "utf8"));
+    const config = await readFile(path.join(templatePath, "kaleido.config.ts"), "utf8");
+
+    expect(manifest.name).toBe("marketplace-with-token");
+    expect(config).toContain("dependsOn: [\"token\"]");
+    expect(config).toContain("tokenContractId: \"${contracts.token.contractId}\"");
+  });
+
   it("should_include_client_dependencies_in_react_vite_counter_template", async () => {
     const templatePackageJsonPath = path.resolve(
       __dirname,

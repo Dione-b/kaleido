@@ -1,0 +1,21 @@
+{
+  "name": "marketplace-with-token",
+  "version": "0.1.0",
+  "description": "Experimental multi-contract Soroban template with token dependency injection.",
+  "kaleido": {
+    "compatibleCore": "^0.1.0",
+    "templateVersion": 1
+  },
+  "frontend": {
+    "framework": "vite-react",
+    "packageManager": "npm"
+  },
+  "contracts": {
+    "path": "contracts",
+    "default": "marketplace"
+  },
+  "files": {
+    "config": "kaleido.config.ts",
+    "artifacts": "kaleido.artifacts.json"
+  }
+}

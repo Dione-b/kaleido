@@ -1,11 +1,15 @@
+import path from "node:path";
 import { readArtifacts } from "../artifacts/read-artifacts.js";
 import { updateArtifact } from "../artifacts/update-artifact.js";
 import { writeArtifacts } from "../artifacts/write-artifacts.js";
 import type { KaleidoConfig } from "../config/config.schema.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
 import { parseContractId } from "../stellar-cli/parse-contract-id.js";
+import { buildDependencyGraph } from "./resolve-deploy-order.js";
+import { resolveDeployArgs, type DeployArgValue } from "./resolve-deploy-args.js";
 import { assertSafeSourceAccount } from "./source-account.js";
 import { resolveContract } from "./resolve-contract.js";
 import { assertWasmExists, hashWasm } from "./wasm.js";
@@ -17,7 +21,30 @@ export type DeployContractOptions = {
   source?: string;
   cwd?: string;
   allowUntestedStellarCli?: boolean;
+  force?: boolean;
+  resolvedDeployArgs?: Record<string, DeployArgValue>;
+  dependencies?: string[];
 };
+
+function toSnakeCaseFlag(key: string): string {
+  return key
+    .replace(/([A-Z])/g, "_$1")
+    .replace(/^_/, "")
+    .toLowerCase();
+}
+
+function formatConstructorCliArgs(resolved: Record<string, DeployArgValue>): string[] {
+  const entries = Object.entries(resolved);
+  if (entries.length === 0) {
+    return [];
+  }
+
+  const tail: string[] = ["--"];
+  for (const [key, value] of entries) {
+    tail.push(`--${toSnakeCaseFlag(key)}`, String(value));
+  }
+  return tail;
+}
 
 export async function deployContract(options: DeployContractOptions) {
   const cwd = options.cwd ?? process.cwd();
@@ -30,7 +57,48 @@ export async function deployContract(options: DeployContractOptions) {
   });
   await assertWasmExists(contract.wasmPath);
 
-  const result = await runCommand("stellar", [
+  const artifactsBefore = await readArtifacts(cwd);
+  const existing = artifactsBefore.networks[network.name]?.contracts[contract.name];
+  if (existing?.contractId && !options.force) {
+    return {
+      contract,
+      network,
+      contractId: existing.contractId,
+      artifactsPath: path.resolve(cwd, "kaleido.artifacts.json"),
+      output: "",
+      skipped: true as const
+    };
+  }
+
+  const rawDeployArgs = contract.config.deployArgs;
+  const hasConfiguredArgs = Object.keys(rawDeployArgs).length > 0;
+  let resolvedDeployArgs: Record<string, DeployArgValue>;
+
+  if (options.resolvedDeployArgs !== undefined) {
+    resolvedDeployArgs = options.resolvedDeployArgs;
+  } else if (hasConfiguredArgs) {
+    resolvedDeployArgs = resolveDeployArgs({
+      deployArgs: rawDeployArgs,
+      artifacts: artifactsBefore,
+      network: network.name
+    });
+  } else {
+    resolvedDeployArgs = {};
+  }
+
+  for (const value of Object.values(resolvedDeployArgs)) {
+    if (typeof value === "string" && value.includes("${")) {
+      throw new KaleidoError(
+        `Deploy args for "${contract.name}" still contain unresolved placeholders.`,
+        KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_UNRESOLVED,
+        "Deploy dependencies first or fix deployArgs templates."
+      );
+    }
+  }
+
+  const constructorArgs = formatConstructorCliArgs(resolvedDeployArgs);
+
+  const stellarArgs = [
     "contract",
     "deploy",
     "--wasm",
@@ -40,23 +108,36 @@ export async function deployContract(options: DeployContractOptions) {
     "--rpc-url",
     network.config.rpcUrl,
     "--network-passphrase",
-    network.config.networkPassphrase
-  ], {
+    network.config.networkPassphrase,
+    ...constructorArgs
+  ];
+
+  const result = await runCommand("stellar", stellarArgs, {
     cwd,
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
   const output = result.all || `${result.stdout}\n${result.stderr}`;
   const contractId = parseContractId(output);
-  const artifacts = await readArtifacts(cwd);
   const wasmHash = await hashWasm(contract.wasmPath);
-  const nextArtifacts = updateArtifact(artifacts, network.name, contract.name, {
-    contractId,
-    wasmHash,
-    deployedAt: new Date().toISOString(),
-    sourcePath: contract.config.path,
-    wasmPath: contract.config.wasm
-  });
+  const dependencyGraph = buildDependencyGraph(options.config.contracts);
+  const dependencies = options.dependencies ?? contract.config.dependsOn;
+
+  const nextArtifacts = updateArtifact(
+    artifactsBefore,
+    network.name,
+    contract.name,
+    {
+      contractId,
+      wasmHash,
+      deployedAt: new Date().toISOString(),
+      sourcePath: contract.config.path,
+      wasmPath: contract.config.wasm,
+      dependencies,
+      resolvedDeployArgs
+    },
+    { dependencyGraph }
+  );
   const artifactsPath = await writeArtifacts(nextArtifacts, cwd);
 
   return {
@@ -64,6 +145,7 @@ export async function deployContract(options: DeployContractOptions) {
     network,
     contractId,
     artifactsPath,
-    output
+    output,
+    skipped: false as const
   };
 }

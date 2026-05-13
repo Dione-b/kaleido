@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { KaleidoArtifactsSchema } from "./artifact.schema.js";
 import { readArtifacts } from "./read-artifacts.js";
 import { createInitialArtifacts, writeArtifacts } from "./write-artifacts.js";
 
@@ -18,7 +19,7 @@ describe("writeArtifacts and readArtifacts", () => {
   it("should_roundtrip_valid_artifacts_json", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
     const initial = createInitialArtifacts("app");
-    initial.networks.testnet = { contracts: {} };
+    initial.networks.testnet = { contracts: {}, dependencyGraph: {} };
 
     await writeArtifacts(initial, tmpDir);
     const loaded = await readArtifacts(tmpDir);
@@ -46,15 +47,41 @@ describe("writeArtifacts and readArtifacts", () => {
     });
   });
 
-  it("should_throw_KALEIDO_ARTIFACT_INVALID_when_shape_invalid", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
-    await writeFile(
-      path.join(tmpDir, "kaleido.artifacts.json"),
-      JSON.stringify({ project: "x", version: 2, networks: {} }),
-      "utf8"
-    );
-    await expect(readArtifacts(tmpDir)).rejects.toMatchObject({
-      code: KaleidoErrorCode.ARTIFACT_INVALID
+  it("accepts dependency metadata in version 1 artifacts", () => {
+    const artifacts = KaleidoArtifactsSchema.parse({
+      project: "marketplace-app",
+      version: 1,
+      networks: {
+        testnet: {
+          contracts: {
+            token: {
+              contractId: "C".padEnd(56, "A"),
+              wasmHash: "hash-token",
+              deployedAt: "2026-05-12T00:00:00.000Z",
+              sourcePath: "./contracts/token",
+              wasmPath: "./contracts/token.wasm",
+              dependencies: []
+            },
+            marketplace: {
+              contractId: "C".padEnd(56, "B"),
+              wasmHash: "hash-marketplace",
+              deployedAt: "2026-05-12T00:00:00.000Z",
+              sourcePath: "./contracts/marketplace",
+              wasmPath: "./contracts/marketplace.wasm",
+              dependencies: ["token"],
+              resolvedDeployArgs: {
+                tokenContractId: "C".padEnd(56, "A")
+              }
+            }
+          },
+          dependencyGraph: {
+            token: [],
+            marketplace: ["token"]
+          }
+        }
+      }
     });
+
+    expect(artifacts.networks.testnet.dependencyGraph?.marketplace).toEqual(["token"]);
   });
 });
