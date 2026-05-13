@@ -16,8 +16,27 @@ export async function buildXdr(input: {
   try {
     const transaction = input.transaction as XdrTransactionLike;
     const unsignedXdr = readXdr(transaction);
-    const preparedTransaction =
-      typeof transaction.prepare === "function" ? await transaction.prepare() : transaction;
+
+    let preparedTransaction: unknown;
+    if (typeof transaction.prepare === "function") {
+      try {
+        preparedTransaction = await transaction.prepare();
+      } catch (error) {
+        if (error instanceof KaleidoError) {
+          throw error;
+        }
+
+        throw new KaleidoError(
+          `Failed to prepare XDR for "${input.contractName}.${input.method}".`,
+          KaleidoErrorCode.XDR_PREPARE_FAILED,
+          "Check RPC connectivity, simulation errors, and binding compatibility.",
+          error
+        );
+      }
+    } else {
+      preparedTransaction = transaction;
+    }
+
     const preparedXdr = readXdr(preparedTransaction);
 
     return {

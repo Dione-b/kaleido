@@ -103,7 +103,22 @@ export class KaleidoContractClient {
       contract: this.contractName,
       explicitContractId: this.registration.contractId
     });
-    const publicKey = await this.config.wallet.getPublicKey();
+
+    let publicKey: string;
+    try {
+      publicKey = await this.config.wallet.getPublicKey();
+    } catch (error) {
+      if (error instanceof KaleidoError) {
+        throw error;
+      }
+
+      throw new KaleidoError(
+        `Wallet is not connected or the public key is unavailable for "${this.contractName}".`,
+        KaleidoErrorCode.WALLET_NOT_CONNECTED,
+        "Connect the wallet and grant account access, then retry.",
+        error
+      );
+    }
     const client = this.bindingAdapter.createClient({
       contractId,
       publicKey,
@@ -169,8 +184,14 @@ async function submitTransaction(
   }
 
   try {
-    return await submit.call(transaction, { signedXdr });
+    const raw = await submit.call(transaction, { signedXdr });
+    assertSubmitResultRecognized(raw, contractName, method);
+    return raw;
   } catch (error) {
+    if (error instanceof KaleidoError) {
+      throw error;
+    }
+
     throw new KaleidoError(
       `Failed to submit XDR for "${contractName}.${method}".`,
       KaleidoErrorCode.XDR_SUBMIT_FAILED,
@@ -178,6 +199,27 @@ async function submitTransaction(
       error
     );
   }
+}
+
+function assertSubmitResultRecognized(raw: unknown, contractName: string, method: string): void {
+  if (raw === null || typeof raw !== "object") {
+    return;
+  }
+
+  const record = raw as Record<string, unknown>;
+  const hasTransactionId =
+    "txHash" in record || "transactionHash" in record || "hash" in record;
+  const hasResult = "result" in record;
+
+  if (hasTransactionId || hasResult) {
+    return;
+  }
+
+  throw new KaleidoError(
+    `Submit returned an unrecognized payload for "${contractName}.${method}".`,
+    KaleidoErrorCode.XDR_RESULT_FAILED,
+    "Expected txHash, transactionHash, hash, or result on the submit response. Use debugRaw to inspect the binding output."
+  );
 }
 
 function normalizeSubmitResult<T>(raw: unknown): {
