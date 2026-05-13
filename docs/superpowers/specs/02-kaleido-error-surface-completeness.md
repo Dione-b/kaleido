@@ -2,7 +2,7 @@
 
 ## Status
 
-Required before v1.
+Implemented on `master` (error codes in `packages/core/src/errors/`, static tests, `docs/errors.md`, `docs/release/error-code-policy.md`). Implementation plan: `docs/superpowers/plans/2026-05-13-kaleido-error-surface-completeness.md`.
 
 ## Problem
 
