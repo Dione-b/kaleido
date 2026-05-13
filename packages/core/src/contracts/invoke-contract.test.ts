@@ -45,8 +45,12 @@ describe("parseInvokeTarget", () => {
   });
 
   it("rejects invalid target shapes", () => {
-    expect(() => parseInvokeTarget("counter")).toThrow(KaleidoError);
-    expect(() => parseInvokeTarget("counter.increment.extra")).toThrow(KaleidoError);
+    expect(() => parseInvokeTarget("counter")).toThrow(
+      expect.objectContaining({ code: KaleidoErrorCode.INVOKE_TARGET_INVALID })
+    );
+    expect(() => parseInvokeTarget("counter.increment.extra")).toThrow(
+      expect.objectContaining({ code: KaleidoErrorCode.INVOKE_TARGET_INVALID })
+    );
   });
 });
 
@@ -115,5 +119,47 @@ describe("invokeContract", () => {
       ]),
       { cwd: tmpDir, failureCode: KaleidoErrorCode.INVOKE_FAILED }
     );
+  });
+
+  it("should_map_stellar_invoke_failure_to_INVOKE_FAILED", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-invoke-fail-"));
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "abc",
+          deployedAt: "2026-05-11T12:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: {}
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "invoke") {
+        throw new KaleidoError(
+          "Command failed: stellar contract invoke",
+          KaleidoErrorCode.INVOKE_FAILED,
+          "stellar stderr here"
+        );
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    await expect(
+      invokeContract({
+        config: baseConfig,
+        target: "counter.increment",
+        networkName: "testnet",
+        source: "alice",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({ code: KaleidoErrorCode.INVOKE_FAILED });
   });
 });

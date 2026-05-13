@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido/core";
+import type { KaleidoClientConfig } from "../types.js";
 import { createKaleidoClient } from "./create-kaleido-client.js";
 
 const artifacts: KaleidoArtifacts = {
@@ -127,6 +128,77 @@ describe("createKaleidoClient", () => {
 
     await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
       code: KaleidoErrorCode.XDR_SIGN_FAILED
+    });
+  });
+
+  it("maps_binding_transaction_without_toXDR_to_XDR_BUILD_FAILED", async () => {
+    class ClientWithoutXdr {
+      increment() {
+        return {};
+      }
+    }
+
+    const base = createClientConfig();
+    const client = createKaleidoClient({
+      ...base,
+      contracts: {
+        counter: { binding: { Client: ClientWithoutXdr } }
+      }
+    } as KaleidoClientConfig);
+
+    await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
+      code: KaleidoErrorCode.XDR_BUILD_FAILED
+    });
+  });
+
+  it("maps_binding_transaction_without_submit_to_XDR_SUBMIT_FAILED", async () => {
+    class ClientWithoutSubmit {
+      increment() {
+        return {
+          toXDR() {
+            return "AAAA_UNSIGNED";
+          }
+        };
+      }
+    }
+
+    const base = createClientConfig();
+    const client = createKaleidoClient({
+      ...base,
+      contracts: {
+        counter: { binding: { Client: ClientWithoutSubmit } }
+      }
+    } as KaleidoClientConfig);
+
+    await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
+      code: KaleidoErrorCode.XDR_SUBMIT_FAILED
+    });
+  });
+
+  it("maps_submit_errors_to_XDR_SUBMIT_FAILED", async () => {
+    class ClientWithFailingSubmit {
+      increment() {
+        return {
+          toXDR() {
+            return "AAAA_UNSIGNED";
+          },
+          async signAndSend() {
+            throw new Error("rpc rejected");
+          }
+        };
+      }
+    }
+
+    const base = createClientConfig();
+    const client = createKaleidoClient({
+      ...base,
+      contracts: {
+        counter: { binding: { Client: ClientWithFailingSubmit } }
+      }
+    } as KaleidoClientConfig);
+
+    await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
+      code: KaleidoErrorCode.XDR_SUBMIT_FAILED
     });
   });
 });

@@ -1,10 +1,10 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { KaleidoConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -110,6 +110,84 @@ describe("generateBindings", () => {
         networkName: "testnet",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: "KALEIDO_ARTIFACT_NOT_FOUND" });
+    ).rejects.toMatchObject({ code: KaleidoErrorCode.ARTIFACT_NOT_FOUND });
+  });
+
+  it("should_propagate_BINDINGS_FAILED_when_stellar_bindings_command_fails", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-fail-"));
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "abc",
+          deployedAt: "2026-05-11T12:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: {}
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "bindings") {
+        throw new KaleidoError(
+          "Command failed: stellar contract bindings",
+          KaleidoErrorCode.BINDINGS_FAILED,
+          "bindings output"
+        );
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    await expect(
+      generateBindings({
+        config: baseConfig,
+        contractName: "counter",
+        networkName: "testnet",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({ code: KaleidoErrorCode.BINDINGS_FAILED });
+  });
+
+  it("should_propagate_KaleidoError_from_runCommand_unchanged", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-build-"));
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "abc",
+          deployedAt: "2026-05-11T12:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: {}
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "bindings") {
+        throw new KaleidoError("cargo failed", KaleidoErrorCode.BUILD_FAILED, "rustc output");
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    await expect(
+      generateBindings({
+        config: baseConfig,
+        contractName: "counter",
+        networkName: "testnet",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({ code: KaleidoErrorCode.BUILD_FAILED });
   });
 });
