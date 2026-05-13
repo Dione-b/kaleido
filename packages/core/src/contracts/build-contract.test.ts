@@ -62,7 +62,8 @@ describe("buildContract", () => {
     });
 
     expect(runCommand).toHaveBeenCalledWith("stellar", ["contract", "build"], {
-      cwd: sourceDir
+      cwd: sourceDir,
+      failureCode: KaleidoErrorCode.BUILD_FAILED
     });
   });
 
@@ -86,7 +87,8 @@ describe("buildContract", () => {
     });
     expect(runCommand).toHaveBeenCalledWith("stellar", ["contract", "build"], {
       cwd: sourceDir,
-      allowUntestedStellarCli: true
+      allowUntestedStellarCli: true,
+      failureCode: KaleidoErrorCode.BUILD_FAILED
     });
   });
 

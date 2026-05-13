@@ -1,6 +1,7 @@
+import type { KaleidoConfig } from "../config/config.schema.js";
+import { KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
 import { resolveContract } from "./resolve-contract.js";
 import { assertWasmExists } from "./wasm.js";
 
@@ -22,7 +23,8 @@ export async function buildContract(options: BuildContractOptions) {
 
   const result = await runCommand("stellar", ["contract", "build"], {
     cwd: contract.sourcePath,
-    allowUntestedStellarCli: options.allowUntestedStellarCli
+    allowUntestedStellarCli: options.allowUntestedStellarCli,
+    failureCode: KaleidoErrorCode.BUILD_FAILED
   });
 
   await assertWasmExists(contract.wasmPath);

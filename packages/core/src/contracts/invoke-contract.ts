@@ -71,7 +71,8 @@ export async function invokeContract(options: InvokeContractOptions) {
     ...(options.args ?? [])
   ], {
     cwd,
-    allowUntestedStellarCli: options.allowUntestedStellarCli
+    allowUntestedStellarCli: options.allowUntestedStellarCli,
+    failureCode: KaleidoErrorCode.INVOKE_FAILED
   });
 
   return {

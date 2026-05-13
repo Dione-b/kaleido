@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { KaleidoConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -113,7 +113,7 @@ describe("invokeContract", () => {
         "--arg1",
         "x"
       ]),
-      { cwd: tmpDir }
+      { cwd: tmpDir, failureCode: KaleidoErrorCode.INVOKE_FAILED }
     );
   });
 });

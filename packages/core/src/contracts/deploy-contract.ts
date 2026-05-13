@@ -114,7 +114,8 @@ export async function deployContract(options: DeployContractOptions) {
 
   const result = await runCommand("stellar", stellarArgs, {
     cwd,
-    allowUntestedStellarCli: options.allowUntestedStellarCli
+    allowUntestedStellarCli: options.allowUntestedStellarCli,
+    failureCode: KaleidoErrorCode.DEPLOY_FAILED
   });
 
   const output = result.all || `${result.stdout}\n${result.stderr}`;

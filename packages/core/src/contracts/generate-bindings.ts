@@ -51,7 +51,8 @@ export async function generateBindings(options: GenerateBindingsOptions) {
     network.config.networkPassphrase
   ], {
     cwd,
-    allowUntestedStellarCli: options.allowUntestedStellarCli
+    allowUntestedStellarCli: options.allowUntestedStellarCli,
+    failureCode: KaleidoErrorCode.BINDINGS_FAILED
   });
 
   return {

@@ -1,5 +1,6 @@
 import { execa, type Options } from "execa";
 import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { KaleidoErrorCodeValue } from "../errors/KaleidoErrorCode.js";
 import { checkStellarCliVersion } from "../stellar-cli/check-stellar-cli-version.js";
 
 export type RunCommandResult = {
@@ -13,6 +14,7 @@ export type RunCommandOptions = {
   env?: NodeJS.ProcessEnv;
   allowUntestedStellarCli?: boolean;
   skipStellarVersionCheck?: boolean;
+  failureCode?: KaleidoErrorCodeValue;
 };
 
 export async function runCommand(
@@ -62,7 +64,7 @@ export async function runCommand(
     const output = typeof error === "object" && error && "all" in error ? String(error.all) : undefined;
     throw new KaleidoError(
       `Command failed: ${command} ${args.join(" ")}`,
-      KaleidoErrorCode.COMMAND_FAILED,
+      options.failureCode ?? KaleidoErrorCode.COMMAND_FAILED,
       output || "Re-run the command with the underlying tool directly for full diagnostics.",
       error
     );
