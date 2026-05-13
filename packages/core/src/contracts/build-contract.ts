@@ -1,5 +1,5 @@
 import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
 import { resolveContract } from "./resolve-contract.js";
@@ -12,6 +12,35 @@ export type BuildContractOptions = {
   allowUntestedStellarCli?: boolean;
 };
 
+const RUST_WASM_TARGET = "wasm32v1-none";
+
+const MISSING_WASM_TARGET_HINT_SUBSTRINGS = [
+  "not installed",
+  "not found",
+  "needs to be installed",
+  "add the",
+  "rustup target"
+] as const;
+
+export function isMissingRustWasmTargetError(error: unknown): boolean {
+  if (!(error instanceof KaleidoError)) {
+    return false;
+  }
+
+  const parts = [
+    error.message,
+    error.hint ?? "",
+    error.cause === undefined ? "" : String(error.cause)
+  ];
+  const haystack = parts.join("\n").toLowerCase();
+
+  if (!haystack.includes(RUST_WASM_TARGET)) {
+    return false;
+  }
+
+  return MISSING_WASM_TARGET_HINT_SUBSTRINGS.some(needle => haystack.includes(needle));
+}
+
 export async function buildContract(options: BuildContractOptions) {
   const cwd = options.cwd ?? process.cwd();
   const contract = resolveContract(options.config, options.contractName, cwd);
@@ -21,11 +50,28 @@ export async function buildContract(options: BuildContractOptions) {
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
-  const result = await runCommand("stellar", ["contract", "build"], {
-    cwd: contract.sourcePath,
-    allowUntestedStellarCli: options.allowUntestedStellarCli,
-    failureCode: KaleidoErrorCode.BUILD_FAILED
-  });
+  let result;
+  try {
+    result = await runCommand("stellar", ["contract", "build"], {
+      cwd: contract.sourcePath,
+      allowUntestedStellarCli: options.allowUntestedStellarCli,
+      failureCode: KaleidoErrorCode.BUILD_FAILED
+    });
+  } catch (error) {
+    if (
+      error instanceof KaleidoError &&
+      error.code === KaleidoErrorCode.BUILD_FAILED &&
+      isMissingRustWasmTargetError(error)
+    ) {
+      throw new KaleidoError(
+        `Required Rust wasm target "${RUST_WASM_TARGET}" is missing.`,
+        KaleidoErrorCode.RUST_TARGET_NOT_FOUND,
+        `Run \`rustup target add ${RUST_WASM_TARGET}\` and retry the build.`,
+        error
+      );
+    }
+    throw error;
+  }
 
   await assertWasmExists(contract.wasmPath);
 

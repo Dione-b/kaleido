@@ -92,6 +92,64 @@ describe("buildContract", () => {
     });
   });
 
+  it("should_throw_RUST_TARGET_NOT_FOUND_when_stellar_build_reports_missing_wasm32v1_none", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    const sourceDir = path.join(tmpDir, "contracts", "counter");
+    await mkdir(sourceDir, { recursive: true });
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "build") {
+        throw new KaleidoError(
+          "Command failed: stellar contract build",
+          KaleidoErrorCode.BUILD_FAILED,
+          "the wasm32v1-none target may not be installed",
+          new Error("error: the wasm32v1-none target is not installed. run `rustup target add wasm32v1-none`")
+        );
+      }
+
+      return { stdout: "ok", stderr: "", all: "ok" };
+    });
+
+    await expect(
+      buildContract({
+        config: baseConfig,
+        contractName: "counter",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({
+      code: KaleidoErrorCode.RUST_TARGET_NOT_FOUND
+    });
+  });
+
+  it("should_rethrow_BUILD_FAILED_when_stellar_build_failure_is_unrelated_to_missing_target", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    const sourceDir = path.join(tmpDir, "contracts", "counter");
+    await mkdir(sourceDir, { recursive: true });
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "build") {
+        throw new KaleidoError(
+          "Command failed: stellar contract build",
+          KaleidoErrorCode.BUILD_FAILED,
+          "compilation error: missing semicolon",
+          new Error("error: expected `;`")
+        );
+      }
+
+      return { stdout: "ok", stderr: "", all: "ok" };
+    });
+
+    await expect(
+      buildContract({
+        config: baseConfig,
+        contractName: "counter",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({
+      code: KaleidoErrorCode.BUILD_FAILED
+    });
+  });
+
   it("does not mask Stellar CLI version errors from the preflight check", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
