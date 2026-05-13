@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { KaleidoConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
+import { KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -101,5 +102,26 @@ describe("deployContract", () => {
     });
 
     expect(result.contractId).toBe(CONTRACT_ID);
+  });
+
+  it("should_throw_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED_when_resolved_args_still_contain_placeholders", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
+    await mkdir(path.dirname(wasmPath), { recursive: true });
+    await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
+    await writeArtifacts(createInitialArtifacts("app"), tmpDir);
+
+    await expect(
+      deployContract({
+        config: baseConfig,
+        contractName: "counter",
+        networkName: "testnet",
+        source: "alice",
+        cwd: tmpDir,
+        resolvedDeployArgs: { initArg: "${contracts.x}" }
+      })
+    ).rejects.toMatchObject({
+      code: KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_UNRESOLVED
+    });
   });
 });
