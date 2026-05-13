@@ -14,6 +14,15 @@ Runtime behavior:
 - Local override: pass `--allow-untested-stellar-cli`.
 - CI must not use the override.
 
+### Local override examples
+
+Run these only on a developer machine when you accept compatibility risk:
+
+- `kaleido build counter --allow-untested-stellar-cli`
+- `kaleido deploy counter -s <identity> --allow-untested-stellar-cli`
+- `kaleido generate counter --allow-untested-stellar-cli`
+- `kaleido invoke counter.increment -s <identity> --allow-untested-stellar-cli` (replace `<identity>` with your Stellar CLI identity alias or public account address)
+
 ## Upgrade Process
 
 1. Install the new Stellar CLI locally.
