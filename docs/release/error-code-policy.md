@@ -4,12 +4,16 @@
 
 ## Semver Rules
 
-- Adding a new `KALEIDO_*` code: minor change.
-- Removing a `KALEIDO_*` code: major change.
-- Renaming a `KALEIDO_*` code: major change.
-- Changing the meaning of a code: major change.
-- Changing message text only: patch change.
+- Adding a new KALEIDO_* code: minor change
+- Removing a KALEIDO_* code: major change
+- Renaming a KALEIDO_* code: major change
+- Changing the meaning of a code: major change
+- Changing message text only: patch change
 
 ## Required Fields
 
 Every documented code must include meaning, likely cause, suggested fix, CI handling recommendation, and semver stability.
+
+## CLI exit behavior
+
+The Kaleido CLI sets `process.exitCode = 1` on failure (including unhandled `program.parseAsync` rejections) and formats failures with `printError`: the `Error:` line uses stderr, while the blank line, `Code:`, and optional `Hint:` use the logger info channel (stdout in the stock CLI). Automation should parse process output for the `Code:` line and must not assume a synchronous `process.exit(1)` — the process may exit non-zero after the event loop drains while still printing the code.

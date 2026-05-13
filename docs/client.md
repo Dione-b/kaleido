@@ -184,7 +184,9 @@ Client failures use public `KALEIDO_*` codes. The most common are:
 - `KALEIDO_BINDING_METHOD_NOT_FOUND`
 - `KALEIDO_WALLET_NOT_CONNECTED`
 - `KALEIDO_XDR_BUILD_FAILED`
+- `KALEIDO_XDR_PREPARE_FAILED`
 - `KALEIDO_XDR_SIGN_FAILED`
 - `KALEIDO_XDR_SUBMIT_FAILED`
+- `KALEIDO_XDR_RESULT_FAILED`
 
 See [`errors.md`](./errors.md) for the full table.
