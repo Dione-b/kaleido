@@ -25,4 +25,15 @@ describe("publish package manifests", () => {
     const packageJson = JSON.parse(readFileSync(join(repoRoot, "packages/cli/package.json"), "utf8"));
     expect(packageJson.bin).toEqual({ kaleido: "./dist/index.js" });
   });
+
+  it("client exposes freighter subpath", () => {
+    const packageJson = JSON.parse(
+      readFileSync(join(repoRoot, "packages/client/package.json"), "utf8")
+    );
+    expect(packageJson.exports["./freighter"]).toEqual({
+      types: "./dist/freighter.d.ts",
+      import: "./dist/freighter.js",
+      require: "./dist/freighter.cjs"
+    });
+  });
 });
