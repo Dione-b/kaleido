@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { KaleidoConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -102,6 +102,35 @@ describe("deployContract", () => {
     });
 
     expect(result.contractId).toBe(CONTRACT_ID);
+  });
+
+  it("should_map_stellar_deploy_command_failures_to_DEPLOY_FAILED", async () => {
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "deploy") {
+        throw new KaleidoError(
+          "Command failed: stellar contract deploy",
+          KaleidoErrorCode.DEPLOY_FAILED,
+          "stellar stderr here"
+        );
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
+    await mkdir(path.dirname(wasmPath), { recursive: true });
+    await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
+    await writeArtifacts(createInitialArtifacts("app"), tmpDir);
+
+    await expect(
+      deployContract({
+        config: baseConfig,
+        contractName: "counter",
+        networkName: "testnet",
+        source: "alice",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({ code: KaleidoErrorCode.DEPLOY_FAILED });
   });
 
   it("should_throw_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED_when_resolved_args_still_contain_placeholders", async () => {

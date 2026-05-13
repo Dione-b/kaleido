@@ -62,6 +62,14 @@ function createClientConfig(overrides: Record<string, unknown> = {}) {
 }
 
 describe("createKaleidoClient", () => {
+  it("should_throw_CONTRACT_NOT_FOUND_when_contract_name_is_unregistered", () => {
+    const client = createKaleidoClient(createClientConfig());
+
+    expect(() => client.contract("unknown")).toThrowError(
+      expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_NOT_FOUND })
+    );
+  });
+
   it("invokes a binding method through wallet signing", async () => {
     const config = createClientConfig();
     const client = createKaleidoClient(config);
