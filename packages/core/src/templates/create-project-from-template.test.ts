@@ -88,6 +88,22 @@ describe("createProjectFromTemplate", () => {
     });
   });
 
+  it("should_fail_when_template_manifest_json_is_invalid", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
+    const templateDir = path.join(tmpDir, "template");
+    await mkdir(templateDir);
+    await writeFile(path.join(templateDir, "kaleido.template.json"), "{ not json", "utf8");
+
+    await expect(createProjectFromTemplate({
+      projectName: "my-dapp",
+      targetDir: path.join(tmpDir, "my-dapp"),
+      templateDir
+    })).rejects.toMatchObject({
+      code: KaleidoErrorCode.TEMPLATE_INVALID,
+      message: "Template manifest is invalid."
+    });
+  });
+
   it("should_fail_when_template_manifest_schema_is_invalid", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
     const templateDir = path.join(tmpDir, "template");
@@ -102,8 +118,8 @@ describe("createProjectFromTemplate", () => {
       targetDir: path.join(tmpDir, "my-dapp"),
       templateDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-      message: "Template is not compatible with this Kaleido version."
+      code: KaleidoErrorCode.TEMPLATE_INVALID,
+      message: "Template manifest is invalid."
     });
   });
 
