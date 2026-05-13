@@ -11,7 +11,8 @@
     "typecheck": "turbo typecheck",
     "changeset": "changeset",
     "pack:packages": "( cd packages/core && pnpm pack --pack-destination ../../packed ) && ( cd packages/client && pnpm pack --pack-destination ../../packed ) && ( cd packages/cli && pnpm pack --pack-destination ../../packed )",
-    "test:consumer": "bash scripts/consumer-isolation-test.sh"
+    "test:consumer": "bash scripts/consumer-isolation-test.sh",
+    "ci:snapshot-pack": "bash scripts/ci-snapshot-pack.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
