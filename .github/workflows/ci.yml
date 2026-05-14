@@ -39,5 +39,19 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Consumer isolation
+      - name: Snapshot pack and packed manifest scan
+        run: pnpm ci:snapshot-pack
+
+      - name: Publish dry-run
+        run: pnpm publish:dry-run
+
+      - name: Consumer isolation (reuse packed tarballs)
+        env:
+          SKIP_PACK: "1"
+          PACKED_DIR: ${{ github.workspace }}/packed
         run: pnpm test:consumer
+
+      - name: Client bundler consumers
+        env:
+          PACKED_DIR: ${{ github.workspace }}/packed
+        run: pnpm test:consumer:client-bundlers
