@@ -19,6 +19,7 @@ Kaleido gives JS/TS teams a **predictable workflow** for Soroban contracts: init
 It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather than replacing them, and layers on a few strong conventions: a typed `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, and a thin `@kaleido/client` that wires generated bindings, artifact lookup, and wallet signing in one place.
 
 > **Status:** Pre-v1 (`0.x` / `next`). The CLI surface is stable; see [v1 readiness](./docs/release/v1-readiness.md) for the remaining gates before `latest` is unfrozen.
+> See [v1 release spec](./docs/release/v1.0.0.md) for the public contract required before `latest`.
 
 ## Table of Contents
 
