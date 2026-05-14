@@ -9,7 +9,7 @@ function defaultRepoRoot(): string {
   return path.resolve(__dirname, "../../../..");
 }
 
-export function getRepoSourceRootDirs(repoRoot: string): string[] {
+function getRepoSourceRootDirs(repoRoot: string): string[] {
   return [
     path.join(repoRoot, "packages/cli/src"),
     path.join(repoRoot, "packages/core/src"),

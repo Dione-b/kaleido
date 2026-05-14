@@ -1,6 +1,6 @@
 import { KaleidoErrorCode, type KaleidoErrorCodeValue } from "./KaleidoErrorCode.js";
 
-export { KaleidoErrorCode, type KaleidoErrorCodeValue } from "./KaleidoErrorCode.js";
+export { KaleidoErrorCode } from "./KaleidoErrorCode.js";
 
 export class KaleidoError extends Error {
   constructor(

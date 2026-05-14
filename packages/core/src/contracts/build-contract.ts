@@ -22,7 +22,7 @@ const MISSING_WASM_TARGET_HINT_SUBSTRINGS = [
   "rustup target"
 ] as const;
 
-export function isMissingRustWasmTargetError(error: unknown): boolean {
+function isMissingRustWasmTargetError(error: unknown): boolean {
   if (!(error instanceof KaleidoError)) {
     return false;
   }
