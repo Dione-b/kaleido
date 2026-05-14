@@ -3,13 +3,21 @@
 ## Install
 
 ```bash
-pnpm add @kaleido/client @stellar/freighter-api
+pnpm add @kaleido/client
+```
+
+If you are using Freighter, add the optional adapter dependency:
+
+```bash
+pnpm add @stellar/freighter-api
 ```
 
 ```ts
 import { createKaleidoClient } from "@kaleido/client";
 import { freighterWalletAdapter } from "@kaleido/client/freighter";
 ```
+
+The `@kaleido/client/freighter` subpath is optional and only needed when you want the bundled Freighter adapter.
 
 ## What It Solves
 
@@ -24,13 +32,16 @@ It connects:
 
 ## Supported Surface
 
-Supported root exports:
+Supported runtime root exports:
 
 - `createKaleidoClient`
 - `resolveContractId`
 - `createDefaultBindingAdapter`
 - `KaleidoContractClient`
 - `buildXdr`
+
+Supported type-only root exports:
+
 - `KaleidoBindingAdapter`
 - `KaleidoClientConfig`
 - `KaleidoContractRegistration`
@@ -43,7 +54,7 @@ Supported root exports:
 
 Supported subpath export:
 
-- `@kaleido/client/freighter` -> `freighterWalletAdapter`
+- `@kaleido/client/freighter` -> `freighterWalletAdapter` (optional)
 
 Primary flow:
 

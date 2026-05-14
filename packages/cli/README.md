@@ -10,15 +10,17 @@ kaleido --help
 ## Requirements
 
 - Node.js `>=20`
-- A supported Stellar CLI version available on `PATH`
+- Stellar CLI `>=22.0.0` and `<=22.0.1` available on `PATH`; see [`docs/stellar-cli-version-contract.md`](../../docs/stellar-cli-version-contract.md)
 - A Kaleido project with `kaleido.config.ts` for project commands such as `build`, `deploy`, `generate`, and `invoke`
+
+If your local machine is on a newer Stellar CLI, `--allow-untested-stellar-cli` is the local-only escape hatch. CI and release workflows should stay on the supported range.
 
 ## Commands
 
 - `kaleido init <projectName>` creates a project from a bundled template and writes `kaleido.artifacts.json`
 - `kaleido build [contract]` builds one contract or the configured contract set through Stellar CLI
-- `kaleido deploy [contract] --source <identity> [--network testnet] [--force] [--no-deps]` deploys contracts and records contract IDs in `kaleido.artifacts.json`
-- `kaleido generate <contract> [--network testnet]` generates TypeScript bindings from a deployed contract ID
+- `kaleido deploy [contract] --source <identity> [--network <network>] [--force] [--no-deps]` deploys contracts and records contract IDs in `kaleido.artifacts.json`
+- `kaleido generate <contract> [--network <network>]` generates TypeScript bindings from a deployed contract ID
 - `kaleido invoke <contract.method> --source <identity> [args...]` invokes a deployed contract method through the configured workflow
 
 The supported CLI flow is `init -> build -> deploy -> generate -> invoke`.
@@ -26,6 +28,7 @@ The supported CLI flow is `init -> build -> deploy -> generate -> invoke`.
 ## Supported Inputs
 
 - `--source` accepts a Stellar CLI identity alias or public `G...` account address
+- `--network <network>` selects a configured network such as `testnet`
 - `invoke` expects a `<contract.method>` target and forwards extra args to the underlying Stellar contract invocation
 - `deploy --no-deps` is supported only when deploying a single named contract
 
