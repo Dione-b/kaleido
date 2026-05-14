@@ -24,7 +24,7 @@ Stellar CLI constructor arguments are passed after `--` using `--snake_case` fla
 
 - Dependency deploy order is deterministic and testable.
 - Artifact schema version remains `1` because new fields are optional and backward-compatible.
-- Environment variables and shell interpolation are rejected for deploy arg placeholders.
+- Environment variables, `${env.*}`, and `$(...)` shell interpolation are rejected for deploy arg placeholders: deploy args are data passed to Stellar CLI, not a second templating language; keeping resolution artifact-only avoids non-reproducible deploys.
 - The feature is experimental until at least one real multi-contract template is validated.
 
 ## Related
