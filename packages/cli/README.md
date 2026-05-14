@@ -10,7 +10,7 @@ kaleido --help
 ## Requirements
 
 - Node.js `>=20`
-- Stellar CLI `>=22.0.0` and `<=22.0.1` available on `PATH`; see [`docs/stellar-cli-version-contract.md`](../../docs/stellar-cli-version-contract.md)
+- Stellar CLI `>=22.0.0` and `<=22.0.1` available on `PATH`
 - A Kaleido project with `kaleido.config.ts` for project commands such as `build`, `deploy`, `generate`, and `invoke`
 
 If your local machine is on a newer Stellar CLI, `--allow-untested-stellar-cli` is the local-only escape hatch. CI and release workflows should stay on the supported range.
@@ -18,7 +18,7 @@ If your local machine is on a newer Stellar CLI, `--allow-untested-stellar-cli` 
 ## Commands
 
 - `kaleido init <projectName>` creates a project from a bundled template and writes `kaleido.artifacts.json`
-- `kaleido build [contract]` builds one contract or the configured contract set through Stellar CLI
+- `kaleido build [contract]` builds one configured contract through Stellar CLI and defaults to `counter` when omitted
 - `kaleido deploy [contract] --source <identity> [--network <network>] [--force] [--no-deps]` deploys contracts and records contract IDs in `kaleido.artifacts.json`
 - `kaleido generate <contract> [--network <network>]` generates TypeScript bindings from a deployed contract ID
 - `kaleido invoke <contract.method> --source <identity> [args...]` invokes a deployed contract method through the configured workflow

@@ -24,6 +24,10 @@ Reach for broader `@kaleido/core` APIs directly only when you are building advan
 
 ## Stability Posture
 
-Being published does not make every export a first-class end-user contract. The stable Kaleido consumer surfaces are the documented CLI workflow and documented `@kaleido/client` APIs.
+Being published does not make every export a first-class end-user contract. The stable consumer surfaces are:
+
+- the documented CLI workflow in `@kaleido/cli`
+- the documented `@kaleido/client` APIs
+- the narrow `@kaleido/core` config/template surface used by generated projects, including `defineConfig`
 
 Direct `@kaleido/core` usage should be treated as advanced integration with a narrower support posture than the CLI package.
