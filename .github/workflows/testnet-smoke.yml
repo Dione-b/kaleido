@@ -51,10 +51,25 @@ jobs:
         run: bash scripts/testnet-smoke.sh smoke-app
 
       - name: Smoke retry
-        if: steps.smoke1.outcome == 'failure'
+        id: smokeretry
+        if: steps.smoke1.outcome == 'failure' && steps.smoke1.outputs.transient == 'true'
         env:
           KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app-retry
+
+      - name: Smoke gate
+        if: always()
+        run: |
+          s1="${{ steps.smoke1.outcome }}"
+          tr="${{ steps.smoke1.outputs.transient }}"
+          sr="${{ steps.smokeretry.outcome }}"
+          if [[ "$s1" == "success" ]]; then
+            exit 0
+          fi
+          if [[ "$s1" == "failure" && "$tr" == "true" && "$sr" == "success" ]]; then
+            exit 0
+          fi
+          exit 1
 
       - name: Upload smoke artifacts
         if: always()
@@ -62,6 +77,7 @@ jobs:
         with:
           name: testnet-smoke-artifacts
           path: |
+            smoke-ci-out/
             smoke-app/kaleido.artifacts.json
             smoke-app-retry/kaleido.artifacts.json
           if-no-files-found: ignore
