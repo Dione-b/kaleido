@@ -1,87 +1,86 @@
-# Kaleido
+<div align="center">
 
-**Kaleido** is an alpha developer toolkit for building dApps on **Stellar / Soroban**. It keeps a **predictable workflow**—create a project, build contracts, deploy, generate TypeScript bindings, invoke, and wire a browser client—while isolating Stellar CLI details inside [`@kaleido/core`](./packages/core).
+<h1>Kaleido</h1>
 
-Kaleido does **not** replace Stellar CLI, Stellar SDK, Soroban SDK, generated bindings, or wallet signing. It **orchestrates** them and adds conventions: `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, templates tuned for JS/TS teams, and a thin `@kaleido/client` layer for artifact lookup, wallet signing, and XDR visibility.
+<p>Developer toolkit for building dApps on <strong>Stellar / Soroban</strong>.</p>
 
-Current release target: **pre-v1** (`0.x` / `next`). Publication layout and CI gates are aligned with [v1 readiness](./docs/release/v1-readiness.md); `latest` remains intentionally strict.
+[![CI](https://img.shields.io/github/actions/workflow/status/Dione-b/kaleido/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Dione-b/kaleido/actions)
+[![npm](https://img.shields.io/npm/v/@kaleido/cli?label=%40kaleido%2Fcli)](https://www.npmjs.com/package/@kaleido/cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+[![pnpm 9+](https://img.shields.io/badge/pnpm-%3E%3D9-orange)](https://pnpm.io)
 
-## Features
+</div>
 
-- **Stable CLI surface:** `init`, `build`, `deploy`, `generate`, `invoke` (plus `dev` as a placeholder until the opinionated dev server lands).
-- **Artifacts per network:** deployed `contractId`, WASM hash, and paths—no manual copy-paste into the frontend for the happy path.
-- **Client interop:** `@kaleido/client` connects generated bindings, artifacts, network config, and wallet adapters without manually serializing SCVal or storing private keys.
-- **XDR observability:** `buildXdr()` and explicit `debugXdr` expose unsigned/prepared/signed XDR only when requested.
-- **Template compatibility:** official templates ship a `kaleido.template.json` manifest and are checked against the current core version before copy.
-- **Stellar CLI parser hardening:** fragile CLI output parsing is isolated in `@kaleido/core` and covered by versioned fixtures.
-- **Public error codes:** failures expose documented `KALEIDO_*` codes that are safe for CI parsing.
-- **Official template:** `react-vite-counter` (Vite + React + Soroban counter contract).
-- **Security by default:** no private key storage, no telemetry in core; deploy/invoke use `--source` (Stellar CLI identity alias or public address only—secrets rejected).
+---
 
-## Not in scope (yet)
+Kaleido gives JS/TS teams a **predictable workflow** for Soroban contracts: init, build, deploy, generate TypeScript bindings, invoke — without copy-pasting contract IDs or manually serializing SCVal.
 
-- `kaleido doctor`
-- CLI XDR commands
-- `kaleido generate --interop`
-- React hooks in `@kaleido/client`
+It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather than replacing them, and layers on a few strong conventions: a typed `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, and a thin `@kaleido/client` that wires generated bindings, artifact lookup, and wallet signing in one place.
 
-Experimental multi-contract deploy, Stellar CLI version gating, consumer isolation packaging checks, and live testnet smoke CI exist in-repo; tagging `v1.0.0` still follows [v1 readiness](./docs/release/v1-readiness.md).
+> **Status:** Pre-v1 (`0.x` / `next`). The CLI surface is stable; see [v1 readiness](./docs/release/v1-readiness.md) for the remaining gates before `latest` is unfrozen.
 
-## Monorepo
+## Table of Contents
 
-| Package | Role |
-|---------|------|
-| [`@kaleido/cli`](./packages/cli) | Argument parsing, terminal output, delegates to core. |
-| [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), networks/contracts resolution, Stellar CLI orchestration (`execa` only here). |
-| [`@kaleido/client`](./packages/client) | Thin browser/client interop layer for generated bindings, artifacts, XDR visibility, and wallet signing. |
-| [`packages/templates`](./packages/templates) | Templates copied by `kaleido init`. |
+- [Why Kaleido](#why-kaleido)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Browser Client](#browser-client)
+- [Packages](#packages)
+- [CLI Reference](#cli-reference)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
-Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84.0+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for CLI deploy/invoke.
+## Why Kaleido
 
-## Quick start (contributors)
+| Without Kaleido | With Kaleido |
+|---|---|
+| Manually copy `contractId` into your frontend | `kaleido deploy` writes it to `kaleido.artifacts.json` automatically |
+| Hand-serialize SCVal for every invocation | `@kaleido/client` handles it via generated bindings |
+| Scatter Stellar CLI flags across scripts | Single config in `kaleido.config.ts` |
+| Debug opaque CLI output by hand | Fragile parsing isolated in `@kaleido/core`, covered by versioned fixtures |
+| XDR is a black box | `buildXdr()` / `debugXdr` expose unsigned, prepared, and signed XDR on demand |
 
-From the repository root:
+**Non-goals:** Kaleido does not store private keys, ship telemetry, or replace Stellar's own tooling. `--source` accepts an identity alias or a public `G…` address — secret keys and seed phrases are refused.
+
+## Requirements
+
+- **Node.js** ≥ 20
+- **pnpm** ≥ 9
+- **Rust** 1.84.0+ with `wasm32v1-none` target
+- **[Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli)**
+- A local Stellar identity for CLI deploy/invoke operations
+
+## Installation
 
 ```bash
-pnpm install
-pnpm build
-pnpm test
+npm install -g @kaleido/cli   # or pnpm / yarn
 ```
 
-Run the CLI from source:
+## Quick Start
 
 ```bash
-pnpm --filter @kaleido/cli dev -- --help
-pnpm --filter @kaleido/cli dev init my-dapp
-```
-
-Before opening a PR, run the same checks CI uses for the libraries:
-
-```bash
-pnpm typecheck
-pnpm build
-pnpm test
-pnpm knip
-```
-
-`pnpm knip` reports unused dependencies, exports, and files (see [`knip.json`](./knip.json); template packages under `packages/templates/*` are excluded from analysis because they use placeholder `package.json` names until `kaleido init` materializes a project).
-
-## Quick start (generated app)
-
-After `kaleido init my-dapp`:
-
-```bash
+# Scaffold a new project (Vite + React + Soroban counter contract)
+kaleido init my-dapp
 cd my-dapp
-npm install   # or pnpm / yarn
+
+# Install dependencies
+npm install
+
+# Build → Deploy → Generate bindings → Invoke
 npx kaleido build counter
 npx kaleido deploy counter --network testnet --source <identity-or-G-address>
 npx kaleido generate counter --network testnet
 npx kaleido invoke counter.increment --network testnet --source <identity-or-G-address>
 ```
 
-Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address for `--source`. Secret keys and seed phrases are refused.
+Use a Stellar CLI identity name (e.g. `alice`) or a public `G…` address for `--source`. Secret keys are rejected.
 
-For browser-side calls, use `@kaleido/client` with generated bindings, `kaleido.artifacts.json`, and a wallet adapter:
+## Browser Client
+
+`@kaleido/client` connects your generated bindings, artifacts, network config, and a wallet adapter with no manual plumbing:
 
 ```ts
 import { createKaleidoClient } from "@kaleido/client";
@@ -93,52 +92,103 @@ const client = createKaleidoClient({
   network: {
     name: "testnet",
     rpcUrl: "https://soroban-testnet.stellar.org",
-    networkPassphrase: "Test SDF Network ; September 2015"
+    networkPassphrase: "Test SDF Network ; September 2015",
   },
   artifacts,
   wallet: freighterWalletAdapter,
   contracts: {
-    counter: { binding: Counter }
-  }
+    counter: { binding: Counter },
+  },
 });
 
 await client.contract("counter").invoke("increment");
 ```
 
-## Documentation
+## Packages
 
-- **[Architecture & product stance](./docs/architecture.md)** — promise, boundaries, roadmap, ADR index.
-- **[Getting started](./docs/getting-started.md)** — prerequisites and commands.
-- **[CLI](./docs/cli.md)** · **[Client](./docs/client.md)** · **[Config](./docs/config.md)** · **[Templates](./docs/templates.md)**
-- **[Errors](./docs/errors.md)** — public `KALEIDO_*` codes.
-- **[Testing](./docs/testing.md)** — fixture strategy and no-testnet default CI policy.
-- **[Stellar CLI version contract](./docs/stellar-cli-version-contract.md)** — supported Stellar CLI range and override policy.
-- **[v1 readiness](./docs/release/v1-readiness.md)** — release gates before `v1.0.0`.
-- **[v0.1.0-alpha release notes](./docs/release/v0.1.0-alpha.md)** — internal alpha scope and verification gates.
+This is a **pnpm monorepo**. Each package has its own README.
 
-## Scripts
+| Package | Description |
+|---|---|
+| [`@kaleido/cli`](./packages/cli) | Argument parsing, terminal output — delegates to core. |
+| [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), network/contract resolution, Stellar CLI orchestration (`execa` only here). |
+| [`@kaleido/client`](./packages/client) | Browser/client interop: generated bindings, artifact lookup, XDR visibility, wallet signing. |
+| [`packages/templates`](./packages/templates) | Project templates copied by `kaleido init`. |
+
+## CLI Reference
 
 | Command | Description |
-|---------|-------------|
-| `pnpm build` | Turbo build for all packages. |
-| `pnpm test` | Turbo test (`@kaleido/core`, `@kaleido/client`, `@kaleido/cli`). |
-| `pnpm typecheck` | Typecheck across the workspace (`tsc` with unused locals/parameters enforced in shared `tsconfig.base.json`). |
-| `pnpm knip` | Find unused dependencies, exports, and files (Knip; templates ignored—see note above). |
-| `pnpm dev` | Run `@kaleido/cli` in dev mode (`tsx`). |
-| `pnpm test:consumer` | Pack tarballs, install outside the monorepo, and smoke-import CLI and client (`scripts/consumer-isolation-test.sh`). |
-| `pnpm test:consumer:client-bundlers` | Same packed artifacts, then smoke-build with Vite and webpack consumer fixtures (`scripts/consumer-client-bundlers-test.sh`). |
-| `pnpm pack:packages` | Produce `.tgz` for `core`, `client`, and `cli` under `./packed` (used by consumer scripts and dry-run publish checks). |
-| `pnpm changeset` | [Changesets](https://github.com/changesets/changesets) CLI for version bumps and changelog entries. |
-| `pnpm ci:snapshot-pack` | CI helper: snapshot pack workflow (`scripts/ci-snapshot-pack.sh`). |
-| `pnpm publish:dry-run` | Dry-run publish all workspace packages (`pnpm publish -r --dry-run`). |
-| `pnpm ci:publish-matrix` | Full local gate: build, test, snapshot pack, publish dry-run, then both consumer smoke scripts (mirrors heavy CI). |
+|---|---|
+| `kaleido init <name>` | Scaffold a new project from a template. |
+| `kaleido build <contract>` | Compile contract to WASM. |
+| `kaleido deploy <contract>` | Deploy to a network; writes `contractId` to artifacts. |
+| `kaleido generate <contract>` | Generate TypeScript bindings from deployed contract. |
+| `kaleido invoke <contract.method>` | Invoke a contract method. |
+| `kaleido dev` | Dev server placeholder (opinionated server coming soon). |
+
+All commands accept `--network` (maps to a network defined in `kaleido.config.ts`) and `--source` (identity alias or public address).
+
+## Documentation
+
+| Doc | Description |
+|---|---|
+| [Architecture](./docs/architecture.md) | Promise, boundaries, roadmap, ADR index. |
+| [Getting started](./docs/getting-started.md) | Prerequisites and first commands. |
+| [CLI](./docs/cli.md) | Full command reference. |
+| [Client](./docs/client.md) | `@kaleido/client` API. |
+| [Config](./docs/config.md) | `kaleido.config.ts` schema. |
+| [Templates](./docs/templates.md) | Official templates and `kaleido.template.json`. |
+| [Errors](./docs/errors.md) | Public `KALEIDO_*` error codes. |
+| [Testing](./docs/testing.md) | Fixture strategy and no-testnet CI policy. |
+| [Stellar CLI version contract](./docs/stellar-cli-version-contract.md) | Supported range and override policy. |
+| [v1 readiness](./docs/release/v1-readiness.md) | Release gates before `v1.0.0`. |
 
 ## Contributing
 
-Read [`docs/architecture.md`](./docs/architecture.md) and the ADRs under [`docs/adr/`](./docs/adr/) before large changes—especially anything that touches Stellar CLI parsing, public error codes, artifact shape, or template contracts.
+Read [`docs/architecture.md`](./docs/architecture.md) and the [ADRs](./docs/adr/) before making changes that touch Stellar CLI parsing, public error codes, artifact shape, or template contracts.
 
-Keep the tree clean of unused imports and dead exports: `pnpm typecheck` and `pnpm knip` should pass. If Knip flags an export that is part of the intentional public API from [`packages/core/src/index.ts`](./packages/core/src/index.ts) (or the other package entrypoints), narrow the report with a documented `ignoreExports` / Knip comment rather than silencing broadly.
+### Development setup
 
-## Repository
+```bash
+git clone https://github.com/Dione-b/kaleido.git
+cd kaleido
+pnpm install
+pnpm build
+pnpm test
+```
 
-<https://github.com/Dione-b/kaleido>
+### Run the CLI from source
+
+```bash
+pnpm --filter @kaleido/cli dev -- --help
+pnpm --filter @kaleido/cli dev init my-dapp
+```
+
+### Before opening a PR
+
+```bash
+pnpm typecheck   # tsc — unused locals/params are errors
+pnpm build
+pnpm test
+pnpm knip        # no unused deps, exports, or files
+```
+
+> **Note:** Template packages under `packages/templates/*` are excluded from Knip analysis — they use placeholder `package.json` names until `kaleido init` materializes a project. If Knip flags an intentional public export, narrow the report with a documented `ignoreExports` comment rather than silencing broadly.
+
+### Changesets
+
+This repo uses [Changesets](https://github.com/changesets/changesets) for versioning.
+
+```bash
+pnpm changeset   # describe your change before opening a PR
+```
+
+### Full CI gate (local)
+
+```bash
+pnpm ci:publish-matrix   # build → test → snapshot pack → publish dry-run → consumer smoke tests
+```
+
+## License
+
+MIT © [Kaleido contributors](https://github.com/Dione-b/kaleido/graphs/contributors)
