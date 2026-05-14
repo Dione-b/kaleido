@@ -178,14 +178,14 @@ For the official template, the contract lives under `contracts/counter`, so the 
 wasm: "./contracts/counter/target/wasm32v1-none/release/counter.wasm"
 ```
 
-Documentation must not recommend `wasm32-unknown-unknown`.
+Documentation must not recommend the deprecated pre-Stellar smart contract Wasm target.
 
 ## Error Handling
 
 - Missing config remains `KALEIDO_CONFIG_NOT_FOUND`.
 - Invalid config remains `KALEIDO_INVALID_CONFIG`.
 - Missing template manifest is `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`.
-- Invalid template manifest schema and incompatible core range are both `KALEIDO_TEMPLATE_INCOMPATIBLE`.
+- Invalid template manifest schema is `KALEIDO_INVALID_TEMPLATE_MANIFEST`; incompatible core range is `KALEIDO_TEMPLATE_INCOMPATIBLE`.
 - Missing contract ID in Stellar CLI output is `KALEIDO_CONTRACT_ID_NOT_FOUND`.
 - Unsafe source account input is `KALEIDO_UNSAFE_SOURCE_ACCOUNT`.
 

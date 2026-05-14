@@ -22,7 +22,7 @@
 | `packages/core/src/contracts/deploy-contract.ts` | Passar `DEPLOY_FAILED` em falha do deploy; manter `DEPLOY_ARG_PLACEHOLDER_UNRESOLVED` no loop existente. |
 | `packages/core/src/contracts/generate-bindings.ts` | Passar `BINDINGS_FAILED` em falha do `stellar contract bindings`. |
 | `packages/core/src/contracts/invoke-contract.ts` | Passar `INVOKE_FAILED` em falha do `stellar contract invoke`. |
-| `packages/core/src/templates/create-project-from-template.ts` | Usar `TEMPLATE_INVALID` para `SyntaxError` / `z.ZodError` no manifest; manter `TEMPLATE_INCOMPATIBLE` para incompatibilidade de versão. |
+| `packages/core/src/templates/create-project-from-template.ts` | Usar `INVALID_TEMPLATE_MANIFEST` para `SyntaxError` / `z.ZodError` no manifest; manter `TEMPLATE_INCOMPATIBLE` para incompatibilidade de versão. |
 | `packages/client/src/xdr/build-xdr.ts` | Separar falha de `prepare()` em `XDR_PREPARE_FAILED`; manter `XDR_BUILD_FAILED` para `toXDR` / resto. |
 | `packages/client/src/client/kaleido-contract-client.ts` | Envolver `getPublicKey()` com `WALLET_NOT_CONNECTED`; opcionalmente validar resultado bruto do submit e lançar `XDR_RESULT_FAILED` quando a forma for incompatível. |
 | `docs/errors.md` | Linhas por código com colunas: Meaning, Likely cause, Suggested fix, CI handling recommendation, Semver stability (alinhado à spec). |
@@ -83,7 +83,7 @@ export const KaleidoErrorCode = {
   UNSAFE_SOURCE_ACCOUNT: "KALEIDO_UNSAFE_SOURCE_ACCOUNT",
   INVOKE_TARGET_INVALID: "KALEIDO_INVOKE_TARGET_INVALID",
   TEMPLATE_NOT_FOUND: "KALEIDO_TEMPLATE_NOT_FOUND",
-  TEMPLATE_INVALID: "KALEIDO_TEMPLATE_INVALID",
+  INVALID_TEMPLATE_MANIFEST: "KALEIDO_INVALID_TEMPLATE_MANIFEST",
   TEMPLATE_MANIFEST_NOT_FOUND: "KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND",
   TEMPLATE_INCOMPATIBLE: "KALEIDO_TEMPLATE_INCOMPATIBLE"
 } as const;
@@ -319,16 +319,16 @@ git commit -m "feat: surface missing wasm target as KALEIDO_RUST_TARGET_NOT_FOUN
 
 ---
 
-### Task 4: Templates — `TEMPLATE_INVALID` vs `TEMPLATE_INCOMPATIBLE`
+### Task 4: Templates — `INVALID_TEMPLATE_MANIFEST` vs `TEMPLATE_INCOMPATIBLE`
 
 **Files:**
 
 - Modify: `packages/core/src/templates/create-project-from-template.ts` (`readTemplateManifest` catch)
 - Test: `packages/core/src/templates/create-project-from-template.test.ts`
 
-- [ ] **Step 1: Teste falhando — manifest JSON inválido deve usar `TEMPLATE_INVALID`**
+- [ ] **Step 1: Teste falhando — manifest JSON inválido deve usar `INVALID_TEMPLATE_MANIFEST`**
 
-Adicionar fixture em memória: escrever `kaleido.template.json` com JSON inválido no `templateDir` temporário; chamar `createProjectFromTemplate`; esperar `KaleidoErrorCode.TEMPLATE_INVALID` (não `TEMPLATE_INCOMPATIBLE`).
+Adicionar fixture em memória: escrever `kaleido.template.json` com JSON inválido no `templateDir` temporário; chamar `createProjectFromTemplate`; esperar `KaleidoErrorCode.INVALID_TEMPLATE_MANIFEST` (não `TEMPLATE_INCOMPATIBLE`).
 
 - [ ] **Step 2: Implementar — no `catch` de `readTemplateManifest`**
 
@@ -337,21 +337,21 @@ Para `SyntaxError` ou `z.ZodError`:
 ```typescript
 throw new KaleidoError(
   "Template manifest is invalid.",
-  KaleidoErrorCode.TEMPLATE_INVALID,
+  KaleidoErrorCode.INVALID_TEMPLATE_MANIFEST,
   "Fix kaleido.template.json to match the published schema."
 );
 ```
 
 Manter `TEMPLATE_INCOMPATIBLE` apenas para versão de template / core incompatível.
 
-- [ ] **Step 3: Atualizar `docs/errors.md`** — garantir linha para `KALEIDO_TEMPLATE_INVALID` com Meaning distinto de `TEMPLATE_INCOMPATIBLE` (manifest malformado vs versão incompatível).
+- [ ] **Step 3: Atualizar `docs/errors.md`** — garantir linha para `KALEIDO_INVALID_TEMPLATE_MANIFEST` com Meaning distinto de `TEMPLATE_INCOMPATIBLE` (manifest malformado vs versão incompatível).
 
 - [ ] **Step 4: Testes + commit**
 
 ```bash
 pnpm --filter @kaleido/core exec vitest run src/templates/create-project-from-template.test.ts -v
 git add packages/core/src/templates/create-project-from-template.ts packages/core/src/templates/create-project-from-template.test.ts docs/errors.md
-git commit -m "fix: classify invalid template manifests as KALEIDO_TEMPLATE_INVALID"
+git commit -m "fix: classify invalid template manifests as KALEIDO_INVALID_TEMPLATE_MANIFEST"
 ```
 
 ---
@@ -559,7 +559,7 @@ Após Tasks 1–7, conferir manualmente cada entrada de `KaleidoErrorCode` contr
 | `SOURCE_ACCOUNT_REQUIRED` / `UNSAFE_SOURCE_ACCOUNT` | source | `source-account.test.ts` |
 | `INVOKE_TARGET_INVALID` | parse target | `invoke-contract.test.ts` |
 | `TEMPLATE_NOT_FOUND` | CLI path / core | `template-path.test.ts`, `create-project-from-template` (diretório inexistente) |
-| `TEMPLATE_INVALID` | manifest JSON/zod | `create-project-from-template.test.ts` |
+| `INVALID_TEMPLATE_MANIFEST` | manifest JSON/zod | `create-project-from-template.test.ts` |
 | `TEMPLATE_MANIFEST_NOT_FOUND` / `TEMPLATE_INCOMPATIBLE` | template | `create-project-from-template.test.ts` |
 
 - [ ] **Step final da Task 8**
@@ -611,7 +611,7 @@ git commit -m "test: enforce KaleidoError code enum usage across packages"
 
 **Files:**
 
-- Modify: `docs/errors.md` (alinhar textos com novos fluxos `TEMPLATE_INVALID`, `XDR_RESULT_FAILED`, etc.)
+- Modify: `docs/errors.md` (alinhar textos com novos fluxos `INVALID_TEMPLATE_MANIFEST`, `XDR_RESULT_FAILED`, etc.)
 - Modify: `docs/release/error-code-policy.md` (confirmar bullet list idêntica à spec 02)
 - Modify: `docs/client.md` se mencionar apenas um subconjunto de códigos (opcional)
 
