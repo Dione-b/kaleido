@@ -1,3 +1,26 @@
 # @kaleido/core
 
 Core config, artifacts, command orchestration, and error primitives for Kaleido.
+
+## Supported Use
+
+`@kaleido/core` is primarily an internal package for the Kaleido CLI and templates; direct use is advanced and less stable than the CLI contract.
+
+## What Is In This Package
+
+- config loading and validation
+- artifact resolution and update helpers
+- shared command orchestration primitives
+- public `KALEIDO_*` error foundations used by higher-level packages
+
+## Consumer Guidance
+
+If you want the supported end-user workflow, use `@kaleido/cli`.
+
+Reach for `@kaleido/core` directly only when you are building advanced tooling on top of Kaleido internals and are prepared to track lower-level package changes more closely than a CLI consumer.
+
+## Stability Posture
+
+Being published does not make every export a first-class end-user contract. The stable Kaleido consumer surfaces are the documented CLI workflow and documented `@kaleido/client` APIs.
+
+Direct `@kaleido/core` usage should be treated as advanced integration with a narrower support posture than the CLI package.
