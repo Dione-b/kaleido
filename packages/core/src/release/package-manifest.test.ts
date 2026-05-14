@@ -33,7 +33,7 @@ describe("publish package manifests", () => {
         import: "./dist/index.js"
       }
     });
-    expect(packageJson.scripts.build).toBe("tsup src/index.ts --format esm --dts");
+    expect(packageJson.scripts.build).toBe("tsup src/index.ts --format esm --dts --clean");
     expect(JSON.stringify(packageJson)).not.toContain("workspace:*");
   });
 

@@ -16,7 +16,7 @@
   },
   "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts",
+    "build": "tsup src/index.ts --format esm --dts --clean",
     "dev": "tsx src/index.ts",
     "test": "vitest run --pool=threads",
     "typecheck": "tsc --noEmit"
