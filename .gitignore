@@ -13,3 +13,6 @@ coverage
 .vite
 .idea
 *.tsbuildinfo
+smoke-ci-out/
+smoke-app/
+smoke-app-retry/

@@ -20,3 +20,5 @@ Before `latest`, require:
 - no unretried testnet smoke failure in the last 7 days
 
 The v1 release requires three consecutive successful scheduled `Testnet Smoke` runs and no unretried smoke failure in the previous 7 days.
+
+Verify in GitHub Actions: filter workflow `Testnet Smoke` by `event:schedule` and confirm the three newest scheduled runs are green, with no hard (non-retried) smoke failure in the last seven days.
