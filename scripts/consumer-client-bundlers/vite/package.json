@@ -1,0 +1,16 @@
+{
+  "name": "kaleido-client-consumer-vite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@kaleido/client": "0.0.0-placeholder",
+    "@kaleido/core": "0.0.0-placeholder"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.6"
+  }
+}

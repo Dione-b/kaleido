@@ -1,0 +1,15 @@
+{
+  "name": "kaleido-client-consumer-webpack",
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack.config.cjs"
+  },
+  "dependencies": {
+    "@kaleido/client": "0.0.0-placeholder",
+    "@kaleido/core": "0.0.0-placeholder"
+  },
+  "devDependencies": {
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
