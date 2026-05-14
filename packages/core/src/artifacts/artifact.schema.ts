@@ -10,7 +10,7 @@ export const ContractArtifactSchema = z.object({
   resolvedDeployArgs: z.record(z.string().min(1), z.union([z.string(), z.number(), z.boolean()])).default({})
 });
 
-export const NetworkArtifactsSchema = z.object({
+const NetworkArtifactsSchema = z.object({
   contracts: z.record(z.string().min(1), ContractArtifactSchema).default({}),
   dependencyGraph: z.record(z.string().min(1), z.array(z.string().min(1))).default({})
 });

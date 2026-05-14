@@ -2,7 +2,7 @@ import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { runCommand } from "../shell/run-command.js";
 import { assertSupportedStellarCliVersion, parseStellarCliVersion } from "./version.js";
 
-export type CheckStellarCliVersionOptions = {
+type CheckStellarCliVersionOptions = {
   allowUntested: boolean;
 };
 

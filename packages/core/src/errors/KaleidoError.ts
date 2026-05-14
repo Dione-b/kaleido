@@ -41,7 +41,7 @@ export const KaleidoErrorCode = {
   TEMPLATE_INCOMPATIBLE: "KALEIDO_TEMPLATE_INCOMPATIBLE"
 } as const;
 
-export type KaleidoErrorCodeValue = typeof KaleidoErrorCode[keyof typeof KaleidoErrorCode];
+type KaleidoErrorCodeValue = typeof KaleidoErrorCode[keyof typeof KaleidoErrorCode];
 
 export class KaleidoError extends Error {
   constructor(

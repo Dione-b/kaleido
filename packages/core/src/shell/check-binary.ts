@@ -1,7 +1,7 @@
 import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 import { runCommand } from "./run-command.js";
 
-export type CheckBinaryOptions = {
+type CheckBinaryOptions = {
   allowUntestedStellarCli?: boolean;
   skipStellarVersionCheck?: boolean;
 };

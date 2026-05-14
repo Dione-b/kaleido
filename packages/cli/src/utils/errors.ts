@@ -1,7 +1,7 @@
 import { toKaleidoError } from "@kaleido/core";
 import { logger } from "./logger.js";
 
-export function printError(error: unknown): void {
+function printError(error: unknown): void {
   const kaleidoError = toKaleidoError(error);
 
   logger.error(`Error: ${kaleidoError.message}`);
