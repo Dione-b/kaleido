@@ -135,9 +135,9 @@ Semver applies to monorepo packages **and** to serialized formats (`kaleido.arti
 | [0002](./adr/0002-local-artifacts-as-source-of-truth.md) | Accepted | Local artifacts and config as source of truth; no central registry in MVP |
 | [0003](./adr/0003-template-manifest-compatibility.md) | Accepted | Template manifest and core compatibility |
 | [0004](./adr/0004-error-codes-as-public-api.md) | Accepted | Stable `KALEIDO_*` error codes and migration |
-| [0005](./adr/0005-multi-contract-dependency-deploy.md) | Draft | Multi-contract `dependsOn` and contractId injection |
+| [0005](./adr/0005-multi-contract-dependency-deploy.md) | Accepted | Multi-contract `dependsOn` and contractId injection |
 
-**0001–0004** are ratified. **0005** remains a draft until dependency deploy sequencing is implemented.
+**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido/core` and documented in ADR 0005.
 
 ## Related docs
 
