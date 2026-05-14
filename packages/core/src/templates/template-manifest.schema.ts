@@ -2,7 +2,7 @@ import { z } from "zod";
 import semver from "semver";
 
 export const CURRENT_TEMPLATE_VERSION = 1;
-export const CURRENT_CORE_VERSION = "0.1.0";
+const CURRENT_CORE_VERSION = "0.1.0";
 
 export const TemplateManifestSchema = z.object({
   name: z.string().min(1),

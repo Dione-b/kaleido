@@ -9,7 +9,7 @@ export type RunCommandResult = {
   all: string;
 };
 
-export type RunCommandOptions = {
+type RunCommandOptions = {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   allowUntestedStellarCli?: boolean;
