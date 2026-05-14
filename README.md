@@ -55,13 +55,16 @@ pnpm --filter @kaleido/cli dev -- --help
 pnpm --filter @kaleido/cli dev init my-dapp
 ```
 
-CI runs the same default checks:
+Before opening a PR, run the same checks CI uses for the libraries:
 
 ```bash
 pnpm typecheck
 pnpm build
 pnpm test
+pnpm knip
 ```
+
+`pnpm knip` reports unused dependencies, exports, and files (see [`knip.json`](./knip.json); template packages under `packages/templates/*` are excluded from analysis because they use placeholder `package.json` names until `kaleido init` materializes a project).
 
 ## Quick start (generated app)
 
@@ -119,13 +122,22 @@ await client.contract("counter").invoke("increment");
 |---------|-------------|
 | `pnpm build` | Turbo build for all packages. |
 | `pnpm test` | Turbo test (`@kaleido/core`, `@kaleido/client`, `@kaleido/cli`). |
-| `pnpm typecheck` | Typecheck across the workspace. |
-| `pnpm test:consumer` | Pack tarballs, install outside the monorepo, and smoke-import CLI and client. |
+| `pnpm typecheck` | Typecheck across the workspace (`tsc` with unused locals/parameters enforced in shared `tsconfig.base.json`). |
+| `pnpm knip` | Find unused dependencies, exports, and files (Knip; templates ignored—see note above). |
 | `pnpm dev` | Run `@kaleido/cli` in dev mode (`tsx`). |
+| `pnpm test:consumer` | Pack tarballs, install outside the monorepo, and smoke-import CLI and client (`scripts/consumer-isolation-test.sh`). |
+| `pnpm test:consumer:client-bundlers` | Same packed artifacts, then smoke-build with Vite and webpack consumer fixtures (`scripts/consumer-client-bundlers-test.sh`). |
+| `pnpm pack:packages` | Produce `.tgz` for `core`, `client`, and `cli` under `./packed` (used by consumer scripts and dry-run publish checks). |
+| `pnpm changeset` | [Changesets](https://github.com/changesets/changesets) CLI for version bumps and changelog entries. |
+| `pnpm ci:snapshot-pack` | CI helper: snapshot pack workflow (`scripts/ci-snapshot-pack.sh`). |
+| `pnpm publish:dry-run` | Dry-run publish all workspace packages (`pnpm publish -r --dry-run`). |
+| `pnpm ci:publish-matrix` | Full local gate: build, test, snapshot pack, publish dry-run, then both consumer smoke scripts (mirrors heavy CI). |
 
 ## Contributing
 
 Read [`docs/architecture.md`](./docs/architecture.md) and the ADRs under [`docs/adr/`](./docs/adr/) before large changes—especially anything that touches Stellar CLI parsing, public error codes, artifact shape, or template contracts.
+
+Keep the tree clean of unused imports and dead exports: `pnpm typecheck` and `pnpm knip` should pass. If Knip flags an export that is part of the intentional public API from [`packages/core/src/index.ts`](./packages/core/src/index.ts) (or the other package entrypoints), narrow the report with a documented `ignoreExports` / Knip comment rather than silencing broadly.
 
 ## Repository
 
