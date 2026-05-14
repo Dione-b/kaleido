@@ -65,5 +65,6 @@ jobs:
         if: github.event_name == 'release'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        # Dist-tag: "next" for pre-v1; switch to "latest" when appropriate.
-        run: pnpm publish -r --access public --provenance --tag next
+        # `latest` is allowed only after the requirements in docs/release/v1-readiness.md
+        # and docs/release/v1.0.0.md are satisfied and verified by the release owner.
+        run: pnpm publish -r --access public --provenance --tag ${{ github.event.inputs.tag || 'next' }}
