@@ -30,7 +30,8 @@ export { resolveContract, type ResolvedContract } from "./contracts/resolve-cont
 export { buildContract, type BuildContractOptions } from "./contracts/build-contract.js";
 export { deployContract, type DeployContractOptions } from "./contracts/deploy-contract.js";
 export { deployContractGraph } from "./contracts/deploy-contract-graph.js";
-export { resolveDeployOrder, buildDependencyGraph } from "./contracts/resolve-deploy-order.js";
+export { buildDependencyGraph } from "./contracts/dependency-graph.js";
+export { resolveDeployOrder } from "./contracts/resolve-deploy-order.js";
 export { resolveDeployArgs, type DeployArgValue } from "./contracts/resolve-deploy-args.js";
 export { generateBindings, type GenerateBindingsOptions } from "./contracts/generate-bindings.js";
 export {

@@ -8,7 +8,7 @@ import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
 import { parseContractId } from "../stellar-cli/parse-contract-id.js";
-import { buildDependencyGraph } from "./resolve-deploy-order.js";
+import { buildDependencyGraph } from "./dependency-graph.js";
 import { resolveDeployArgs, type DeployArgValue } from "./resolve-deploy-args.js";
 import { assertSafeSourceAccount } from "./source-account.js";
 import { resolveContract } from "./resolve-contract.js";

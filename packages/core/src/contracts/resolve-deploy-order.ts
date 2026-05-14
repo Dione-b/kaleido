@@ -3,14 +3,6 @@ import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 type VisitState = "visiting" | "visited";
 
-export function buildDependencyGraph(contracts: Record<string, ContractConfig>): Record<string, string[]> {
-  const graph: Record<string, string[]> = {};
-  for (const name of Object.keys(contracts)) {
-    graph[name] = [...contracts[name].dependsOn];
-  }
-  return graph;
-}
-
 export function resolveDeployOrder(input: {
   contracts: Record<string, ContractConfig>;
   selectedContract?: string;
