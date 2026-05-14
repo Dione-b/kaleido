@@ -47,11 +47,23 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Pack packages
+        run: pnpm pack:packages
+
       - name: Consumer isolation
+        env:
+          SKIP_PACK: "1"
+          PACKED_DIR: ${{ github.workspace }}/packed
         run: pnpm test:consumer
+
+      - name: Client bundler consumers
+        env:
+          PACKED_DIR: ${{ github.workspace }}/packed
+        run: pnpm test:consumer:client-bundlers
 
       - name: Publish
         if: github.event_name == 'release'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # Dist-tag: "next" for pre-v1; switch to "latest" when appropriate.
         run: pnpm publish -r --access public --provenance --tag next
