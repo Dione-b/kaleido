@@ -62,7 +62,7 @@ jobs:
         run: pnpm test:consumer:client-bundlers
 
       - name: Publish
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         # `latest` is allowed only after the requirements in docs/release/v1-readiness.md
