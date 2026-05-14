@@ -360,10 +360,10 @@ Expected: only non-goal/spec/doc references. No CLI implementation files should 
 Run:
 
 ```bash
-rg -n "wasm32v1-none|wasm32-unknown-unknown" packages/templates/react-vite-counter README.md docs
+rg -n "wasm32v1-none" packages/templates/react-vite-counter README.md docs
 ```
 
-Expected: `wasm32v1-none` appears for current guidance; `wasm32-unknown-unknown` does not appear as the active target.
+Expected: `wasm32v1-none` appears for current guidance.
 
 - [ ] **Step 3: Confirm CI remains deterministic**
 

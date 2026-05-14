@@ -99,7 +99,7 @@ describe("createProjectFromTemplate", () => {
       targetDir: path.join(tmpDir, "my-dapp"),
       templateDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.TEMPLATE_INVALID,
+      code: KaleidoErrorCode.INVALID_TEMPLATE_MANIFEST,
       message: "Template manifest is invalid."
     });
   });
@@ -118,7 +118,7 @@ describe("createProjectFromTemplate", () => {
       targetDir: path.join(tmpDir, "my-dapp"),
       templateDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.TEMPLATE_INVALID,
+      code: KaleidoErrorCode.INVALID_TEMPLATE_MANIFEST,
       message: "Template manifest is invalid."
     });
   });

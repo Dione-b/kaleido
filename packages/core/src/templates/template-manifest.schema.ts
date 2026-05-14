@@ -1,8 +1,8 @@
 import { z } from "zod";
 import semver from "semver";
+import { KALEIDO_CORE_VERSION } from "../version.js";
 
 export const CURRENT_TEMPLATE_VERSION = 1;
-const CURRENT_CORE_VERSION = "0.1.0";
 
 export const TemplateManifestSchema = z.object({
   name: z.string().min(1),
@@ -28,6 +28,6 @@ export const TemplateManifestSchema = z.object({
 
 export type TemplateManifest = z.infer<typeof TemplateManifestSchema>;
 
-export function isCoreVersionCompatible(range: string, coreVersion = CURRENT_CORE_VERSION): boolean {
+export function isCoreVersionCompatible(range: string, coreVersion = KALEIDO_CORE_VERSION): boolean {
   return semver.satisfies(coreVersion, range);
 }

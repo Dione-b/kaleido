@@ -85,7 +85,7 @@ async function readTemplateManifest(templateDir: string): Promise<TemplateManife
     if (error instanceof SyntaxError || error instanceof z.ZodError) {
       throw new KaleidoError(
         "Template manifest is invalid.",
-        KaleidoErrorCode.TEMPLATE_INVALID,
+        KaleidoErrorCode.INVALID_TEMPLATE_MANIFEST,
         "Fix kaleido.template.json so it is valid JSON and matches the template manifest schema."
       );
     }

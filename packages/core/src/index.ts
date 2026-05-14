@@ -1,4 +1,5 @@
 export { KaleidoError, KaleidoErrorCode, toKaleidoError } from "./errors/KaleidoError.js";
+export { KALEIDO_CORE_VERSION } from "./version.js";
 
 export {
   KaleidoConfigSchema,
