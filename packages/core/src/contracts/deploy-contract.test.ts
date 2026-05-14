@@ -133,6 +133,43 @@ describe("deployContract", () => {
     ).rejects.toMatchObject({ code: KaleidoErrorCode.DEPLOY_FAILED });
   });
 
+  it("should_skip_stellar_contract_deploy_when_artifact_has_contractId_and_force_is_false", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-skip-"));
+    const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
+    await mkdir(path.dirname(wasmPath), { recursive: true });
+    await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "a".repeat(64),
+          deployedAt: "2026-05-12T00:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: { counter: [] }
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    const result = await deployContract({
+      config: baseConfig,
+      contractName: "counter",
+      networkName: "testnet",
+      source: "alice",
+      cwd: tmpDir,
+      force: false
+    });
+
+    expect(result.skipped).toBe(true);
+    expect(result.contractId).toBe(CONTRACT_ID);
+    expect(runCommand).not.toHaveBeenCalledWith("stellar", expect.arrayContaining(["contract", "deploy"]));
+  });
+
   it("should_throw_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED_when_resolved_args_still_contain_placeholders", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
