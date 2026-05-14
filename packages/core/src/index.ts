@@ -47,3 +47,5 @@ export {
   TemplateManifestSchema,
   type TemplateManifest
 } from "./templates/template-manifest.schema.js";
+
+export { isTransientTestnetSmokeFailure } from "./ci/is-transient-testnet-smoke-failure.js";
