@@ -5,19 +5,18 @@
   "bin": {
     "kaleido": "./dist/index.js"
   },
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     }
   },
   "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsx src/index.ts",
     "test": "vitest run --pool=threads",
     "typecheck": "tsc --noEmit"
