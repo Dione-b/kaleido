@@ -1,6 +1,7 @@
 node_modules
 .worktrees
 packed
+packed-unpacked-package-jsons
 dist
 .turbo
 *.log
