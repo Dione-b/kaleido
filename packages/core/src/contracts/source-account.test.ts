@@ -3,8 +3,11 @@ import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { assertSafeSourceAccount } from "./source-account.js";
 
 describe("assertSafeSourceAccount", () => {
-  it("should_return_source_when_public_g_address", () => {
-    expect(assertSafeSourceAccount("GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF")).toMatch(/^G/);
+  it("should_reject_public_g_address", () => {
+    expect(() => assertSafeSourceAccount("GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF"))
+      .toThrow(expect.objectContaining({
+        code: CaatingaErrorCode.UNSAFE_SOURCE_ACCOUNT
+      }));
   });
 
   it("should_return_alias_when_non_secret_shape", () => {

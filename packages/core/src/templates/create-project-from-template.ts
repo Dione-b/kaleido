@@ -4,9 +4,10 @@ import { z } from "zod";
 import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
 import {
-  CURRENT_TEMPLATE_VERSION,
   TemplateManifestSchema,
-  isCoreVersionCompatible,
+  formatTemplateCompatibilityHint,
+  formatTemplateCompatibilityMessage,
+  getTemplateCompatibilityIssue,
   type TemplateManifest
 } from "./template-manifest.schema.js";
 
@@ -52,19 +53,12 @@ async function readTemplateManifest(templateDir: string): Promise<TemplateManife
     const rawManifest = await readFile(manifestPath, "utf8");
     const manifest = TemplateManifestSchema.parse(JSON.parse(rawManifest));
 
-    if (manifest.caatinga.templateVersion !== CURRENT_TEMPLATE_VERSION) {
+    const compatibilityIssue = getTemplateCompatibilityIssue(manifest);
+    if (compatibilityIssue) {
       throw new CaatingaError(
-        "Template is not compatible with this Caatinga version.",
+        formatTemplateCompatibilityMessage(compatibilityIssue),
         CaatingaErrorCode.TEMPLATE_INCOMPATIBLE,
-        "Use a compatible template version or upgrade Caatinga."
-      );
-    }
-
-    if (!isCoreVersionCompatible(manifest.caatinga.compatibleCore)) {
-      throw new CaatingaError(
-        "Template is not compatible with this Caatinga version.",
-        CaatingaErrorCode.TEMPLATE_INCOMPATIBLE,
-        "Use a compatible template version or upgrade Caatinga."
+        formatTemplateCompatibilityHint(compatibilityIssue)
       );
     }
 

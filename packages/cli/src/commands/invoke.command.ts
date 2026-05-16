@@ -10,7 +10,7 @@ export function registerInvokeCommand(program: Command): void {
     .argument("<target>", "Invoke target in contract.method format")
     .argument("[args...]", "Arguments forwarded to Stellar CLI after the method name")
     .option("-n, --network <network>", "Configured network name")
-    .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
+    .requiredOption("-s, --source <source>", "Stellar CLI identity alias that can sign (for example alice)")
     .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
     .allowUnknownOption(true)
     .allowExcessArguments(true)

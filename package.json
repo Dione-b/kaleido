@@ -7,6 +7,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "pnpm --filter @caatinga/cli dev",
+    "install:global": "pnpm build && NPM_CONFIG_PREFIX=\"$(dirname \"$(dirname \"$(command -v node)\")\")\" npm install -g ./packages/cli",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "knip": "knip --no-config-hints",

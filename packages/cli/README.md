@@ -27,7 +27,7 @@ The supported CLI flow is `init -> build -> deploy -> generate -> invoke`.
 
 ## Supported Inputs
 
-- `--source` accepts a Stellar CLI identity alias or public `G...` account address
+- `--source` accepts a Stellar CLI identity alias (for example `alice`) that can sign transactions; public `G...` addresses are rejected
 - `--network <network>` selects a configured network such as `testnet`
 - `invoke` expects a `<contract.method>` target and forwards extra args to the underlying Stellar contract invocation
 - `deploy --no-deps` is supported only when deploying a single named contract

@@ -8,6 +8,7 @@ import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
 import { parseContractId } from "../stellar-cli/parse-contract-id.js";
+import { tryRecoverContractIdFromDeployFailure } from "../stellar-cli/recover-deploy-contract-id.js";
 import { buildDependencyGraph } from "./dependency-graph.js";
 import { resolveDeployArgs, type DeployArgValue } from "./resolve-deploy-args.js";
 import { assertSafeSourceAccount } from "./source-account.js";
@@ -112,14 +113,41 @@ export async function deployContract(options: DeployContractOptions) {
     ...constructorArgs
   ];
 
-  const result = await runCommand("stellar", stellarArgs, {
-    cwd,
-    allowUntestedStellarCli: options.allowUntestedStellarCli,
-    failureCode: CaatingaErrorCode.DEPLOY_FAILED
-  });
+  let output = "";
+  let contractId: string;
 
-  const output = result.all || `${result.stdout}\n${result.stderr}`;
-  const contractId = parseContractId(output);
+  try {
+    const result = await runCommand("stellar", stellarArgs, {
+      cwd,
+      allowUntestedStellarCli: options.allowUntestedStellarCli,
+      failureCode: CaatingaErrorCode.DEPLOY_FAILED
+    });
+    output = result.all || `${result.stdout}\n${result.stderr}`;
+    contractId = parseContractId(output);
+  } catch (error) {
+    if (!(error instanceof CaatingaError) || error.code !== CaatingaErrorCode.DEPLOY_FAILED) {
+      throw error;
+    }
+
+    const recoveredContractId = await tryRecoverContractIdFromDeployFailure({
+      output: `${error.message}\n${error.hint ?? ""}`,
+      source,
+      network: network.config,
+      cwd,
+      allowUntestedStellarCli: options.allowUntestedStellarCli
+    });
+
+    if (!recoveredContractId) {
+      throw error;
+    }
+
+    contractId = recoveredContractId;
+    output = [
+      error.hint ?? "",
+      "Caatinga recovered the contract ID from the on-chain deploy transaction.",
+      `Contract ID: ${contractId}`
+    ].filter(Boolean).join("\n");
+  }
   const wasmHash = await hashWasm(contract.wasmPath);
   const dependencyGraph = buildDependencyGraph(options.config.contracts);
   const dependencies = options.dependencies ?? contract.config.dependsOn;

@@ -315,6 +315,34 @@ for (const templateName of Object.keys(expectedInternalRanges)) {
 ')
 
 for template_name in "${bundled_template_names[@]}"; do
+  if ! tar -xOf "${cli_tarball[0]}" "package/templates/${template_name}/caatinga.template.json" | node --input-type=module -e '
+import { readFileSync } from "node:fs";
+
+const manifest = JSON.parse(readFileSync(0, "utf8"));
+const coreVersion = process.argv[1];
+const expectedRange = `^${coreVersion}`;
+const compatibleCore = manifest.caatinga?.compatibleCore;
+const templateVersion = manifest.caatinga?.templateVersion;
+
+if (compatibleCore !== expectedRange) {
+  console.error(
+    `${process.argv[2]}: compatibleCore expected ${expectedRange} but found ${compatibleCore ?? "missing"}`
+  );
+  process.exit(1);
+}
+
+if (templateVersion !== 1) {
+  console.error(
+    `${process.argv[2]}: templateVersion expected 1 but found ${templateVersion ?? "missing"}`
+  );
+  process.exit(1);
+}
+' "$packed_core_version" "$template_name"; then
+    echo "Bundled CLI template manifest failed compatibility validation." >&2
+    tar -xOf "${cli_tarball[0]}" "package/templates/${template_name}/caatinga.template.json" >&2 || true
+    exit 1
+  fi
+
   if ! tar -xOf "${cli_tarball[0]}" "package/templates/${template_name}/package.json" | node --input-type=module -e '
 import { readFileSync } from "node:fs";
 

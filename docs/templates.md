@@ -31,7 +31,7 @@ Every template must include `caatinga.template.json`:
 }
 ```
 
-`compatibleCore` is checked against the current `@caatinga/core` version before files are copied. Missing manifests fail with `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND`; invalid or incompatible manifests fail with `CAATINGA_TEMPLATE_INCOMPATIBLE`.
+`compatibleCore` is checked against the current `@caatinga/core` version before files are copied. Official templates in this repository must pin `compatibleCore` to `^<coreVersion>` (the same range `defaultCompatibleCoreRange()` derives from `CAATINGA_CORE_VERSION`); CI enforces that pin so a core bump cannot ship with stale template metadata. Missing manifests fail with `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND`; invalid or incompatible manifests fail with `CAATINGA_TEMPLATE_INCOMPATIBLE`.
 
 Official templates are maintained in this repository. Community templates should be treated as executable source code: inspect the files before running install scripts or connecting wallets.
 
