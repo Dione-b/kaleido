@@ -29,8 +29,8 @@ importers:
   packages/cli:
     dependencies:
       '@caatinga/core':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: workspace:^
+        version: link:../core
       chalk:
         specifier: ^5.4.1
         version: 5.6.2
@@ -54,8 +54,8 @@ importers:
   packages/client:
     dependencies:
       '@caatinga/core':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: workspace:^
+        version: link:../core
       '@stellar/freighter-api':
         specifier: ^4.0.0
         version: 4.1.0
@@ -103,10 +103,6 @@ packages:
   '@babel/runtime@7.29.2':
     resolution: {integrity: sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==}
     engines: {node: '>=6.9.0'}
-
-  '@caatinga/core@0.2.0':
-    resolution: {integrity: sha512-dl0kzsI8oGNuicWPE5rK99ogB5Vmy7WxyxHMB/6rSIPCGH1A5+UqdjYdpYzyRgO0YsfhPMVJybGD6Z7TwJrOJw==}
-    engines: {node: '>=20'}
 
   '@changesets/apply-release-plan@7.1.1':
     resolution: {integrity: sha512-9qPCm/rLx/xoOFXIHGB229+4GOL76S4MC+7tyOuTsR6+1jYlfFDQORdvwR5hDA6y4FL2BPt3qpbcQIS+dW85LA==}
@@ -1593,13 +1589,6 @@ packages:
 snapshots:
 
   '@babel/runtime@7.29.2': {}
-
-  '@caatinga/core@0.2.0':
-    dependencies:
-      execa: 9.6.1
-      jiti: 2.7.0
-      semver: 7.8.0
-      zod: 3.25.76
 
   '@changesets/apply-release-plan@7.1.1':
     dependencies:

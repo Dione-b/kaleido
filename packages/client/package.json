@@ -51,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@caatinga/core": "^0.2.1"
+    "@caatinga/core": "workspace:^"
   },
   "devDependencies": {
     "tsup": "^8.3.5",
