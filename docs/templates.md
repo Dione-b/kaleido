@@ -13,7 +13,7 @@ Every template must include `caatinga.template.json`:
   "version": "0.1.0",
   "description": "Minimal Vite + React + Soroban counter dApp.",
   "caatinga": {
-    "compatibleCore": "^0.1.0",
+    "compatibleCore": "^0.2.0",
     "templateVersion": 1
   },
   "frontend": {
