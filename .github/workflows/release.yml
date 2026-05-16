@@ -31,7 +31,6 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -45,24 +44,14 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Pack packages
-        run: pnpm pack:packages
+      - name: Snapshot pack
+        run: pnpm ci:snapshot-pack
+
+      - name: Publish dry run
+        run: pnpm publish:dry-run
 
       - name: Consumer isolation
-        env:
-          SKIP_PACK: "1"
-          PACKED_DIR: ${{ github.workspace }}/packed
         run: pnpm test:consumer
 
       - name: Client bundler consumers
-        env:
-          PACKED_DIR: ${{ github.workspace }}/packed
         run: pnpm test:consumer:client-bundlers
-
-      - name: Publish
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        # `latest` is allowed only after the requirements in docs/release/v1-readiness.md
-        # and docs/release/v1.0.0.md are satisfied and verified by the release owner.
-        run: pnpm publish -r --access public --provenance --tag ${{ github.event.inputs.tag || 'next' }}
