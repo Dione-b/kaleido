@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Kaleido</h1>
+<h1>Kaleido Stellar</h1>
 
 <p>Developer toolkit for building dApps on <strong>Stellar / Soroban</strong>.</p>
 
@@ -14,7 +14,7 @@
 
 ---
 
-Kaleido gives JS/TS teams a **predictable workflow** for Soroban contracts: init, build, deploy, generate TypeScript bindings, invoke — without copy-pasting contract IDs or manually serializing SCVal.
+Kaleido Stellar gives JS/TS teams a **predictable workflow** for Soroban contracts: init, build, deploy, generate TypeScript bindings, invoke — without copy-pasting contract IDs or manually serializing SCVal.
 
 It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather than replacing them, and layers on a few strong conventions: a typed `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, and a thin `@kaleido-xlm/client` that wires generated bindings, artifact lookup, and wallet signing in one place.
 
@@ -23,7 +23,7 @@ It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather tha
 
 ## Table of Contents
 
-- [Why Kaleido](#why-kaleido)
+- [Why Kaleido Stellar](#why-kaleido-stellar)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
@@ -34,9 +34,9 @@ It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather tha
 - [Contributing](#contributing)
 - [License](#license)
 
-## Why Kaleido
+## Why Kaleido Stellar
 
-| Without Kaleido | With Kaleido |
+| Without Kaleido Stellar | With Kaleido Stellar |
 |---|---|
 | Manually copy `contractId` into your frontend | `kaleido deploy` writes it to `kaleido.artifacts.json` automatically |
 | Hand-serialize SCVal for every invocation | `@kaleido-xlm/client` handles it via generated bindings |
@@ -44,13 +44,13 @@ It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather tha
 | Debug opaque CLI output by hand | Fragile parsing isolated in `@kaleido-xlm/core`, covered by versioned fixtures |
 | XDR is a black box | `buildXdr()` / `debugXdr` expose unsigned, prepared, and signed XDR on demand |
 
-**Non-goals:** Kaleido does not store private keys, ship telemetry, or replace Stellar's own tooling. `--source` accepts an identity alias or a public `G…` address — secret keys and seed phrases are refused.
+**Non-goals:** Kaleido Stellar does not store private keys, ship telemetry, or replace Stellar's own tooling. `--source` accepts an identity alias or a public `G…` address — secret keys and seed phrases are refused.
 
 ## Requirements
 
 - **Node.js** ≥ 20
 - **pnpm** ≥ 9
-- **Rust** 1.84.0+ with `wasm32v1-none` target
+- **Rust** with the `wasm32-unknown-unknown` target for the currently supported Stellar CLI 22.x toolchain
 - **[Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli)**
 - A local Stellar identity for CLI deploy/invoke operations
 
