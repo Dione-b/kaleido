@@ -29,7 +29,7 @@ importers:
   packages/cli:
     dependencies:
       '@kaleido-xlm/core':
-        specifier: ^0.1.2
+        specifier: ^0.1.3
         version: link:../core
       chalk:
         specifier: ^5.4.1
@@ -54,7 +54,7 @@ importers:
   packages/client:
     dependencies:
       '@kaleido-xlm/core':
-        specifier: ^0.1.2
+        specifier: ^0.1.3
         version: link:../core
       '@stellar/freighter-api':
         specifier: ^4.0.0
