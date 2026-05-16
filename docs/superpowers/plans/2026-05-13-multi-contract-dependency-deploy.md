@@ -6,7 +6,7 @@
 
 **Architecture:** O núcleo já concentra `dependsOn` e `deployArgs` em `ContractConfigSchema`, ordenação DFS com detecção de ciclo em `resolveDeployOrder`, resolução estrita de placeholders em `resolveDeployArgs`, orquestração em `deployContractGraph` e persistência de `dependencyGraph` / `dependencies` / `resolvedDeployArgs` via `updateArtifact`. Este plano prioriza **verificação**, **extração do módulo `dependency-graph.ts` como na spec**, **lacunas de teste** (`--force`, deploy completo sem nome de contrato, skip quando artefato existe) e **correção de drift** em `docs/architecture.md` (tabela ADR 0005 ainda marca Draft).
 
-**Tech Stack:** pnpm workspaces, TypeScript, Vitest, Zod (`config` + `artifacts`), Commander (`@kaleido-xlm/cli`), `@kaleido-xlm/core`.
+**Tech Stack:** pnpm workspaces, TypeScript, Vitest, Zod (`config` + `artifacts`), Commander (`@caatinga/cli`), `@caatinga/core`.
 
 **Nota de contexto:** A skill *writing-plans* recomenda worktree dedicado (brainstorming). Use um worktree limpo se a branch atual misturar outras mudanças.
 
@@ -24,7 +24,7 @@
 | `packages/core/src/contracts/resolve-deploy-args.ts` | Somente placeholder `${contracts.<name>.contractId}`; erros `PLACEHOLDER_*` e `ARTIFACT_NOT_FOUND` |
 | `packages/core/src/contracts/deploy-contract-graph.ts` | Lê artefatos por iteração; `resolveDeployArgs` antes de cada deploy; repassa `resolvedDeployArgs` e `dependsOn` |
 | `packages/core/src/contracts/deploy-contract.ts` | Skip se `contractId` e `!force`; Stellar deploy; `updateArtifact` com grafo completo |
-| `packages/core/src/errors/KaleidoErrorCode.ts` | Códigos `KALEIDO_CONTRACT_DEPENDENCY_*`, `KALEIDO_DEPLOY_ARG_PLACEHOLDER_*` |
+| `packages/core/src/errors/CaatingaErrorCode.ts` | Códigos `CAATINGA_CONTRACT_DEPENDENCY_*`, `CAATINGA_DEPLOY_ARG_PLACEHOLDER_*` |
 | `packages/cli/src/commands/deploy.command.ts` | `deploy [contract]`, `--no-deps`, `--force` |
 | `packages/templates/marketplace-with-token/*` | Template oficial (já demonstra token + marketplace + README) |
 | `docs/adr/0005-multi-contract-dependency-deploy.md` | ADR já **Accepted** — revisar bullets da spec |
@@ -46,7 +46,7 @@
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm typecheck
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm typecheck
 ```
 
 Expected: exit code `0`.
@@ -56,7 +56,7 @@ Expected: exit code `0`.
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido-xlm/core test
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm --filter @caatinga/core test
 ```
 
 Expected: Vitest conclui com sucesso; em especial `resolve-deploy-order.test.ts`, `resolve-deploy-args.test.ts`, `deploy-contract-graph.test.ts`, `deploy-contract.test.ts`, `error-surface.test.ts`.
@@ -114,7 +114,7 @@ describe("buildDependencyGraph", () => {
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/contracts/dependency-graph.test.ts
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/contracts/dependency-graph.test.ts
 ```
 
 Expected: FAIL (cannot find module `./dependency-graph.js` ou equivalente).
@@ -167,7 +167,7 @@ export { resolveDeployOrder } from "./contracts/resolve-deploy-order.js";
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/contracts/dependency-graph.test.ts src/contracts/resolve-deploy-order.test.ts src/contracts/deploy-contract.test.ts
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/contracts/dependency-graph.test.ts src/contracts/resolve-deploy-order.test.ts src/contracts/deploy-contract.test.ts
 ```
 
 Expected: PASS.
@@ -210,7 +210,7 @@ Substituir o parágrafo:
 por:
 
 ```markdown
-**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido-xlm/core` and documented in ADR 0005.
+**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@caatinga/core` and documented in ADR 0005.
 ```
 
 - [ ] **Step 2: Commit**
@@ -234,7 +234,7 @@ Add dentro de `describe("deployContract", () => { ... })` um novo `it`:
 
 ```typescript
   it("should_skip_stellar_deploy_when_artifact_has_contractId_and_force_is_false", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-skip-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-skip-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(path.dirname(wasmPath), { recursive: true });
     await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
@@ -276,7 +276,7 @@ Add dentro de `describe("deployContract", () => { ... })` um novo `it`:
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/contracts/deploy-contract.test.ts
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/contracts/deploy-contract.test.ts
 ```
 
 Expected: PASS.
@@ -392,7 +392,7 @@ Add ao `describe("deployContractGraph", () => { ... })`:
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/contracts/deploy-contract-graph.test.ts
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/contracts/deploy-contract-graph.test.ts
 ```
 
 Expected: PASS.
@@ -448,7 +448,7 @@ git commit -m "docs: clarify env and shell rejection in ADR 0005"
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm test
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm test
 ```
 
 Expected: exit code `0`.
@@ -463,7 +463,7 @@ Somente se houve correções de última hora.
 
 1. **Spec coverage:** `dependsOn` / grafo acíclico / ordem / placeholders / CLI `--no-deps` / artefatos / códigos de erro / template / ADR → cobertos por baseline + Tasks 2–7.  
 2. **Placeholder scan:** Nenhum TBD; passos com código ou comandos concretos.  
-3. **Consistência:** `buildDependencyGraph` permanece com a mesma assinatura após extração; exports públicos de `@kaleido-xlm/core` preservados.
+3. **Consistência:** `buildDependencyGraph` permanece com a mesma assinatura após extração; exports públicos de `@caatinga/core` preservados.
 
 **Gaps intencionais:** Não duplicar testes já presentes em `resolve-deploy-order.test.ts` e `resolve-deploy-args.test.ts` além do smoke em `dependency-graph.test.ts`.
 

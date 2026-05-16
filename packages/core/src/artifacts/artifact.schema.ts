@@ -15,11 +15,11 @@ const NetworkArtifactsSchema = z.object({
   dependencyGraph: z.record(z.string().min(1), z.array(z.string().min(1))).default({})
 });
 
-export const KaleidoArtifactsSchema = z.object({
+export const CaatingaArtifactsSchema = z.object({
   project: z.string().min(1),
   version: z.literal(1),
   networks: z.record(z.string().min(1), NetworkArtifactsSchema).default({})
 });
 
 export type ContractArtifact = z.infer<typeof ContractArtifactSchema>;
-export type KaleidoArtifacts = z.infer<typeof KaleidoArtifactsSchema>;
+export type CaatingaArtifacts = z.infer<typeof CaatingaArtifactsSchema>;

@@ -1,4 +1,4 @@
-# Kaleido Correction Design
+# Caatinga Correction Design
 
 ## Status
 
@@ -10,13 +10,13 @@ Approved for implementation planning.
 
 ## Motivation
 
-Kaleido needs a correction pass before new features. The current hardening work is mostly in place, but a few repository contracts still need to be made exact: TypeScript schema exports, public error-code usage, Stellar CLI deploy parsing, CI workflow shape, template manifest compatibility validation, and the documented Rust WASM target.
+Caatinga needs a correction pass before new features. The current hardening work is mostly in place, but a few repository contracts still need to be made exact: TypeScript schema exports, public error-code usage, Stellar CLI deploy parsing, CI workflow shape, template manifest compatibility validation, and the documented Rust WASM target.
 
-This pass deliberately excludes `kaleido doctor`.
+This pass deliberately excludes `caatinga doctor`.
 
 ## Non-goals
 
-- Do not implement `kaleido doctor`.
+- Do not implement `caatinga doctor`.
 - Do not add multi-contract deploy sequencing.
 - Do not change artifact schema version.
 - Do not introduce a template registry or plugin system.
@@ -27,10 +27,10 @@ This pass deliberately excludes `kaleido doctor`.
 Implement P0-P5 only:
 
 1. Make schema type exports compile correctly.
-2. Standardize public `KaleidoError` codes through `KaleidoErrorCode`.
+2. Standardize public `CaatingaError` codes through `CaatingaErrorCode`.
 3. Ensure deploy uses the centralized Stellar CLI contract ID parser.
 4. Rewrite GitHub Actions CI as valid multiline YAML.
-5. Validate `kaleido.template.json` before copying templates.
+5. Validate `caatinga.template.json` before copying templates.
 6. Align docs, tests, and template config with `wasm32v1-none`.
 
 ## Architecture
@@ -40,7 +40,7 @@ Implement P0-P5 only:
 `packages/core/src/config/config.schema.ts` exports inferred types with `typeof`:
 
 ```ts
-export type KaleidoConfig = z.infer<typeof KaleidoConfigSchema>;
+export type CaatingaConfig = z.infer<typeof CaatingaConfigSchema>;
 export type ContractConfig = z.infer<typeof ContractConfigSchema>;
 export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;
 ```
@@ -55,20 +55,20 @@ No exported type may use bare `z.infer`.
 
 ### Public Error Codes
 
-`KaleidoErrorCode` is the single source of public error codes. Public `KaleidoError` construction uses `KaleidoErrorCode.*`, not legacy string literals.
+`CaatingaErrorCode` is the single source of public error codes. Public `CaatingaError` construction uses `CaatingaErrorCode.*`, not legacy string literals.
 
 Required mappings:
 
 | Legacy | Public code |
 | --- | --- |
-| `CONFIG_NOT_FOUND` | `KALEIDO_CONFIG_NOT_FOUND` |
-| `CONFIG_INVALID` | `KALEIDO_INVALID_CONFIG` |
-| `COMMAND_FAILED` | `KALEIDO_COMMAND_FAILED` |
-| `CONTRACT_ID_NOT_FOUND` | `KALEIDO_CONTRACT_ID_NOT_FOUND` |
-| `SOURCE_ACCOUNT_REQUIRED` | `KALEIDO_SOURCE_ACCOUNT_REQUIRED` |
-| `SECRET_SOURCE_REJECTED` | `KALEIDO_UNSAFE_SOURCE_ACCOUNT` |
+| `CONFIG_NOT_FOUND` | `CAATINGA_CONFIG_NOT_FOUND` |
+| `CONFIG_INVALID` | `CAATINGA_INVALID_CONFIG` |
+| `COMMAND_FAILED` | `CAATINGA_COMMAND_FAILED` |
+| `CONTRACT_ID_NOT_FOUND` | `CAATINGA_CONTRACT_ID_NOT_FOUND` |
+| `SOURCE_ACCOUNT_REQUIRED` | `CAATINGA_SOURCE_ACCOUNT_REQUIRED` |
+| `SECRET_SOURCE_REJECTED` | `CAATINGA_UNSAFE_SOURCE_ACCOUNT` |
 
-Tests must assert that every exported code starts with `KALEIDO_`. Documentation in `docs/errors.md` must match the implemented codes.
+Tests must assert that every exported code starts with `CAATINGA_`. Documentation in `docs/errors.md` must match the implemented codes.
 
 ### Stellar CLI Parsing
 
@@ -93,7 +93,7 @@ const contractId = parseContractId(output);
 const CONTRACT_ID_REGEX = /\bC[A-Z0-9]{55}\b/;
 ```
 
-Missing contract IDs throw `KALEIDO_CONTRACT_ID_NOT_FOUND`.
+Missing contract IDs throw `CAATINGA_CONTRACT_ID_NOT_FOUND`.
 
 Fixture tests cover:
 
@@ -125,12 +125,12 @@ CI must not require Stellar testnet access.
 
 ### Template Manifest
 
-`createProjectFromTemplate` validates `kaleido.template.json` before creating or copying into the target directory.
+`createProjectFromTemplate` validates `caatinga.template.json` before creating or copying into the target directory.
 
 Flow:
 
 1. Resolve template directory.
-2. Read `kaleido.template.json`.
+2. Read `caatinga.template.json`.
 3. Validate with `TemplateManifestSchema`.
 4. Validate `compatibleCore`.
 5. Copy only if valid.
@@ -138,10 +138,10 @@ Flow:
 Compatibility uses:
 
 ```ts
-semver.satisfies(coreVersion, manifest.kaleido.compatibleCore)
+semver.satisfies(coreVersion, manifest.caatinga.compatibleCore)
 ```
 
-`@kaleido-xlm/core` owns this dependency:
+`@caatinga/core` owns this dependency:
 
 - Runtime dependency: `semver`
 - Dev dependency: `@types/semver`
@@ -149,20 +149,20 @@ semver.satisfies(coreVersion, manifest.kaleido.compatibleCore)
 Missing manifest error:
 
 ```ts
-throw new KaleidoError(
+throw new CaatingaError(
   "Template manifest was not found.",
-  KaleidoErrorCode.TEMPLATE_MANIFEST_NOT_FOUND,
-  "Add a kaleido.template.json file to the template root."
+  CaatingaErrorCode.TEMPLATE_MANIFEST_NOT_FOUND,
+  "Add a caatinga.template.json file to the template root."
 );
 ```
 
 Invalid or incompatible manifest error:
 
 ```ts
-throw new KaleidoError(
-  "Template is not compatible with this Kaleido version.",
-  KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-  "Use a compatible template version or upgrade Kaleido."
+throw new CaatingaError(
+  "Template is not compatible with this Caatinga version.",
+  CaatingaErrorCode.TEMPLATE_INCOMPATIBLE,
+  "Use a compatible template version or upgrade Caatinga."
 );
 ```
 
@@ -182,12 +182,12 @@ Documentation must not recommend the deprecated pre-Stellar smart contract Wasm 
 
 ## Error Handling
 
-- Missing config remains `KALEIDO_CONFIG_NOT_FOUND`.
-- Invalid config remains `KALEIDO_INVALID_CONFIG`.
-- Missing template manifest is `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`.
-- Invalid template manifest schema is `KALEIDO_INVALID_TEMPLATE_MANIFEST`; incompatible core range is `KALEIDO_TEMPLATE_INCOMPATIBLE`.
-- Missing contract ID in Stellar CLI output is `KALEIDO_CONTRACT_ID_NOT_FOUND`.
-- Unsafe source account input is `KALEIDO_UNSAFE_SOURCE_ACCOUNT`.
+- Missing config remains `CAATINGA_CONFIG_NOT_FOUND`.
+- Invalid config remains `CAATINGA_INVALID_CONFIG`.
+- Missing template manifest is `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND`.
+- Invalid template manifest schema is `CAATINGA_INVALID_TEMPLATE_MANIFEST`; incompatible core range is `CAATINGA_TEMPLATE_INCOMPATIBLE`.
+- Missing contract ID in Stellar CLI output is `CAATINGA_CONTRACT_ID_NOT_FOUND`.
+- Unsafe source account input is `CAATINGA_UNSAFE_SOURCE_ACCOUNT`.
 
 Messages and hints may change, but codes are public API.
 
@@ -204,9 +204,9 @@ pnpm test
 Specific tests:
 
 - Schema type exports compile.
-- All public error codes start with `KALEIDO_`.
-- No public `KaleidoError` construction uses raw legacy codes.
-- Contract ID parser uses fixtures and throws `KALEIDO_CONTRACT_ID_NOT_FOUND` on missing ID.
+- All public error codes start with `CAATINGA_`.
+- No public `CaatingaError` construction uses raw legacy codes.
+- Contract ID parser uses fixtures and throws `CAATINGA_CONTRACT_ID_NOT_FOUND` on missing ID.
 - Template init fails for missing manifest.
 - Template init fails for invalid manifest schema.
 - Template init fails for incompatible `compatibleCore`.
@@ -222,7 +222,7 @@ Update:
 - `docs/getting-started.md`
 - `docs/config.md`
 
-Docs must describe actual implemented behavior only. `kaleido doctor` remains out of scope.
+Docs must describe actual implemented behavior only. `caatinga doctor` remains out of scope.
 
 ## Acceptance Criteria
 
@@ -231,8 +231,8 @@ Docs must describe actual implemented behavior only. `kaleido doctor` remains ou
 - `pnpm test` passes.
 - GitHub Actions workflow is valid multiline YAML.
 - No exported type uses bare `z.infer`.
-- No public `KaleidoError` is constructed with raw legacy error codes.
-- All public error codes start with `KALEIDO_`.
+- No public `CaatingaError` is constructed with raw legacy error codes.
+- All public error codes start with `CAATINGA_`.
 - `deploy-contract.ts` has no local `parseContractId`.
 - `deploy-contract.ts` passes combined command output to the centralized parser.
 - Template manifest is validated before copying.

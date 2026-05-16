@@ -1,12 +1,12 @@
-# Kaleido Client Interop Implementation Plan
+# Caatinga Client Interop Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `@kaleido-xlm/client`, a thin interop layer that connects generated Soroban TypeScript bindings, Kaleido artifacts, and wallet signing.
+**Goal:** Build `@caatinga/client`, a thin interop layer that connects generated Soroban TypeScript bindings, Caatinga artifacts, and wallet signing.
 
-**Architecture:** `@kaleido-xlm/client` owns orchestration only: artifact resolution, binding invocation, wallet signing, and normalized result shapes. It imports public types/errors from `@kaleido-xlm/core`, delegates transaction/XDR behavior to generated bindings, and exposes Freighter as a subpath adapter.
+**Architecture:** `@caatinga/client` owns orchestration only: artifact resolution, binding invocation, wallet signing, and normalized result shapes. It imports public types/errors from `@caatinga/core`, delegates transaction/XDR behavior to generated bindings, and exposes Freighter as a subpath adapter.
 
-**Tech Stack:** TypeScript ESM, pnpm workspace, tsup, Vitest, `@stellar/freighter-api`, `@kaleido-xlm/core`.
+**Tech Stack:** TypeScript ESM, pnpm workspace, tsup, Vitest, `@stellar/freighter-api`, `@caatinga/core`.
 
 ---
 
@@ -20,17 +20,17 @@
 
 - [ ] **Step 1: Write failing package presence check**
 
-Run: `pnpm --filter @kaleido-xlm/client typecheck`
+Run: `pnpm --filter @caatinga/client typecheck`
 
-Expected: FAIL because `@kaleido-xlm/client` does not exist.
+Expected: FAIL because `@caatinga/client` does not exist.
 
 - [ ] **Step 2: Create package manifest and base exports**
 
-Add `@kaleido-xlm/client` with ESM build, test, typecheck scripts, root export, and `./freighter` subpath export.
+Add `@caatinga/client` with ESM build, test, typecheck scripts, root export, and `./freighter` subpath export.
 
 - [ ] **Step 3: Verify package is discoverable**
 
-Run: `pnpm --filter @kaleido-xlm/client typecheck`
+Run: `pnpm --filter @caatinga/client typecheck`
 
 Expected: PASS after base files exist.
 
@@ -43,21 +43,21 @@ Expected: PASS after base files exist.
 
 - [ ] **Step 1: Write failing tests**
 
-Test explicit `contractId`, artifact lookup by network/contract, and `KALEIDO_CONTRACT_ARTIFACT_NOT_FOUND` when missing.
+Test explicit `contractId`, artifact lookup by network/contract, and `CAATINGA_CONTRACT_ARTIFACT_NOT_FOUND` when missing.
 
 - [ ] **Step 2: Run resolver tests**
 
-Run: `pnpm --filter @kaleido-xlm/client test -- src/artifacts/resolve-contract-id.test.ts`
+Run: `pnpm --filter @caatinga/client test -- src/artifacts/resolve-contract-id.test.ts`
 
 Expected: FAIL because implementation is missing.
 
 - [ ] **Step 3: Implement resolver**
 
-Use `explicitContractId` first, then `artifacts.networks[network].contracts[contract].contractId`, then throw `KaleidoError`.
+Use `explicitContractId` first, then `artifacts.networks[network].contracts[contract].contractId`, then throw `CaatingaError`.
 
 - [ ] **Step 4: Verify resolver tests**
 
-Run: `pnpm --filter @kaleido-xlm/client test -- src/artifacts/resolve-contract-id.test.ts`
+Run: `pnpm --filter @caatinga/client test -- src/artifacts/resolve-contract-id.test.ts`
 
 Expected: PASS.
 
@@ -74,36 +74,36 @@ Test missing `Client`, missing method, client construction arguments, and method
 
 - [ ] **Step 2: Run binding adapter tests**
 
-Run: `pnpm --filter @kaleido-xlm/client test -- src/bindings/default-binding-adapter.test.ts`
+Run: `pnpm --filter @caatinga/client test -- src/bindings/default-binding-adapter.test.ts`
 
 Expected: FAIL because implementation is missing.
 
 - [ ] **Step 3: Implement adapter**
 
-Instantiate `new binding.Client(...)`; call the requested method with either no args or one args object; throw `KALEIDO_BINDING_*` errors.
+Instantiate `new binding.Client(...)`; call the requested method with either no args or one args object; throw `CAATINGA_BINDING_*` errors.
 
 - [ ] **Step 4: Verify adapter tests**
 
-Run: `pnpm --filter @kaleido-xlm/client test -- src/bindings/default-binding-adapter.test.ts`
+Run: `pnpm --filter @caatinga/client test -- src/bindings/default-binding-adapter.test.ts`
 
 Expected: PASS.
 
 ### Task 4: XDR Orchestration and Client API
 
 **Files:**
-- Create: `packages/client/src/client/create-kaleido-client.test.ts`
-- Create: `packages/client/src/client/create-kaleido-client.ts`
-- Create: `packages/client/src/client/kaleido-contract-client.ts`
+- Create: `packages/client/src/client/create-caatinga-client.test.ts`
+- Create: `packages/client/src/client/create-caatinga-client.ts`
+- Create: `packages/client/src/client/caatinga-contract-client.ts`
 - Create: `packages/client/src/xdr/build-xdr.ts`
 - Modify: `packages/client/src/index.ts`
 
 - [ ] **Step 1: Write failing tests**
 
-Test `invoke("increment")`, `buildXdr("increment")`, `debugXdr` disabled/enabled, and wallet sign failure mapped to `KALEIDO_XDR_SIGN_FAILED`.
+Test `invoke("increment")`, `buildXdr("increment")`, `debugXdr` disabled/enabled, and wallet sign failure mapped to `CAATINGA_XDR_SIGN_FAILED`.
 
 - [ ] **Step 2: Run client tests**
 
-Run: `pnpm --filter @kaleido-xlm/client test -- src/client/create-kaleido-client.test.ts`
+Run: `pnpm --filter @caatinga/client test -- src/client/create-caatinga-client.test.ts`
 
 Expected: FAIL because API is missing.
 
@@ -113,7 +113,7 @@ Resolve contract, get public key, create binding client, call method, extract un
 
 - [ ] **Step 4: Verify client tests**
 
-Run: `pnpm --filter @kaleido-xlm/client test -- src/client/create-kaleido-client.test.ts`
+Run: `pnpm --filter @caatinga/client test -- src/client/create-caatinga-client.test.ts`
 
 Expected: PASS.
 
@@ -122,7 +122,7 @@ Expected: PASS.
 **Files:**
 - Create: `packages/client/src/adapters/freighter.ts`
 - Create: `packages/client/src/freighter.ts`
-- Modify: `packages/core/src/errors/KaleidoError.ts`
+- Modify: `packages/core/src/errors/CaatingaError.ts`
 - Modify: `docs/errors.md`
 
 - [ ] **Step 1: Write failing public API checks**
@@ -135,11 +135,11 @@ Import `getAddress` and `signTransaction` from `@stellar/freighter-api`; expose 
 
 - [ ] **Step 3: Add public error codes**
 
-Add the specified `KALEIDO_XDR_*`, `KALEIDO_BINDING_*`, `KALEIDO_WALLET_NOT_CONNECTED`, and `KALEIDO_CONTRACT_ARTIFACT_NOT_FOUND` codes, and document them.
+Add the specified `CAATINGA_XDR_*`, `CAATINGA_BINDING_*`, `CAATINGA_WALLET_NOT_CONNECTED`, and `CAATINGA_CONTRACT_ARTIFACT_NOT_FOUND` codes, and document them.
 
 - [ ] **Step 4: Verify public API**
 
-Run: `pnpm --filter @kaleido-xlm/client build` and `pnpm --filter @kaleido-xlm/core test -- src/errors/error-codes.test.ts`.
+Run: `pnpm --filter @caatinga/client build` and `pnpm --filter @caatinga/core test -- src/errors/error-codes.test.ts`.
 
 Expected: PASS.
 
@@ -151,7 +151,7 @@ Expected: PASS.
 
 - [ ] **Step 1: Document counter usage**
 
-Add a concise example showing `createKaleidoClient`, Freighter adapter, generated Counter binding, artifacts, `invoke`, and `buildXdr`.
+Add a concise example showing `createCaatingaClient`, Freighter adapter, generated Counter binding, artifacts, `invoke`, and `buildXdr`.
 
 - [ ] **Step 2: Run full checks**
 

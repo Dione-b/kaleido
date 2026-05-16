@@ -1,12 +1,12 @@
 {
-  "name": "kaleido",
+  "name": "caatinga",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "build": "turbo build",
-    "dev": "pnpm --filter @kaleido-xlm/cli dev",
+    "dev": "pnpm --filter @caatinga/cli dev",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "knip": "knip --no-config-hints",

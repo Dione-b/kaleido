@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido-xlm/core";
-import { createKaleidoClient } from "./create-kaleido-client.js";
+import { CaatingaErrorCode, type CaatingaArtifacts } from "@caatinga/core";
+import { createCaatingaClient } from "./create-caatinga-client.js";
 
-const artifacts: KaleidoArtifacts = {
+const artifacts: CaatingaArtifacts = {
   project: "counter-app",
   version: 1,
   networks: {
@@ -71,7 +71,7 @@ function createClientConfig(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe("KaleidoContractClient (via createKaleidoClient)", () => {
+describe("CaatingaContractClient (via createCaatingaClient)", () => {
   it("should_map_wallet_getPublicKey_rejection_to_WALLET_NOT_CONNECTED_on_buildXdr", async () => {
     const config = createClientConfig({
       wallet: {
@@ -81,10 +81,10 @@ describe("KaleidoContractClient (via createKaleidoClient)", () => {
         signTransaction: vi.fn(async () => "AAAA_SIGNED")
       }
     });
-    const client = createKaleidoClient(config);
+    const client = createCaatingaClient(config);
 
     await expect(client.contract("counter").buildXdr("increment")).rejects.toMatchObject({
-      code: KaleidoErrorCode.WALLET_NOT_CONNECTED
+      code: CaatingaErrorCode.WALLET_NOT_CONNECTED
     });
   });
 
@@ -97,18 +97,18 @@ describe("KaleidoContractClient (via createKaleidoClient)", () => {
         signTransaction: vi.fn(async () => "AAAA_SIGNED")
       }
     });
-    const client = createKaleidoClient(config);
+    const client = createCaatingaClient(config);
 
     await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
-      code: KaleidoErrorCode.WALLET_NOT_CONNECTED
+      code: CaatingaErrorCode.WALLET_NOT_CONNECTED
     });
   });
 
   it("should_map_empty_submit_payload_to_XDR_RESULT_FAILED", async () => {
-    const client = createKaleidoClient(createClientConfig());
+    const client = createCaatingaClient(createClientConfig());
 
     await expect(client.contract("counter").invoke("badSubmit")).rejects.toMatchObject({
-      code: KaleidoErrorCode.XDR_RESULT_FAILED
+      code: CaatingaErrorCode.XDR_RESULT_FAILED
     });
   });
 });

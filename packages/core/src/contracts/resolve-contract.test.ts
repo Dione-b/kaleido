@@ -1,10 +1,10 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveContract } from "./resolve-contract.js";
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -33,13 +33,13 @@ describe("resolveContract", () => {
     expect(r.wasmPath).toBe(path.resolve(cwd, "./target/counter.wasm"));
   });
 
-  it("should_throw_KALEIDO_CONTRACT_NOT_FOUND_when_name_unknown", () => {
+  it("should_throw_CAATINGA_CONTRACT_NOT_FOUND_when_name_unknown", () => {
     try {
       resolveContract(baseConfig, "token");
       expect.fail("expected throw");
     } catch (error) {
-      expect(error).toBeInstanceOf(KaleidoError);
-      expect((error as KaleidoError).code).toBe(KaleidoErrorCode.CONTRACT_NOT_FOUND);
+      expect(error).toBeInstanceOf(CaatingaError);
+      expect((error as CaatingaError).code).toBe(CaatingaErrorCode.CONTRACT_NOT_FOUND);
     }
   });
 });

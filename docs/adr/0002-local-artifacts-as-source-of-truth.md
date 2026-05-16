@@ -15,18 +15,18 @@ Soroban dApps need to know **which contract IDs** correspond to which logical na
 ## Decision
 
 1. For the MVP and the near-term roadmap, **local project files** are the **source of truth**:
-   - `kaleido.config.ts` — project name, networks, contract paths/WASM paths, frontend binding output.
-   - `kaleido.artifacts.json` — deployed `contractId`, `wasmHash`, timestamps, and paths, keyed by **network** (same logical contract may differ per network).
+   - `caatinga.config.ts` — project name, networks, contract paths/WASM paths, frontend binding output.
+   - `caatinga.artifacts.json` — deployed `contractId`, `wasmHash`, timestamps, and paths, keyed by **network** (same logical contract may differ per network).
    - `contracts/` and **generated bindings** on disk — authoritative integration surface for the frontend.
-2. **No required central artifact registry** in core. Optional future services (hosted metadata, dashboards) must remain **optional** and must not be hard dependencies of `@kaleido-xlm/core` or `@kaleido-xlm/cli`.
+2. **No required central artifact registry** in core. Optional future services (hosted metadata, dashboards) must remain **optional** and must not be hard dependencies of `@caatinga/core` or `@caatinga/cli`.
 3. **Networks vs environments:** today’s model is **per-network** artifacts. A future **environment** dimension (e.g. staging vs production on the same testnet) is acknowledged; it will require a **versioned** artifacts or config evolution and a migration path—not silent overload of “network” semantics.
 
 ## Consequences
 
-- **Positive:** Reproducible deploys, simple offline inspection, no Kaleido account or cloud dependency for core flows.
+- **Positive:** Reproducible deploys, simple offline inspection, no Caatinga account or cloud dependency for core flows.
 - **Positive:** Aligns with security stance: no exfiltration of deploy metadata by default.
 - **Negative:** Teams must share artifacts/config via git or their own secret management—by design.
-- **Neutral:** When environments land, expect **`kaleido migrate`** (or equivalent) and a bumped `kaleido.artifacts.json` schema version.
+- **Neutral:** When environments land, expect **`caatinga migrate`** (or equivalent) and a bumped `caatinga.artifacts.json` schema version.
 
 ## Related
 

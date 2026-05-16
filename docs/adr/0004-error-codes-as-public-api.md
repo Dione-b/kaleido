@@ -14,15 +14,15 @@ CI pipelines, support playbooks, and programmatic wrappers need **stable identif
 
 ## Decision
 
-1. Expose **stable machine codes** for Kaleido failures using the `KALEIDO_*` namespace.
-2. Keep codes centralized in `KaleidoErrorCode`.
+1. Expose **stable machine codes** for Caatinga failures using the `CAATINGA_*` namespace.
+2. Keep codes centralized in `CaatingaErrorCode`.
 3. Document the mapping in `docs/errors.md`.
 4. Tests assert error codes for public failure paths.
 5. New public error codes must be prefixed before they are exposed.
 
 ## Consequences
 
-- Breaking change for anyone parsing legacy pre-`KALEIDO_*` codes; this must be communicated in release notes.
+- Breaking change for anyone parsing legacy pre-`CAATINGA_*` codes; this must be communicated in release notes.
 - Enables fixture-based tests that assert on `code` fields, not full English strings.
 - Makes stderr/message text easier to improve without breaking CI consumers.
 

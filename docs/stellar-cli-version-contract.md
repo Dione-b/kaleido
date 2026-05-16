@@ -1,6 +1,6 @@
 # Stellar CLI Version Contract
 
-Kaleido shells out to Stellar CLI for current build, deploy, bindings, and invoke commands. Future XDR or doctor commands must follow the same version contract when implemented. Unsupported CLI versions are not assumed safe.
+Caatinga shells out to Stellar CLI for current build, deploy, bindings, and invoke commands. Future XDR or doctor commands must follow the same version contract when implemented. Unsupported CLI versions are not assumed safe.
 
 ## Supported Range
 
@@ -9,8 +9,8 @@ Kaleido shells out to Stellar CLI for current build, deploy, bindings, and invok
 
 Runtime behavior:
 
-- Below the minimum: fail with `KALEIDO_UNSUPPORTED_CLI_VERSION`.
-- Above the tested maximum: fail with `KALEIDO_UNTESTED_CLI_VERSION`.
+- Below the minimum: fail with `CAATINGA_UNSUPPORTED_CLI_VERSION`.
+- Above the tested maximum: fail with `CAATINGA_UNTESTED_CLI_VERSION`.
 - Local override: pass `--allow-untested-stellar-cli`.
 - CI must not use the override.
 
@@ -18,10 +18,10 @@ Runtime behavior:
 
 Run these only on a developer machine when you accept compatibility risk:
 
-- `kaleido build counter --allow-untested-stellar-cli`
-- `kaleido deploy counter -s <identity> --allow-untested-stellar-cli`
-- `kaleido generate counter --allow-untested-stellar-cli`
-- `kaleido invoke counter.increment -s <identity> --allow-untested-stellar-cli` (replace `<identity>` with your Stellar CLI identity alias or public account address)
+- `caatinga build counter --allow-untested-stellar-cli`
+- `caatinga deploy counter -s <identity> --allow-untested-stellar-cli`
+- `caatinga generate counter --allow-untested-stellar-cli`
+- `caatinga invoke counter.increment -s <identity> --allow-untested-stellar-cli` (replace `<identity>` with your Stellar CLI identity alias or public account address)
 
 ## Upgrade Process
 
@@ -33,4 +33,4 @@ Run these only on a developer machine when you accept compatibility risk:
 
 ## CI Rule
 
-CI must use a pinned Stellar CLI version within the supported range. The override flag is for local experiments only because CI is the release boundary.
+CI installs Stellar CLI via `stellar/stellar-cli@v22.8.1` in `.github/workflows/ci.yml` (adjust the tag when raising `STELLAR_CLI_TESTED_MAX_VERSION`). Parser fixture tests run on every push and pull request. The override flag is for local experiments only because CI is the release boundary.

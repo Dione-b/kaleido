@@ -1,9 +1,9 @@
-# Client (`@kaleido-xlm/client`)
+# Client (`@caatinga/client`)
 
-`@kaleido-xlm/client` is the alpha browser/client-side interop layer for generated Stellar CLI TypeScript bindings. It connects:
+`@caatinga/client` is the alpha browser/client-side interop layer for generated Stellar CLI TypeScript bindings. It connects:
 
 - generated contract bindings
-- `kaleido.artifacts.json`
+- `caatinga.artifacts.json`
 - RPC URL and network passphrase
 - a wallet adapter
 
@@ -15,18 +15,18 @@ Included in alpha:
 
 - artifact-based `contractId` lookup
 - generated binding registration
-- `KaleidoWalletAdapter`
+- `CaatingaWalletAdapter`
 - Freighter adapter
 - `invoke()`
 - `buildXdr()`
 - explicit `debugXdr` and `debugRaw`
-- `KALEIDO_XDR_*`, binding, wallet, and artifact errors
+- `CAATINGA_XDR_*`, binding, wallet, and artifact errors
 
 Not included:
 
 - React hooks
 - CLI XDR commands
-- `kaleido generate --interop`
+- `caatinga generate --interop`
 - custom SCVal serialization
 - multisig orchestration
 - backend signing
@@ -34,18 +34,18 @@ Not included:
 ## Install
 
 ```bash
-pnpm add @kaleido-xlm/client @stellar/freighter-api
+pnpm add @caatinga/client @stellar/freighter-api
 ```
 
 ## Counter Example
 
 ```ts
-import { createKaleidoClient } from "@kaleido-xlm/client";
-import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
+import { createCaatingaClient } from "@caatinga/client";
+import { freighterWalletAdapter } from "@caatinga/client/freighter";
 import * as Counter from "./contracts/generated/counter";
-import artifacts from "../kaleido.artifacts.json";
+import artifacts from "../caatinga.artifacts.json";
 
-const client = createKaleidoClient({
+const client = createCaatingaClient({
   network: {
     name: "testnet",
     rpcUrl: "https://soroban-testnet.stellar.org",
@@ -84,7 +84,7 @@ artifacts.networks[network].contracts[contract].contractId
 To override artifacts:
 
 ```ts
-const client = createKaleidoClient({
+const client = createCaatingaClient({
   network,
   artifacts,
   wallet: freighterWalletAdapter,
@@ -147,7 +147,7 @@ console.log(tx.preparedXdr);
 ## Wallet Adapter
 
 ```ts
-export interface KaleidoWalletAdapter {
+export interface CaatingaWalletAdapter {
   getPublicKey(): Promise<string>;
 
   signTransaction(input: {
@@ -160,7 +160,7 @@ export interface KaleidoWalletAdapter {
 The Freighter adapter is exported from:
 
 ```ts
-import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
+import { freighterWalletAdapter } from "@caatinga/client/freighter";
 ```
 
 ## Binding Contract
@@ -177,16 +177,16 @@ If Stellar CLI changes this generated shape, the compatibility fix belongs in th
 
 ## Failure behavior
 
-Client failures use public `KALEIDO_*` codes. The most common are:
+Client failures use public `CAATINGA_*` codes. The most common are:
 
-- `KALEIDO_CONTRACT_ARTIFACT_NOT_FOUND`
-- `KALEIDO_BINDING_CLIENT_NOT_FOUND`
-- `KALEIDO_BINDING_METHOD_NOT_FOUND`
-- `KALEIDO_WALLET_NOT_CONNECTED`
-- `KALEIDO_XDR_BUILD_FAILED`
-- `KALEIDO_XDR_PREPARE_FAILED`
-- `KALEIDO_XDR_SIGN_FAILED`
-- `KALEIDO_XDR_SUBMIT_FAILED`
-- `KALEIDO_XDR_RESULT_FAILED`
+- `CAATINGA_CONTRACT_ARTIFACT_NOT_FOUND`
+- `CAATINGA_BINDING_CLIENT_NOT_FOUND`
+- `CAATINGA_BINDING_METHOD_NOT_FOUND`
+- `CAATINGA_WALLET_NOT_CONNECTED`
+- `CAATINGA_XDR_BUILD_FAILED`
+- `CAATINGA_XDR_PREPARE_FAILED`
+- `CAATINGA_XDR_SIGN_FAILED`
+- `CAATINGA_XDR_SUBMIT_FAILED`
+- `CAATINGA_XDR_RESULT_FAILED`
 
 See [`errors.md`](./errors.md) for the full table.

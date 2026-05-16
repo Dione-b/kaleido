@@ -2,8 +2,8 @@ import path from "node:path";
 import { readArtifacts } from "../artifacts/read-artifacts.js";
 import { updateArtifact } from "../artifacts/update-artifact.js";
 import { writeArtifacts } from "../artifacts/write-artifacts.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
@@ -15,7 +15,7 @@ import { resolveContract } from "./resolve-contract.js";
 import { assertWasmExists, hashWasm } from "./wasm.js";
 
 export type DeployContractOptions = {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   contractName: string;
   networkName?: string;
   source?: string;
@@ -52,7 +52,7 @@ export async function deployContract(options: DeployContractOptions) {
   const network = resolveNetwork(options.config, options.networkName);
   const source = assertSafeSourceAccount(options.source);
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido deploy.", {
+  await checkBinary("stellar", "Install Stellar CLI before running caatinga deploy.", {
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
   await assertWasmExists(contract.wasmPath);
@@ -64,7 +64,7 @@ export async function deployContract(options: DeployContractOptions) {
       contract,
       network,
       contractId: existing.contractId,
-      artifactsPath: path.resolve(cwd, "kaleido.artifacts.json"),
+      artifactsPath: path.resolve(cwd, "caatinga.artifacts.json"),
       output: "",
       skipped: true as const
     };
@@ -88,9 +88,9 @@ export async function deployContract(options: DeployContractOptions) {
 
   for (const value of Object.values(resolvedDeployArgs)) {
     if (typeof value === "string" && value.includes("${")) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Deploy args for "${contract.name}" still contain unresolved placeholders.`,
-        KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_UNRESOLVED,
+        CaatingaErrorCode.DEPLOY_ARG_PLACEHOLDER_UNRESOLVED,
         "Deploy dependencies first or fix deployArgs templates."
       );
     }
@@ -115,7 +115,7 @@ export async function deployContract(options: DeployContractOptions) {
   const result = await runCommand("stellar", stellarArgs, {
     cwd,
     allowUntestedStellarCli: options.allowUntestedStellarCli,
-    failureCode: KaleidoErrorCode.DEPLOY_FAILED
+    failureCode: CaatingaErrorCode.DEPLOY_FAILED
   });
 
   const output = result.all || `${result.stdout}\n${result.stderr}`;

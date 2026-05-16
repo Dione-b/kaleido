@@ -6,7 +6,7 @@ Required before v1, at least experimental.
 
 ## Problem
 
-Single-contract Kaleido is mostly a convenience wrapper over Stellar CLI plus config. Multi-contract deployment with dependency ordering and contractId injection is the first feature that materially differentiates Kaleido.
+Single-contract Caatinga is mostly a convenience wrapper over Stellar CLI plus config. Multi-contract deployment with dependency ordering and contractId injection is the first feature that materially differentiates Caatinga.
 
 ## Goal
 
@@ -18,7 +18,7 @@ Example:
 token -> marketplace
 ```
 
-Kaleido must deploy `token` first, capture its `contractId`, then inject that ID into the deploy/init args for `marketplace`.
+Caatinga must deploy `token` first, capture its `contractId`, then inject that ID into the deploy/init args for `marketplace`.
 
 ## Config shape
 
@@ -84,7 +84,7 @@ ${process.env.X}
 Command:
 
 ```bash
-kaleido deploy --network testnet
+caatinga deploy --network testnet
 ```
 
 Behavior:
@@ -99,7 +99,7 @@ resolve deployArgs placeholders before dependent deploy
 Contract-specific deploy remains valid:
 
 ```bash
-kaleido deploy marketplace --network testnet
+caatinga deploy marketplace --network testnet
 ```
 
 Behavior:
@@ -146,11 +146,11 @@ If this breaks existing readers, use artifact schema `version: 2`.
 ## New error codes
 
 ```txt
-KALEIDO_CONTRACT_DEPENDENCY_NOT_FOUND
-KALEIDO_CONTRACT_DEPENDENCY_CYCLE
-KALEIDO_CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND
-KALEIDO_DEPLOY_ARG_PLACEHOLDER_INVALID
-KALEIDO_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED
+CAATINGA_CONTRACT_DEPENDENCY_NOT_FOUND
+CAATINGA_CONTRACT_DEPENDENCY_CYCLE
+CAATINGA_CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND
+CAATINGA_DEPLOY_ARG_PLACEHOLDER_INVALID
+CAATINGA_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED
 ```
 
 ## Core modules
@@ -224,7 +224,7 @@ experimental stability if applicable
 ## Acceptance criteria
 
 ```txt
-dependsOn works in kaleido.config.ts
+dependsOn works in caatinga.config.ts
 deploy order uses topological sort
 contractId placeholders are resolved safely
 dependency graph is recorded in artifacts

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import semver from "semver";
-import { KALEIDO_CORE_VERSION } from "../version.js";
+import { CAATINGA_CORE_VERSION } from "../version.js";
 
 export const CURRENT_TEMPLATE_VERSION = 1;
 
@@ -8,7 +8,7 @@ export const TemplateManifestSchema = z.object({
   name: z.string().min(1),
   version: z.string().min(1),
   description: z.string().optional(),
-  kaleido: z.object({
+  caatinga: z.object({
     compatibleCore: z.string().min(1),
     templateVersion: z.number().int().positive()
   }),
@@ -21,13 +21,13 @@ export const TemplateManifestSchema = z.object({
     default: z.string().optional()
   }),
   files: z.object({
-    config: z.string().default("kaleido.config.ts"),
-    artifacts: z.string().default("kaleido.artifacts.json")
+    config: z.string().default("caatinga.config.ts"),
+    artifacts: z.string().default("caatinga.artifacts.json")
   })
 });
 
 export type TemplateManifest = z.infer<typeof TemplateManifestSchema>;
 
-export function isCoreVersionCompatible(range: string, coreVersion = KALEIDO_CORE_VERSION): boolean {
+export function isCoreVersionCompatible(range: string, coreVersion = CAATINGA_CORE_VERSION): boolean {
   return semver.satisfies(coreVersion, range);
 }

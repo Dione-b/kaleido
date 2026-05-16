@@ -1,7 +1,7 @@
 import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
 import {
   CURRENT_TEMPLATE_VERSION,
@@ -23,10 +23,10 @@ export async function createProjectFromTemplate(options: CreateProjectFromTempla
   try {
     await stat(templateDir);
   } catch {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Template directory was not found: ${templateDir}`,
-      KaleidoErrorCode.TEMPLATE_NOT_FOUND,
-      "Use a bundled Kaleido template or set KALEIDO_TEMPLATES_DIR for local development."
+      CaatingaErrorCode.TEMPLATE_NOT_FOUND,
+      "Use a bundled Caatinga template or set CAATINGA_TEMPLATES_DIR for local development."
     );
   }
 
@@ -46,47 +46,47 @@ export async function createProjectFromTemplate(options: CreateProjectFromTempla
 }
 
 async function readTemplateManifest(templateDir: string): Promise<TemplateManifest> {
-  const manifestPath = path.join(templateDir, "kaleido.template.json");
+  const manifestPath = path.join(templateDir, "caatinga.template.json");
 
   try {
     const rawManifest = await readFile(manifestPath, "utf8");
     const manifest = TemplateManifestSchema.parse(JSON.parse(rawManifest));
 
-    if (manifest.kaleido.templateVersion !== CURRENT_TEMPLATE_VERSION) {
-      throw new KaleidoError(
-        "Template is not compatible with this Kaleido version.",
-        KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-        "Use a compatible template version or upgrade Kaleido."
+    if (manifest.caatinga.templateVersion !== CURRENT_TEMPLATE_VERSION) {
+      throw new CaatingaError(
+        "Template is not compatible with this Caatinga version.",
+        CaatingaErrorCode.TEMPLATE_INCOMPATIBLE,
+        "Use a compatible template version or upgrade Caatinga."
       );
     }
 
-    if (!isCoreVersionCompatible(manifest.kaleido.compatibleCore)) {
-      throw new KaleidoError(
-        "Template is not compatible with this Kaleido version.",
-        KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-        "Use a compatible template version or upgrade Kaleido."
+    if (!isCoreVersionCompatible(manifest.caatinga.compatibleCore)) {
+      throw new CaatingaError(
+        "Template is not compatible with this Caatinga version.",
+        CaatingaErrorCode.TEMPLATE_INCOMPATIBLE,
+        "Use a compatible template version or upgrade Caatinga."
       );
     }
 
     return manifest;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      throw new KaleidoError(
+      throw new CaatingaError(
         "Template manifest was not found.",
-        KaleidoErrorCode.TEMPLATE_MANIFEST_NOT_FOUND,
-        "Add a kaleido.template.json file to the template root."
+        CaatingaErrorCode.TEMPLATE_MANIFEST_NOT_FOUND,
+        "Add a caatinga.template.json file to the template root."
       );
     }
 
-    if (error instanceof KaleidoError) {
+    if (error instanceof CaatingaError) {
       throw error;
     }
 
     if (error instanceof SyntaxError || error instanceof z.ZodError) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         "Template manifest is invalid.",
-        KaleidoErrorCode.INVALID_TEMPLATE_MANIFEST,
-        "Fix kaleido.template.json so it is valid JSON and matches the template manifest schema."
+        CaatingaErrorCode.INVALID_TEMPLATE_MANIFEST,
+        "Fix caatinga.template.json so it is valid JSON and matches the template manifest schema."
       );
     }
 

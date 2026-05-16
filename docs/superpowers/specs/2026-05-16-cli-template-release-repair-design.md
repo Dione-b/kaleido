@@ -10,12 +10,12 @@ Proposed.
 
 ## Motivation
 
-`npx @kaleido-xlm/cli@0.1.0 init my-app` fails for real consumers with `KALEIDO_TEMPLATE_NOT_FOUND` because the published CLI contract was not enforced strongly enough at release time. The repository already contains the template-bundling fix, but the published package and the release validation path allowed a broken consumer experience to ship.
+`npx @caatinga/cli@0.1.0 init my-app` fails for real consumers with `CAATINGA_TEMPLATE_NOT_FOUND` because the published CLI contract was not enforced strongly enough at release time. The repository already contains the template-bundling fix, but the published package and the release validation path allowed a broken consumer experience to ship.
 
 We need a release repair that:
 
 1. Blocks any future CLI tarball that omits bundled templates.
-2. Validates `kaleido init` from a packed consumer environment without `KALEIDO_TEMPLATES_DIR`.
+2. Validates `caatinga init` from a packed consumer environment without `CAATINGA_TEMPLATES_DIR`.
 3. Publishes the three fixed-version packages in lockstep as `0.1.3` so the public contract matches the repository state.
 
 ## Non-goals
@@ -28,15 +28,15 @@ We need a release repair that:
 
 ## Prior Art
 
-### Rejected: patch only `@kaleido-xlm/cli`
+### Rejected: patch only `@caatinga/cli`
 
-Rejected because [`.changeset/config.json`](/home/dionebastos/Documentos/PROJETOS/kaleido/.changeset/config.json:1) defines fixed versioning for `@kaleido-xlm/cli`, `@kaleido-xlm/core`, and `@kaleido-xlm/client`. Publishing only one package would create version drift and weaken the release contract.
+Rejected because [`.changeset/config.json`](/home/dionebastos/Documentos/PROJETOS/caatinga/.changeset/config.json:1) defines fixed versioning for `@caatinga/cli`, `@caatinga/core`, and `@caatinga/client`. Publishing only one package would create version drift and weaken the release contract.
 
 ### Rejected: reuse `0.1.2`
 
 Rejected because npm already exposes `0.1.0` while the repository is on `0.1.2`. Reusing or force-fitting `0.1.2` obscures release history. `0.1.3` makes the repair explicit and monotonic.
 
-### Rejected: keep `KALEIDO_TEMPLATES_DIR` in consumer validation
+### Rejected: keep `CAATINGA_TEMPLATES_DIR` in consumer validation
 
 Rejected because it hides the exact failure mode experienced by users. Consumer isolation must prove the packaged CLI resolves bundled templates on its own.
 
@@ -46,9 +46,9 @@ Rejected because it hides the exact failure mode experienced by users. Consumer 
 
 The next prepared release bumps these packages together from `0.1.2` to `0.1.3`:
 
-- `@kaleido-xlm/cli`
-- `@kaleido-xlm/core`
-- `@kaleido-xlm/client`
+- `@caatinga/cli`
+- `@caatinga/core`
+- `@caatinga/client`
 
 ### CLI packaging contract
 
@@ -57,10 +57,10 @@ The packed CLI tarball must contain at minimum:
 ```txt
 package/dist/index.js
 package/package.json
-package/templates/react-vite-counter/kaleido.template.json
+package/templates/react-vite-counter/caatinga.template.json
 ```
 
-If `package/templates/react-vite-counter/kaleido.template.json` is absent, release validation must fail before any consumer test or publish step continues.
+If `package/templates/react-vite-counter/caatinga.template.json` is absent, release validation must fail before any consumer test or publish step continues.
 
 ### Consumer isolation contract
 
@@ -68,9 +68,9 @@ If `package/templates/react-vite-counter/kaleido.template.json` is absent, relea
 
 1. Create a temp directory outside the monorepo.
 2. Install packed `core`, `client`, and `cli` tarballs.
-3. Run `npx kaleido --version`.
-4. Run `npx kaleido init test-app --template react-vite-counter` with no `KALEIDO_TEMPLATES_DIR`.
-5. Verify `test-app/kaleido.config.ts` and `test-app/kaleido.artifacts.json` exist.
+3. Run `npx caatinga --version`.
+4. Run `npx caatinga init test-app --template react-vite-counter` with no `CAATINGA_TEMPLATES_DIR`.
+5. Verify `test-app/caatinga.config.ts` and `test-app/caatinga.artifacts.json` exist.
 6. Install generated app dependencies.
 7. Run `npm run build` in the generated app.
 
@@ -78,7 +78,7 @@ Failure cases:
 
 - Missing tarball: exit non-zero with explicit stderr.
 - Missing bundled templates in CLI tarball: exit non-zero with explicit stderr.
-- `kaleido init` failure: exit non-zero and stop release preparation.
+- `caatinga init` failure: exit non-zero and stop release preparation.
 - Generated app build failure: exit non-zero and stop release preparation.
 
 ### Release evidence contract
@@ -90,7 +90,7 @@ pnpm typecheck
 pnpm build
 pnpm test
 pnpm ci:snapshot-pack
-NPM_CONFIG_CACHE=/tmp/kaleido-npm-cache bash scripts/consumer-isolation-test.sh
+NPM_CONFIG_CACHE=/tmp/caatinga-npm-cache bash scripts/consumer-isolation-test.sh
 ```
 
 If any command fails, release preparation is incomplete.

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { deployContractGraph } from "./deploy-contract-graph.js";
 
 const deployContractMock = vi.hoisted(() => vi.fn());
@@ -14,7 +14,7 @@ vi.mock("../artifacts/read-artifacts.js", () => ({
   readArtifacts: readArtifactsMock
 }));
 
-const config: KaleidoConfig = {
+const config: CaatingaConfig = {
   project: "marketplace-app",
   defaultNetwork: "testnet",
   contracts: {
@@ -112,7 +112,7 @@ describe("deployContractGraph", () => {
         includeDependencies: false,
         force: false
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND });
   });
 
   it("deploys_all_contracts_in_topological_order_when_contractName_is_omitted", async () => {

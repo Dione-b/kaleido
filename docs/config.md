@@ -1,9 +1,9 @@
 # Config
 
-Kaleido projects use `kaleido.config.ts`.
+Caatinga projects use `caatinga.config.ts`.
 
 ```ts
-import { defineConfig } from "@kaleido-xlm/core";
+import { defineConfig } from "@caatinga/core";
 
 export default defineConfig({
   project: "my-dapp",
@@ -48,7 +48,7 @@ Current shape (optional fields omitted when empty):
 
 ### Multi-contract dependencies
 
-`dependsOn` lists contracts that must deploy before the current contract. `deployArgs` may use `${contracts.<name>.contractId}` placeholders, resolved from `kaleido.artifacts.json` after dependencies deploy:
+`dependsOn` lists contracts that must deploy before the current contract. `deployArgs` may use `${contracts.<name>.contractId}` placeholders, resolved from `caatinga.artifacts.json` after dependencies deploy:
 
 ```ts
 contracts: {

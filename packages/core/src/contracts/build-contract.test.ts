@@ -2,8 +2,8 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -13,7 +13,7 @@ vi.mock("../shell/run-command.js", () => ({
 
 import { buildContract } from "./build-contract.js";
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -48,7 +48,7 @@ describe("buildContract", () => {
   });
 
   it("should_run_stellar_contract_build_in_contract_source_dir_when_binaries_ok", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(sourceDir, { recursive: true });
@@ -63,12 +63,12 @@ describe("buildContract", () => {
 
     expect(runCommand).toHaveBeenCalledWith("stellar", ["contract", "build"], {
       cwd: sourceDir,
-      failureCode: KaleidoErrorCode.BUILD_FAILED
+      failureCode: CaatingaErrorCode.BUILD_FAILED
     });
   });
 
   it("passes the untested Stellar CLI override into the preflight version check", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(sourceDir, { recursive: true });
@@ -88,20 +88,20 @@ describe("buildContract", () => {
     expect(runCommand).toHaveBeenCalledWith("stellar", ["contract", "build"], {
       cwd: sourceDir,
       allowUntestedStellarCli: true,
-      failureCode: KaleidoErrorCode.BUILD_FAILED
+      failureCode: CaatingaErrorCode.BUILD_FAILED
     });
   });
 
   it("should_throw_RUST_TARGET_NOT_FOUND_when_stellar_build_reports_missing_wasm32_unknown_unknown", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
     await mkdir(sourceDir, { recursive: true });
 
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "contract" && args[1] === "build") {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "Command failed: stellar contract build",
-          KaleidoErrorCode.BUILD_FAILED,
+          CaatingaErrorCode.BUILD_FAILED,
           "the wasm32-unknown-unknown target may not be installed",
           new Error("error: the wasm32-unknown-unknown target is not installed. run `rustup target add wasm32-unknown-unknown`")
         );
@@ -117,20 +117,20 @@ describe("buildContract", () => {
         cwd: tmpDir
       })
     ).rejects.toMatchObject({
-      code: KaleidoErrorCode.RUST_TARGET_NOT_FOUND
+      code: CaatingaErrorCode.RUST_TARGET_NOT_FOUND
     });
   });
 
   it("should_rethrow_BUILD_FAILED_when_stellar_build_failure_is_unrelated_to_missing_target", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
     await mkdir(sourceDir, { recursive: true });
 
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "contract" && args[1] === "build") {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "Command failed: stellar contract build",
-          KaleidoErrorCode.BUILD_FAILED,
+          CaatingaErrorCode.BUILD_FAILED,
           "compilation error: missing semicolon",
           new Error("error: expected `;`")
         );
@@ -146,19 +146,19 @@ describe("buildContract", () => {
         cwd: tmpDir
       })
     ).rejects.toMatchObject({
-      code: KaleidoErrorCode.BUILD_FAILED
+      code: CaatingaErrorCode.BUILD_FAILED
     });
   });
 
   it("does not mask Stellar CLI version errors from the preflight check", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-build-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
     await mkdir(sourceDir, { recursive: true });
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "--version") {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "Stellar CLI 99.0.0 is newer than the tested maximum.",
-          KaleidoErrorCode.UNTESTED_CLI_VERSION
+          CaatingaErrorCode.UNTESTED_CLI_VERSION
         );
       }
 
@@ -170,7 +170,7 @@ describe("buildContract", () => {
       contractName: "counter",
       cwd: tmpDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+      code: CaatingaErrorCode.UNTESTED_CLI_VERSION
     });
   });
 });

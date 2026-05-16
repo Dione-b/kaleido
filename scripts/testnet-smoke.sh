@@ -6,10 +6,10 @@ export PATH="$ROOT_DIR/node_modules/.bin:$PATH"
 CORE_INDEX="${ROOT_DIR}/packages/core/dist/index.js"
 
 APP_NAME="${1:-smoke-app}"
-IDENTITY_ALIAS="${KALEIDO_CI_IDENTITY_ALIAS:?KALEIDO_CI_IDENTITY_ALIAS is required}"
+IDENTITY_ALIAS="${CAATINGA_CI_IDENTITY_ALIAS:?CAATINGA_CI_IDENTITY_ALIAS is required}"
 ARTIFACT_DIR="$ROOT_DIR/smoke-ci-out"
 LOG_FILE="$ARTIFACT_DIR/${APP_NAME}-smoke.log"
-KALEIDO_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-kaleido-version.txt"
+CAATINGA_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-caatinga-version.txt"
 STELLAR_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-stellar-version.txt"
 
 mkdir -p "$ARTIFACT_DIR"
@@ -50,13 +50,13 @@ run_step() {
   fi
 }
 
-log "=== kaleido-version ==="
+log "=== caatinga-version ==="
 set +e
-kaleido --version 2>&1 | tee "$KALEIDO_VERSION_FILE" | tee -a "$LOG_FILE"
+caatinga --version 2>&1 | tee "$CAATINGA_VERSION_FILE" | tee -a "$LOG_FILE"
 ec_kv=${PIPESTATUS[0]}
 set -e
 if [[ "$ec_kv" -ne 0 ]]; then
-  classify_and_exit "$ec_kv" "kaleido-version"
+  classify_and_exit "$ec_kv" "caatinga-version"
 fi
 
 log "=== stellar-version ==="
@@ -70,19 +70,19 @@ fi
 
 rm -rf "$ROOT_DIR/$APP_NAME"
 
-run_step "init" kaleido init "$APP_NAME" --template react-vite-counter
+run_step "init" caatinga init "$APP_NAME" --template react-vite-counter
 cd "$ROOT_DIR/$APP_NAME"
 
-run_step "build" kaleido build counter
-run_step "deploy" kaleido deploy counter --network testnet --source "$IDENTITY_ALIAS"
+run_step "build" caatinga build counter
+run_step "deploy" caatinga deploy counter --network testnet --source "$IDENTITY_ALIAS"
 
-test -f kaleido.artifacts.json
+test -f caatinga.artifacts.json
 
 log "=== artifacts-contract-id ==="
 set +e
 node --input-type=module -e '
 import fs from "node:fs";
-const artifacts = JSON.parse(fs.readFileSync("kaleido.artifacts.json", "utf8"));
+const artifacts = JSON.parse(fs.readFileSync("caatinga.artifacts.json", "utf8"));
 const contractId = artifacts.networks?.testnet?.contracts?.counter?.contractId;
 if (!/^C[A-Z0-9]{55}$/.test(contractId ?? "")) {
   console.error(`Invalid contractId: ${contractId}`);
@@ -95,12 +95,12 @@ if [[ "$ec_art" -ne 0 ]]; then
   classify_and_exit "$ec_art" "artifacts-contract-id"
 fi
 
-run_step "generate" kaleido generate counter --network testnet
+run_step "generate" caatinga generate counter --network testnet
 test -d src/contracts/generated
 
 set +e
 INVOKE_OUT="$(mktemp)"
-kaleido invoke counter.increment --network testnet --source "$IDENTITY_ALIAS" 2>&1 | tee "$INVOKE_OUT" | tee -a "$LOG_FILE"
+caatinga invoke counter.increment --network testnet --source "$IDENTITY_ALIAS" 2>&1 | tee "$INVOKE_OUT" | tee -a "$LOG_FILE"
 INV_EC=${PIPESTATUS[0]}
 set -e
 if [[ "$INV_EC" -ne 0 ]]; then

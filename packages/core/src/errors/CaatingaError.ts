@@ -1,27 +1,27 @@
-import { KaleidoErrorCode, type KaleidoErrorCodeValue } from "./KaleidoErrorCode.js";
+import { CaatingaErrorCode, type CaatingaErrorCodeValue } from "./CaatingaErrorCode.js";
 
-export { KaleidoErrorCode } from "./KaleidoErrorCode.js";
+export { CaatingaErrorCode } from "./CaatingaErrorCode.js";
 
-export class KaleidoError extends Error {
+export class CaatingaError extends Error {
   constructor(
     message: string,
-    public readonly code: KaleidoErrorCodeValue,
+    public readonly code: CaatingaErrorCodeValue,
     public readonly hint?: string,
     public readonly cause?: unknown
   ) {
     super(message);
-    this.name = "KaleidoError";
+    this.name = "CaatingaError";
   }
 }
 
-export function toKaleidoError(error: unknown): KaleidoError {
-  if (error instanceof KaleidoError) {
+export function toCaatingaError(error: unknown): CaatingaError {
+  if (error instanceof CaatingaError) {
     return error;
   }
 
   if (error instanceof Error) {
-    return new KaleidoError(error.message, KaleidoErrorCode.UNEXPECTED_ERROR, undefined, error);
+    return new CaatingaError(error.message, CaatingaErrorCode.UNEXPECTED_ERROR, undefined, error);
   }
 
-  return new KaleidoError("An unexpected error occurred.", KaleidoErrorCode.UNEXPECTED_ERROR);
+  return new CaatingaError("An unexpected error occurred.", CaatingaErrorCode.UNEXPECTED_ERROR);
 }

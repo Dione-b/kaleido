@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { execa } from "execa";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { runCommand } from "./run-command.js";
 
 vi.mock("execa", () => ({ execa: vi.fn() }));
@@ -18,10 +18,10 @@ describe("runCommand failureCode", () => {
     await expect(
       runCommand("false", [], {
         skipStellarVersionCheck: true,
-        failureCode: KaleidoErrorCode.BUILD_FAILED
+        failureCode: CaatingaErrorCode.BUILD_FAILED
       })
     ).rejects.toMatchObject({
-      code: KaleidoErrorCode.BUILD_FAILED
+      code: CaatingaErrorCode.BUILD_FAILED
     });
   });
 
@@ -31,7 +31,7 @@ describe("runCommand failureCode", () => {
     await expect(
       runCommand("false", [], { skipStellarVersionCheck: true })
     ).rejects.toMatchObject({
-      code: KaleidoErrorCode.COMMAND_FAILED
+      code: CaatingaErrorCode.COMMAND_FAILED
     });
   });
 });

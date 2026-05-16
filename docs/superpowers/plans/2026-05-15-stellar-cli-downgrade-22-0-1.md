@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Substituir o binario local `stellar` `25.1.0` por `22.0.1` no ambiente Linux x86_64 para manter compatibilidade com o contrato atual do Kaleido.
+**Goal:** Substituir o binario local `stellar` `25.1.0` por `22.0.1` no ambiente Linux x86_64 para manter compatibilidade com o contrato atual do Caatinga.
 
-**Architecture:** O downgrade sera tratado como mudanca operacional local, sem tocar no codigo do repositorio. Como este host nao permite escrita direta em `/usr/local/bin` sem `sudo` interativo, o binario atual em `/usr/local/bin/stellar` sera preservado em backup no escopo do usuario e o release oficial `v22.0.1` sera instalado em `~/.local/bin/stellar`, que tem precedencia no `PATH`. A validacao final ocorre com `stellar --version` e com um build real de um projeto Kaleido fora do monorepo.
+**Architecture:** O downgrade sera tratado como mudanca operacional local, sem tocar no codigo do repositorio. Como este host nao permite escrita direta em `/usr/local/bin` sem `sudo` interativo, o binario atual em `/usr/local/bin/stellar` sera preservado em backup no escopo do usuario e o release oficial `v22.0.1` sera instalado em `~/.local/bin/stellar`, que tem precedencia no `PATH`. A validacao final ocorre com `stellar --version` e com um build real de um projeto Caatinga fora do monorepo.
 
-**Tech Stack:** Bash, `curl`, `tar`, GitHub Releases (`stellar/stellar-cli`), Kaleido CLI, Linux x86_64 glibc.
+**Tech Stack:** Bash, `curl`, `tar`, GitHub Releases (`stellar/stellar-cli`), Caatinga CLI, Linux x86_64 glibc.
 
 ---
 
@@ -17,7 +17,7 @@
 | `docs/superpowers/plans/2026-05-15-stellar-cli-downgrade-22-0-1.md` | Plano operacional do downgrade |
 | `/usr/local/bin/stellar` | Binario de sistema original, mantido intacto |
 | `/home/dionebastos/.local/bin/stellar-25.1.0.backup` | Backup nomeado do binario atual antes da troca |
-| `/home/dionebastos/.local/bin/stellar` | Binario ativo do Stellar CLI usado pelo Kaleido apos o downgrade |
+| `/home/dionebastos/.local/bin/stellar` | Binario ativo do Stellar CLI usado pelo Caatinga apos o downgrade |
 | `/tmp/stellar-cli-downgrade/` | Diretorio temporario para download e extracao do release `22.0.1` |
 
 **Baseline verificado neste ambiente:** `which stellar` retornava `/usr/local/bin/stellar`; `stellar --version` retornava `25.1.0`; o host e Linux x86_64; `brew` e `asdf` nao estao instalados; o binario atual nao pertence a pacote `dpkg`; `/usr/local/bin` exige privilegio fora do fluxo automatizavel; `~/.local/bin` aparece antes de `/usr/local/bin` no `PATH`, entao a substituicao local em escopo de usuario e o caminho correto.
@@ -153,28 +153,28 @@ Expected:
 - `readlink -f` tambem resolve para `/home/dionebastos/.local/bin/stellar`
 - `stellar --version` mostra `stellar 22.0.1`
 
-### Task 4: Verificar compatibilidade com o Kaleido
+### Task 4: Verificar compatibilidade com o Caatinga
 
 **Files:**
-- Read-only: `/home/dionebastos/Documentos/PROJETOS/kaleido/packages/cli/src/commands/build.command.ts`
-- Read-only: `/home/dionebastos/Documentos/PROJETOS/first-dapp/kaleido.config.ts`
+- Read-only: `/home/dionebastos/Documentos/PROJETOS/caatinga/packages/cli/src/commands/build.command.ts`
+- Read-only: `/home/dionebastos/Documentos/PROJETOS/first-dapp/caatinga.config.ts`
 
-- [x] **Step 1: Rodar o build sem override em um projeto Kaleido real**
+- [x] **Step 1: Rodar o build sem override em um projeto Caatinga real**
 
 Run:
 
 ```bash
 cd /home/dionebastos/Documentos/PROJETOS/first-dapp
-npx kaleido build counter
+npx caatinga build counter
 ```
 
 Expected:
-- nao aparece `KALEIDO_UNTESTED_CLI_VERSION`
+- nao aparece `CAATINGA_UNTESTED_CLI_VERSION`
 - se houver falha, ela deve ser do pipeline real de build do contrato, nao do gate de versao
 
 Observed:
 - o erro de versao desapareceu
-- o build avancou ate a etapa Rust e falhou com `KALEIDO_RUST_TARGET_NOT_FOUND`
+- o build avancou ate a etapa Rust e falhou com `CAATINGA_RUST_TARGET_NOT_FOUND`
 - o hint retornado foi `rustup target add wasm32v1-none`
 
 - [x] **Step 2: Revalidar o contrato de versao do projeto**
@@ -182,7 +182,7 @@ Observed:
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido
+cd /home/dionebastos/Documentos/PROJETOS/caatinga
 sed -n '1,80p' docs/stellar-cli-version-contract.md
 sed -n '1,40p' packages/cli/README.md
 ```
@@ -190,7 +190,7 @@ sed -n '1,40p' packages/cli/README.md
 Expected:
 - documentacao mostra suporte `>=22.0.0` e `<=22.0.1`
 
-### Task 5: Rollback explicito se o downgrade quebrar algo fora do Kaleido
+### Task 5: Rollback explicito se o downgrade quebrar algo fora do Caatinga
 
 **Files:**
 - Modify: `/home/dionebastos/.local/bin/stellar`
@@ -225,7 +225,7 @@ Observed:
 
 ## Self-review
 
-**Spec coverage:** O plano cobre motivacao operacional, caminho principal, verificacao final e rollback. Nao cobre mudancas de codigo no Kaleido porque isso esta explicitamente fora de escopo.
+**Spec coverage:** O plano cobre motivacao operacional, caminho principal, verificacao final e rollback. Nao cobre mudancas de codigo no Caatinga porque isso esta explicitamente fora de escopo.
 
 **Placeholder scan:** Nenhum `TODO`, `TBD` ou referencia vaga ficou no plano. Todos os passos tem comandos concretos, resultado esperado e observacao de execucao quando relevante.
 

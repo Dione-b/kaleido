@@ -1,15 +1,15 @@
 import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 export async function assertWasmExists(wasmPath: string): Promise<void> {
   try {
     await access(wasmPath);
   } catch {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `WASM output was not found at ${wasmPath}.`,
-      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
-      "Run kaleido build before deploy or generate."
+      CaatingaErrorCode.ARTIFACT_NOT_FOUND,
+      "Run caatinga build before deploy or generate."
     );
   }
 }

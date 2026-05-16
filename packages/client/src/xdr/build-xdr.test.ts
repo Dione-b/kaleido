@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
+import { CaatingaError, CaatingaErrorCode } from "@caatinga/core";
 import { buildXdr } from "./build-xdr.js";
 
 describe("buildXdr", () => {
@@ -19,12 +19,12 @@ describe("buildXdr", () => {
         }
       })
     ).rejects.toMatchObject({
-      code: KaleidoErrorCode.XDR_PREPARE_FAILED
+      code: CaatingaErrorCode.XDR_PREPARE_FAILED
     });
   });
 
-  it("should_rethrow_KaleidoError_from_prepare_without_wrapping", async () => {
-    const original = new KaleidoError("prep", KaleidoErrorCode.XDR_SIGN_FAILED);
+  it("should_rethrow_CaatingaError_from_prepare_without_wrapping", async () => {
+    const original = new CaatingaError("prep", CaatingaErrorCode.XDR_SIGN_FAILED);
 
     await expect(
       buildXdr({

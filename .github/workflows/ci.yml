@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches:
-      - master
       - main
   pull_request:
 
@@ -24,6 +23,12 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Install Stellar CLI
+        uses: stellar/stellar-cli@v22.8.1
+
+      - name: Verify Stellar CLI version
+        run: stellar --version
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -35,3 +40,9 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Stellar CLI parser fixtures
+        run: >-
+          pnpm --filter @caatinga/core exec vitest run
+          src/stellar-cli/parse-stellar-cli-version.fixtures.test.ts
+          src/stellar-cli/parse-contract-id.test.ts

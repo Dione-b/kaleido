@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -14,7 +14,7 @@ describe("checkBinary", () => {
     runCommand.mockRejectedValueOnce(new Error("not found"));
 
     await expect(checkBinary("rustc", "hint")).rejects.toMatchObject({
-      code: KaleidoErrorCode.RUST_NOT_FOUND
+      code: CaatingaErrorCode.RUST_NOT_FOUND
     });
 
     expect(runCommand).toHaveBeenCalledWith("rustc", ["--version"], {});

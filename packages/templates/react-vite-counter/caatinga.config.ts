@@ -1,4 +1,4 @@
-import { defineConfig } from "@kaleido-xlm/core";
+import { defineConfig } from "@caatinga/core";
 
 export default defineConfig({
   project: "__PROJECT_NAME__",

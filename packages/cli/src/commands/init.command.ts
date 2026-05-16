@@ -1,6 +1,6 @@
 import path from "node:path";
 import { Command } from "commander";
-import { createProjectFromTemplate } from "@kaleido-xlm/core";
+import { createProjectFromTemplate } from "@caatinga/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 import { resolveTemplateDir } from "../utils/template-path.js";
@@ -8,7 +8,7 @@ import { resolveTemplateDir } from "../utils/template-path.js";
 export function registerInitCommand(program: Command): void {
   program
     .command("init")
-    .description("Create a new Kaleido dApp from a template")
+    .description("Create a new Caatinga dApp from a template")
     .argument("<projectName>", "Project directory to create")
     .option("-t, --template <template>", "Template name", "react-vite-counter")
     .action((projectName: string, options: { template: string }) => runCliAction(async () => {
@@ -32,6 +32,6 @@ export function registerInitCommand(program: Command): void {
       logger.info("Next steps:");
       logger.info(`  cd ${projectDirectory}`);
       logger.info("  npm install");
-      logger.info("  npx kaleido build counter");
+      logger.info("  npx caatinga build counter");
     }));
 }

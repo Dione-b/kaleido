@@ -1,23 +1,23 @@
-# Kaleido v0.1.0-alpha Release Design
+# Caatinga v0.1.0-alpha Release Design
 
 ## Motivation
 
-Ship an internal `v0.1.0-alpha` release that proves Kaleido's first coherent product slice:
+Ship an internal `v0.1.0-alpha` release that proves Caatinga's first coherent product slice:
 
 ```txt
 init -> build -> deploy -> generate -> invoke
 ```
 
-plus the new `@kaleido-xlm/client` interop layer for generated bindings, artifacts, XDR visibility, and wallet signing.
+plus the new `@caatinga/client` interop layer for generated bindings, artifacts, XDR visibility, and wallet signing.
 
 The alpha is not a public npm launch. It is a tagged internal checkpoint that makes the supported surface auditable and repeatable.
 
 ## Non-goals
 
 - Publish packages to npm.
-- Implement `kaleido doctor`.
+- Implement `caatinga doctor`.
 - Implement CLI XDR commands.
-- Implement `kaleido generate --interop`.
+- Implement `caatinga generate --interop`.
 - Implement React hooks.
 - Require testnet access in default CI.
 - Implement multi-contract dependency deploy.
@@ -30,19 +30,19 @@ The alpha is not a public npm launch. It is a tagged internal checkpoint that ma
 
 The existing CLI/core flow already exposes:
 
-- `kaleido init`
-- `kaleido build`
-- `kaleido deploy`
-- `kaleido generate`
-- `kaleido invoke`
+- `caatinga init`
+- `caatinga build`
+- `caatinga deploy`
+- `caatinga generate`
+- `caatinga invoke`
 
-It persists deployment facts in `kaleido.artifacts.json` and isolates Stellar CLI parsing in `@kaleido-xlm/core`.
+It persists deployment facts in `caatinga.artifacts.json` and isolates Stellar CLI parsing in `@caatinga/core`.
 
-### Current `@kaleido-xlm/client`
+### Current `@caatinga/client`
 
 The current client implementation adds:
 
-- `createKaleidoClient`
+- `createCaatingaClient`
 - `client.contract(name).invoke(method)`
 - `client.contract(name).buildXdr(method)`
 - `freighterWalletAdapter`
@@ -51,9 +51,9 @@ The current client implementation adds:
 
 ### Rejected Alternatives
 
-#### Alpha without `@kaleido-xlm/client`
+#### Alpha without `@caatinga/client`
 
-Rejected because the user explicitly included `@kaleido-xlm/client` in the alpha scope. Cutting it would make the tag less representative of the project's current product direction.
+Rejected because the user explicitly included `@caatinga/client` in the alpha scope. Cutting it would make the tag less representative of the project's current product direction.
 
 #### Alpha with public npm publish
 
@@ -82,9 +82,9 @@ The tag represents an internal checkpoint, not a public stability guarantee.
 ### Included Packages
 
 ```txt
-@kaleido-xlm/cli
-@kaleido-xlm/core
-@kaleido-xlm/client
+@caatinga/cli
+@caatinga/core
+@caatinga/client
 packages/templates/react-vite-counter
 ```
 
@@ -93,11 +93,11 @@ packages/templates/react-vite-counter
 The alpha supports:
 
 ```txt
-kaleido init <projectName>
-kaleido build [contract]
-kaleido deploy <contract> --network <network> --source <identity-or-G-address>
-kaleido generate <contract> --network <network>
-kaleido invoke <contract.method> --network <network> --source <identity-or-G-address> [args...]
+caatinga init <projectName>
+caatinga build [contract]
+caatinga deploy <contract> --network <network> --source <identity-or-G-address>
+caatinga generate <contract> --network <network>
+caatinga invoke <contract.method> --network <network> --source <identity-or-G-address> [args...]
 ```
 
 ### Supported Client Surface
@@ -105,7 +105,7 @@ kaleido invoke <contract.method> --network <network> --source <identity-or-G-add
 The alpha supports:
 
 ```ts
-createKaleidoClient(config)
+createCaatingaClient(config)
 client.contract("counter").invoke("increment")
 client.contract("counter").buildXdr("increment")
 freighterWalletAdapter
@@ -116,7 +116,7 @@ The client must:
 - resolve `contractId` from explicit registration before artifacts;
 - resolve `contractId` from `artifacts.networks[network].contracts[contract].contractId`;
 - call generated binding methods through an adapter;
-- send signing through `KaleidoWalletAdapter.signTransaction`;
+- send signing through `CaatingaWalletAdapter.signTransaction`;
 - omit XDR unless `debugXdr` is enabled;
 - omit raw data unless `debugRaw` is enabled;
 - avoid private key storage;
@@ -127,24 +127,24 @@ The client must:
 
 The `react-vite-counter` template must remain buildable and aligned with the documented alpha workflow.
 
-For option B, the template must have a documented client smoke path. It does not need to make `@kaleido-xlm/client` the only or default UI path if doing so would require generated bindings or live wallet state during template CI.
+For option B, the template must have a documented client smoke path. It does not need to make `@caatinga/client` the only or default UI path if doing so would require generated bindings or live wallet state during template CI.
 
 ### Error Contract
 
-All public failures emitted by Kaleido code must use documented `KALEIDO_*` codes.
+All public failures emitted by Caatinga code must use documented `CAATINGA_*` codes.
 
 New alpha-relevant client codes include:
 
 ```txt
-KALEIDO_XDR_BUILD_FAILED
-KALEIDO_XDR_PREPARE_FAILED
-KALEIDO_XDR_SIGN_FAILED
-KALEIDO_XDR_SUBMIT_FAILED
-KALEIDO_XDR_RESULT_FAILED
-KALEIDO_BINDING_CLIENT_NOT_FOUND
-KALEIDO_BINDING_METHOD_NOT_FOUND
-KALEIDO_WALLET_NOT_CONNECTED
-KALEIDO_CONTRACT_ARTIFACT_NOT_FOUND
+CAATINGA_XDR_BUILD_FAILED
+CAATINGA_XDR_PREPARE_FAILED
+CAATINGA_XDR_SIGN_FAILED
+CAATINGA_XDR_SUBMIT_FAILED
+CAATINGA_XDR_RESULT_FAILED
+CAATINGA_BINDING_CLIENT_NOT_FOUND
+CAATINGA_BINDING_METHOD_NOT_FOUND
+CAATINGA_WALLET_NOT_CONNECTED
+CAATINGA_CONTRACT_ARTIFACT_NOT_FOUND
 ```
 
 ### Release Gates
@@ -164,7 +164,7 @@ The release also requires a local template smoke check:
 1. Generate or inspect the counter template.
 2. Confirm template config uses wasm32v1-none.
 3. Confirm docs describe init -> build -> deploy -> generate -> invoke.
-4. Confirm docs describe how @kaleido-xlm/client connects artifacts, generated bindings, and Freighter.
+4. Confirm docs describe how @caatinga/client connects artifacts, generated bindings, and Freighter.
 5. Confirm no default test requires testnet or Freighter.
 ```
 
@@ -180,7 +180,7 @@ Default CI remains deterministic:
 
 Release confidence comes from:
 
-- documented `KALEIDO_*` errors;
+- documented `CAATINGA_*` errors;
 - Stellar CLI output fixtures for parser-sensitive behavior;
 - unit tests for client artifact resolution, binding adapter, XDR debug gating, and wallet signing;
 - manual smoke checklist for the generated counter flow.
@@ -228,10 +228,10 @@ It must not add `doctor`, CLI XDR, `generate --interop`, React hooks, or npm pub
 ## Acceptance Criteria
 
 ```txt
-1. @kaleido-xlm/client is included in the alpha scope.
+1. @caatinga/client is included in the alpha scope.
 2. README links CLI, client, config, templates, errors, and testing docs.
 3. docs/client.md documents counter usage with generated bindings, artifacts, and Freighter.
-4. docs/errors.md documents every public KaleidoErrorCode.
+4. docs/errors.md documents every public CaatingaErrorCode.
 5. react-vite-counter remains compatible with the alpha workflow.
 6. No default CI step requires testnet, Freighter, or secret keys.
 7. pnpm install --frozen-lockfile passes.

@@ -2,7 +2,7 @@
   "name": "react-vite-counter",
   "version": "0.1.0",
   "description": "Minimal Vite + React + Soroban counter dApp.",
-  "kaleido": {
+  "caatinga": {
     "compatibleCore": "^0.1.0",
     "templateVersion": 1
   },
@@ -15,7 +15,7 @@
     "default": "counter"
   },
   "files": {
-    "config": "kaleido.config.ts",
-    "artifacts": "kaleido.artifacts.json"
+    "config": "caatinga.config.ts",
+    "artifacts": "caatinga.artifacts.json"
   }
 }

@@ -1,12 +1,12 @@
 {
-  "name": "kaleido-client-consumer-webpack",
+  "name": "caatinga-client-consumer-webpack",
   "private": true,
   "scripts": {
     "build": "webpack --config webpack.config.cjs"
   },
   "dependencies": {
-    "@kaleido-xlm/client": "0.0.0-placeholder",
-    "@kaleido-xlm/core": "0.0.0-placeholder"
+    "@caatinga/client": "0.0.0-placeholder",
+    "@caatinga/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "webpack": "^5.97.1",

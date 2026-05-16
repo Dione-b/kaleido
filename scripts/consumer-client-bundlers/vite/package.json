@@ -1,13 +1,13 @@
 {
-  "name": "kaleido-client-consumer-vite",
+  "name": "caatinga-client-consumer-vite",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "vite build"
   },
   "dependencies": {
-    "@kaleido-xlm/client": "0.0.0-placeholder",
-    "@kaleido-xlm/core": "0.0.0-placeholder"
+    "@caatinga/client": "0.0.0-placeholder",
+    "@caatinga/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

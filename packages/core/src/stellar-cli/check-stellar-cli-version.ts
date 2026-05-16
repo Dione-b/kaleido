@@ -1,4 +1,4 @@
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { runCommand } from "../shell/run-command.js";
 import { assertSupportedStellarCliVersion, parseStellarCliVersion } from "./version.js";
 
@@ -21,10 +21,10 @@ export async function checkStellarCliVersion(
     });
   } catch (error) {
     if (typeof error === "object" && error && "code" in error && error.code === "ENOENT") {
-      throw new KaleidoError(
+      throw new CaatingaError(
         "Stellar CLI was not found.",
-        KaleidoErrorCode.STELLAR_CLI_NOT_FOUND,
-        "Install Stellar CLI before running Kaleido Stellar-backed commands.",
+        CaatingaErrorCode.STELLAR_CLI_NOT_FOUND,
+        "Install Stellar CLI before running Caatinga-backed commands.",
         error
       );
     }

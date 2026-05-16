@@ -2,9 +2,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -16,7 +16,7 @@ import { generateBindings } from "./generate-bindings.js";
 
 const CONTRACT_ID = `C${"2".repeat(55)}`;
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -56,7 +56,7 @@ describe("generateBindings", () => {
   });
 
   it("should_call_stellar_bindings_with_contract_id_and_output_dir", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-gen-"));
 
     const artifacts = createInitialArtifacts("app");
     artifacts.networks.testnet = {
@@ -95,12 +95,12 @@ describe("generateBindings", () => {
         result.outputDir,
         "--overwrite"
       ]),
-      { cwd: tmpDir, failureCode: KaleidoErrorCode.BINDINGS_FAILED }
+      { cwd: tmpDir, failureCode: CaatingaErrorCode.BINDINGS_FAILED }
     );
   });
 
-  it("should_throw_KALEIDO_ARTIFACT_NOT_FOUND_when_not_deployed", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-"));
+  it("should_throw_CAATINGA_ARTIFACT_NOT_FOUND_when_not_deployed", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-gen-"));
     await writeArtifacts(createInitialArtifacts("app"), tmpDir);
 
     await expect(
@@ -110,11 +110,11 @@ describe("generateBindings", () => {
         networkName: "testnet",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.ARTIFACT_NOT_FOUND });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.ARTIFACT_NOT_FOUND });
   });
 
   it("should_propagate_BINDINGS_FAILED_when_stellar_bindings_command_fails", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-fail-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-gen-fail-"));
 
     const artifacts = createInitialArtifacts("app");
     artifacts.networks.testnet = {
@@ -135,9 +135,9 @@ describe("generateBindings", () => {
 
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "contract" && args[1] === "bindings") {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "Command failed: stellar contract bindings",
-          KaleidoErrorCode.BINDINGS_FAILED,
+          CaatingaErrorCode.BINDINGS_FAILED,
           "bindings output"
         );
       }
@@ -151,11 +151,11 @@ describe("generateBindings", () => {
         networkName: "testnet",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.BINDINGS_FAILED });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.BINDINGS_FAILED });
   });
 
-  it("should_propagate_KaleidoError_from_runCommand_unchanged", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-gen-build-"));
+  it("should_propagate_CaatingaError_from_runCommand_unchanged", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-gen-build-"));
 
     const artifacts = createInitialArtifacts("app");
     artifacts.networks.testnet = {
@@ -176,7 +176,7 @@ describe("generateBindings", () => {
 
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "contract" && args[1] === "bindings") {
-        throw new KaleidoError("cargo failed", KaleidoErrorCode.BUILD_FAILED, "rustc output");
+        throw new CaatingaError("cargo failed", CaatingaErrorCode.BUILD_FAILED, "rustc output");
       }
       return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
     });
@@ -188,6 +188,6 @@ describe("generateBindings", () => {
         networkName: "testnet",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.BUILD_FAILED });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.BUILD_FAILED });
   });
 });

@@ -10,13 +10,13 @@ Accepted
 
 ## Context
 
-Multi-contract deployment is the first Kaleido workflow that is materially more useful than ad-hoc package scripts. Dependents need upstream `contractId`s without unsafe shell interpolation or environment mutation.
+Multi-contract deployment is the first Caatinga workflow that is materially more useful than ad-hoc package scripts. Dependents need upstream `contractId`s without unsafe shell interpolation or environment mutation.
 
-After single-contract MVP, Kaleido must prove **multi-contract** workflows: build and deploy order, dependency edges, binding generation for multiple contracts, and invocations that rely on more than one deployed ID.
+After single-contract MVP, Caatinga must prove **multi-contract** workflows: build and deploy order, dependency edges, binding generation for multiple contracts, and invocations that rely on more than one deployed ID.
 
 ## Decision
 
-Kaleido core owns `dependsOn`, topological deploy order, and `${contracts.<contractName>.contractId}` placeholder resolution. The placeholder language is intentionally narrow and reads only from `kaleido.artifacts.json`.
+Caatinga core owns `dependsOn`, topological deploy order, and `${contracts.<contractName>.contractId}` placeholder resolution. The placeholder language is intentionally narrow and reads only from `caatinga.artifacts.json`.
 
 Stellar CLI constructor arguments are passed after `--` using `--snake_case` flags derived from `deployArgs` keys.
 

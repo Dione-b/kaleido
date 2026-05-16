@@ -1,12 +1,12 @@
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
 import { resolveContract } from "./resolve-contract.js";
 import { assertWasmExists } from "./wasm.js";
 
 export type BuildContractOptions = {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   contractName: string;
   cwd?: string;
   allowUntestedStellarCli?: boolean;
@@ -23,7 +23,7 @@ const MISSING_WASM_TARGET_HINT_SUBSTRINGS = [
 ] as const;
 
 function isMissingRustWasmTargetError(error: unknown): boolean {
-  if (!(error instanceof KaleidoError)) {
+  if (!(error instanceof CaatingaError)) {
     return false;
   }
 
@@ -45,8 +45,8 @@ export async function buildContract(options: BuildContractOptions) {
   const cwd = options.cwd ?? process.cwd();
   const contract = resolveContract(options.config, options.contractName, cwd);
 
-  await checkBinary("rustc", "Install Rust before running kaleido build.");
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido build.", {
+  await checkBinary("rustc", "Install Rust before running caatinga build.");
+  await checkBinary("stellar", "Install Stellar CLI before running caatinga build.", {
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
@@ -55,17 +55,17 @@ export async function buildContract(options: BuildContractOptions) {
     result = await runCommand("stellar", ["contract", "build"], {
       cwd: contract.sourcePath,
       allowUntestedStellarCli: options.allowUntestedStellarCli,
-      failureCode: KaleidoErrorCode.BUILD_FAILED
+      failureCode: CaatingaErrorCode.BUILD_FAILED
     });
   } catch (error) {
     if (
-      error instanceof KaleidoError &&
-      error.code === KaleidoErrorCode.BUILD_FAILED &&
+      error instanceof CaatingaError &&
+      error.code === CaatingaErrorCode.BUILD_FAILED &&
       isMissingRustWasmTargetError(error)
     ) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Required Rust wasm target "${RUST_WASM_TARGET}" is missing.`,
-        KaleidoErrorCode.RUST_TARGET_NOT_FOUND,
+        CaatingaErrorCode.RUST_TARGET_NOT_FOUND,
         `Run \`rustup target add ${RUST_WASM_TARGET}\` and retry the build.`,
         error
       );

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const execaMock = vi.hoisted(() => vi.fn());
 const runCommandMock = vi.hoisted(() => vi.fn());
@@ -28,7 +28,7 @@ describe("checkStellarCliVersion", () => {
     });
   });
 
-  it("normalizes missing stellar binary to KALEIDO_STELLAR_CLI_NOT_FOUND", async () => {
+  it("normalizes missing stellar binary to CAATINGA_STELLAR_CLI_NOT_FOUND", async () => {
     vi.doMock("../shell/run-command.js", () => ({
       runCommand: runCommandMock
     }));
@@ -36,7 +36,7 @@ describe("checkStellarCliVersion", () => {
     runCommandMock.mockRejectedValueOnce(Object.assign(new Error("not found"), { code: "ENOENT" }));
 
     await expect(checkStellarCliVersion({ allowUntested: false })).rejects.toMatchObject({
-      code: KaleidoErrorCode.STELLAR_CLI_NOT_FOUND
+      code: CaatingaErrorCode.STELLAR_CLI_NOT_FOUND
     });
   });
 });
@@ -98,28 +98,28 @@ describe("runCommand Stellar CLI version gate", () => {
     expect(checkStellarCliVersionMock).not.toHaveBeenCalled();
   });
 
-  it("normalizes missing stellar binary to KALEIDO_STELLAR_CLI_NOT_FOUND", async () => {
+  it("normalizes missing stellar binary to CAATINGA_STELLAR_CLI_NOT_FOUND", async () => {
     const { runCommand } = await import("../shell/run-command.js");
     checkStellarCliVersionMock.mockResolvedValueOnce("22.0.1");
     execaMock.mockRejectedValueOnce(Object.assign(new Error("not found"), { code: "ENOENT" }));
 
     await expect(runCommand("stellar", ["contract", "build"])).rejects.toMatchObject({
-      code: KaleidoErrorCode.STELLAR_CLI_NOT_FOUND
+      code: CaatingaErrorCode.STELLAR_CLI_NOT_FOUND
     });
   });
 
-  it("preserves version gate KaleidoError codes", async () => {
-    const { KaleidoError } = await import("../errors/KaleidoError.js");
+  it("preserves version gate CaatingaError codes", async () => {
+    const { CaatingaError } = await import("../errors/CaatingaError.js");
     const { runCommand } = await import("../shell/run-command.js");
     checkStellarCliVersionMock.mockRejectedValueOnce(
-      new KaleidoError(
+      new CaatingaError(
         "Stellar CLI 99.0.0 is newer than the tested maximum.",
-        KaleidoErrorCode.UNTESTED_CLI_VERSION
+        CaatingaErrorCode.UNTESTED_CLI_VERSION
       )
     );
 
     await expect(runCommand("stellar", ["contract", "build"])).rejects.toMatchObject({
-      code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+      code: CaatingaErrorCode.UNTESTED_CLI_VERSION
     });
     expect(execaMock).not.toHaveBeenCalled();
   });

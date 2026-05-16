@@ -1,21 +1,21 @@
-import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
-import { KaleidoContractClient } from "./kaleido-contract-client.js";
-import type { KaleidoClientConfig } from "../types.js";
+import { CaatingaError, CaatingaErrorCode } from "@caatinga/core";
+import { CaatingaContractClient } from "./caatinga-contract-client.js";
+import type { CaatingaClientConfig } from "../types.js";
 
-export function createKaleidoClient(config: KaleidoClientConfig) {
+export function createCaatingaClient(config: CaatingaClientConfig) {
   return {
     contract(contractName: string) {
       const registration = config.contracts[contractName];
 
       if (!registration) {
-        throw new KaleidoError(
+        throw new CaatingaError(
           `Contract "${contractName}" is not registered.`,
-          KaleidoErrorCode.CONTRACT_NOT_FOUND,
-          "Add the contract binding to createKaleidoClient()."
+          CaatingaErrorCode.CONTRACT_NOT_FOUND,
+          "Add the contract binding to createCaatingaClient()."
         );
       }
 
-      return new KaleidoContractClient(config, contractName, registration);
+      return new CaatingaContractClient(config, contractName, registration);
     }
   };
 }

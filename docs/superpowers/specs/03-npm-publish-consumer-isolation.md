@@ -17,15 +17,15 @@ Guarantee that packages work outside the monorepo before npm publish.
 Validate:
 
 ```txt
-@kaleido-xlm/cli
-@kaleido-xlm/core
-@kaleido-xlm/client
+@caatinga/cli
+@caatinga/core
+@caatinga/client
 ```
 
 Add later:
 
 ```txt
-@kaleido/react
+@caatinga/react
 ```
 
 ## Package requirements
@@ -34,7 +34,7 @@ Each package must define:
 
 ```json
 {
-  "name": "@kaleido/package",
+  "name": "@caatinga/package",
   "version": "x.y.z",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -51,12 +51,12 @@ Each package must define:
 }
 ```
 
-For `@kaleido-xlm/cli`:
+For `@caatinga/cli`:
 
 ```json
 {
   "bin": {
-    "kaleido": "./dist/index.js"
+    "caatinga": "./dist/index.js"
   }
 }
 ```
@@ -91,12 +91,12 @@ Do not rely only on `pnpm publish --dry-run`.
 Create a temporary project outside the monorepo:
 
 ```bash
-mkdir /tmp/kaleido-consumer-test
-cd /tmp/kaleido-consumer-test
+mkdir /tmp/caatinga-consumer-test
+cd /tmp/caatinga-consumer-test
 npm init -y
-npm install /path/to/packed/kaleido-cli.tgz /path/to/packed/kaleido-client.tgz
-npx kaleido --version
-npx kaleido init test-app --template react-vite-counter
+npm install /path/to/packed/caatinga-cli.tgz /path/to/packed/caatinga-client.tgz
+npx caatinga --version
+npx caatinga init test-app --template react-vite-counter
 cd test-app
 npm install
 npm run build
@@ -111,7 +111,7 @@ consumer-runtime-test: Rust/Stellar required
 
 ## Browser package test
 
-`@kaleido-xlm/client` must pass:
+`@caatinga/client` must pass:
 
 ```txt
 Vite consumer test
@@ -122,8 +122,8 @@ bare ESM import test
 Minimum test:
 
 ```ts
-import { createKaleidoClient } from "@kaleido-xlm/client";
-console.log(typeof createKaleidoClient);
+import { createCaatingaClient } from "@caatinga/client";
+console.log(typeof createCaatingaClient);
 ```
 
 ## Workspace references
@@ -167,8 +167,8 @@ pnpm publish -r --access public --provenance
 
 ```txt
 all packages have valid exports/types/files
-@kaleido-xlm/cli works through npx from packed tarball
-@kaleido-xlm/client imports in clean Vite project
+@caatinga/cli works through npx from packed tarball
+@caatinga/client imports in clean Vite project
 no published package contains workspace:* dependency
 release workflow publishes with provenance
 pnpm publish dry run emits no warnings

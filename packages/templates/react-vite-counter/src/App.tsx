@@ -6,7 +6,7 @@ export default function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Kaleido</p>
+          <p className="eyebrow">Caatinga</p>
           <h1>__PROJECT_NAME__</h1>
         </div>
         <WalletButton />

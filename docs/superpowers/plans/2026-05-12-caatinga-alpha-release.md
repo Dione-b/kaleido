@@ -1,12 +1,12 @@
-# Kaleido v0.1.0-alpha Release Implementation Plan
+# Caatinga v0.1.0-alpha Release Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Prepare an auditable internal `v0.1.0-alpha` release that includes the CLI/core MVP, `@kaleido-xlm/client`, and a counter template smoke path.
+**Goal:** Prepare an auditable internal `v0.1.0-alpha` release that includes the CLI/core MVP, `@caatinga/client`, and a counter template smoke path.
 
 **Architecture:** Keep the release gate deterministic: unit tests and workspace build run without testnet, wallet, or secret keys. The template/client confidence comes from static package/docs checks plus documented manual smoke steps, not from live network CI.
 
-**Tech Stack:** pnpm workspace, Turbo, TypeScript ESM, Vitest, tsup, GitHub Actions, Kaleido CLI/core/client packages.
+**Tech Stack:** pnpm workspace, Turbo, TypeScript ESM, Vitest, tsup, GitHub Actions, Caatinga CLI/core/client packages.
 
 ---
 
@@ -40,7 +40,7 @@ it("should_include_client_dependencies_in_react_vite_counter_template", async ()
     devDependencies?: Record<string, string>;
   };
 
-  expect(packageJson.dependencies?.["@kaleido-xlm/client"]).toBe("^0.1.0");
+  expect(packageJson.dependencies?.["@caatinga/client"]).toBe("^0.1.0");
   expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
 });
 ```
@@ -50,10 +50,10 @@ it("should_include_client_dependencies_in_react_vite_counter_template", async ()
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- src/templates/create-project-from-template.test.ts
+pnpm --filter @caatinga/core test -- src/templates/create-project-from-template.test.ts
 ```
 
-Expected: FAIL because `packages/templates/react-vite-counter/package.json` does not yet include `@kaleido-xlm/client` or `@stellar/freighter-api`.
+Expected: FAIL because `packages/templates/react-vite-counter/package.json` does not yet include `@caatinga/client` or `@stellar/freighter-api`.
 
 - [ ] **Step 3: Add template dependencies**
 
@@ -61,8 +61,8 @@ Change `packages/templates/react-vite-counter/package.json` dependencies to incl
 
 ```json
 "dependencies": {
-  "@kaleido-xlm/client": "^0.1.0",
-  "@kaleido-xlm/core": "^0.1.0",
+  "@caatinga/client": "^0.1.0",
+  "@caatinga/core": "^0.1.0",
   "@stellar/freighter-api": "^4.0.0",
   "@vitejs/plugin-react": "^4.3.4",
   "vite": "^6.0.6",
@@ -76,7 +76,7 @@ Change `packages/templates/react-vite-counter/package.json` dependencies to incl
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- src/templates/create-project-from-template.test.ts
+pnpm --filter @caatinga/core test -- src/templates/create-project-from-template.test.ts
 ```
 
 Expected: PASS.
@@ -102,16 +102,16 @@ Update `packages/templates/react-vite-counter/README.md` to:
 ````md
 # __PROJECT_NAME__
 
-Kaleido counter dApp for Stellar/Soroban.
+Caatinga counter dApp for Stellar/Soroban.
 
 ## CLI Flow
 
 ```bash
 npm install
-npx kaleido build counter
-npx kaleido deploy counter --network testnet --source alice
-npx kaleido generate counter --network testnet
-npx kaleido invoke counter.increment --network testnet --source alice
+npx caatinga build counter
+npx caatinga deploy counter --network testnet --source alice
+npx caatinga generate counter --network testnet
+npx caatinga invoke counter.increment --network testnet --source alice
 npm run dev
 ```
 
@@ -119,15 +119,15 @@ Use a Stellar CLI identity alias or public account address for `--source`; do no
 
 ## Client Smoke Path
 
-After `kaleido generate`, wire generated bindings to the client:
+After `caatinga generate`, wire generated bindings to the client:
 
 ```ts
-import { createKaleidoClient } from "@kaleido-xlm/client";
-import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
+import { createCaatingaClient } from "@caatinga/client";
+import { freighterWalletAdapter } from "@caatinga/client/freighter";
 import * as Counter from "./contracts/generated/counter";
-import artifacts from "../kaleido.artifacts.json";
+import artifacts from "../caatinga.artifacts.json";
 
-export const kaleidoClient = createKaleidoClient({
+export const caatingaClient = createCaatingaClient({
   network: {
     name: "testnet",
     rpcUrl: "https://soroban-testnet.stellar.org",
@@ -146,14 +146,14 @@ export const kaleidoClient = createKaleidoClient({
 Build XDR without wallet signing:
 
 ```ts
-const tx = await kaleidoClient.contract("counter").buildXdr("increment");
+const tx = await caatingaClient.contract("counter").buildXdr("increment");
 console.log(tx.preparedXdr);
 ```
 
 Invoke through Freighter:
 
 ```ts
-const result = await kaleidoClient.contract("counter").invoke("increment", {
+const result = await caatingaClient.contract("counter").invoke("increment", {
   debugXdr: true
 });
 console.log(result.transactionHash);
@@ -168,7 +168,7 @@ Run:
 sed -n '1,220p' packages/templates/react-vite-counter/README.md
 ```
 
-Expected: output includes `CLI Flow`, `Client Smoke Path`, `createKaleidoClient`, and `freighterWalletAdapter`.
+Expected: output includes `CLI Flow`, `Client Smoke Path`, `createCaatingaClient`, and `freighterWalletAdapter`.
 
 - [ ] **Step 3: Commit**
 
@@ -192,35 +192,35 @@ Create `docs/release/v0.1.0-alpha.md`:
 ````md
 # v0.1.0-alpha
 
-Internal alpha release for Kaleido.
+Internal alpha release for Caatinga.
 
 ## Included
 
-- `@kaleido-xlm/cli`
-- `@kaleido-xlm/core`
-- `@kaleido-xlm/client`
+- `@caatinga/cli`
+- `@caatinga/core`
+- `@caatinga/client`
 - `react-vite-counter` official template
 
 ## Supported Alpha Flow
 
 ```bash
-kaleido init <projectName>
-kaleido build counter
-kaleido deploy counter --network testnet --source <identity-or-G-address>
-kaleido generate counter --network testnet
-kaleido invoke counter.increment --network testnet --source <identity-or-G-address>
+caatinga init <projectName>
+caatinga build counter
+caatinga deploy counter --network testnet --source <identity-or-G-address>
+caatinga generate counter --network testnet
+caatinga invoke counter.increment --network testnet --source <identity-or-G-address>
 ```
 
 ## Client Alpha Flow
 
-`@kaleido-xlm/client` supports generated binding registration, artifact-based `contractId` lookup, wallet signing through `KaleidoWalletAdapter`, `invoke()`, `buildXdr()`, and explicit `debugXdr`/`debugRaw` output.
+`@caatinga/client` supports generated binding registration, artifact-based `contractId` lookup, wallet signing through `CaatingaWalletAdapter`, `invoke()`, `buildXdr()`, and explicit `debugXdr`/`debugRaw` output.
 
 ## Non-goals
 
 - npm publish
-- `kaleido doctor`
+- `caatinga doctor`
 - CLI XDR commands
-- `kaleido generate --interop`
+- `caatinga generate --interop`
 - React hooks
 - multi-contract dependency deploy
 - live testnet CI
@@ -240,7 +240,7 @@ pnpm test
 
 - `react-vite-counter` uses `wasm32v1-none`.
 - `react-vite-counter` documents `init -> build -> deploy -> generate -> invoke`.
-- `react-vite-counter` documents `@kaleido-xlm/client` with generated bindings, artifacts, and Freighter.
+- `react-vite-counter` documents `@caatinga/client` with generated bindings, artifacts, and Freighter.
 - No default CI step requires testnet, Freighter, or secret keys.
 
 ## Tag
@@ -304,7 +304,7 @@ Run:
 pnpm typecheck
 ```
 
-Expected: PASS for `@kaleido-xlm/core`, `@kaleido-xlm/client`, and `@kaleido-xlm/cli`.
+Expected: PASS for `@caatinga/core`, `@caatinga/client`, and `@caatinga/cli`.
 
 - [ ] **Step 3: Verify build**
 
@@ -314,7 +314,7 @@ Run:
 pnpm build
 ```
 
-Expected: PASS for `@kaleido-xlm/core`, `@kaleido-xlm/client`, and `@kaleido-xlm/cli`.
+Expected: PASS for `@caatinga/core`, `@caatinga/client`, and `@caatinga/cli`.
 
 - [ ] **Step 4: Verify tests**
 
@@ -340,17 +340,17 @@ Only run this commit if `git status --short` shows `pnpm-lock.yaml` changed afte
 ### Task 5: Release Readiness Audit
 
 **Files:**
-- Verify: `docs/superpowers/specs/2026-05-12-kaleido-alpha-release-design.md`
+- Verify: `docs/superpowers/specs/2026-05-12-caatinga-alpha-release-design.md`
 - Verify: `docs/release/v0.1.0-alpha.md`
 - Verify: `.github/workflows/ci.yml`
-- Verify: `packages/templates/react-vite-counter/kaleido.config.ts`
+- Verify: `packages/templates/react-vite-counter/caatinga.config.ts`
 
 - [ ] **Step 1: Confirm no out-of-scope commands were added**
 
 Run:
 
 ```bash
-rg -n "doctor|xdr build|xdr simulate|xdr inspect|--interop|useKaleido|useContract" packages docs README.md
+rg -n "doctor|xdr build|xdr simulate|xdr inspect|--interop|useCaatinga|useContract" packages docs README.md
 ```
 
 Expected: only non-goal/spec/doc references. No CLI implementation files should register these commands.
@@ -411,7 +411,7 @@ Do not create the tag unless explicitly instructed.
 
 ## Self-Review
 
-- Spec coverage: covers `@kaleido-xlm/client` inclusion, README/client/errors docs, template compatibility, deterministic CI, frozen install, full checks, release notes, and auditable working tree.
+- Spec coverage: covers `@caatinga/client` inclusion, README/client/errors docs, template compatibility, deterministic CI, frozen install, full checks, release notes, and auditable working tree.
 - Scope control: excludes `doctor`, CLI XDR, `generate --interop`, React hooks, multi-contract deploy, live testnet CI, and npm publishing.
 - Placeholder scan: no `TBD`, no `TODO`, no unbounded "handle/process" requirements.
 - Type consistency: client package names, command names, release tag, and file paths match the approved spec.

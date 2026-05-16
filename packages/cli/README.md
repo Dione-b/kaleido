@@ -1,27 +1,27 @@
-# @kaleido-xlm/cli
+# @caatinga/cli
 
 ## Install
 
 ```bash
-npm install -g @kaleido-xlm/cli
-kaleido --help
+npm install -g @caatinga/cli
+caatinga --help
 ```
 
 ## Requirements
 
 - Node.js `>=20`
 - Stellar CLI `>=22.0.0` and `<=25.2.0` available on `PATH`
-- A Kaleido project with `kaleido.config.ts` for project commands such as `build`, `deploy`, `generate`, and `invoke`
+- A Caatinga project with `caatinga.config.ts` for project commands such as `build`, `deploy`, `generate`, and `invoke`
 
 If your local machine is on a newer Stellar CLI, `--allow-untested-stellar-cli` is the local-only escape hatch. CI and release workflows should stay on the supported range.
 
 ## Commands
 
-- `kaleido init <projectName>` creates a project from a bundled template and writes `kaleido.artifacts.json`
-- `kaleido build [contract]` builds one configured contract through Stellar CLI and defaults to `counter` when omitted
-- `kaleido deploy [contract] --source <identity> [--network <network>] [--force] [--no-deps]` deploys contracts and records contract IDs in `kaleido.artifacts.json`
-- `kaleido generate <contract> [--network <network>]` generates TypeScript bindings from a deployed contract ID
-- `kaleido invoke <contract.method> --source <identity> [args...]` invokes a deployed contract method through the configured workflow
+- `caatinga init <projectName>` creates a project from a bundled template and writes `caatinga.artifacts.json`
+- `caatinga build [contract]` builds one configured contract through Stellar CLI and defaults to `counter` when omitted
+- `caatinga deploy [contract] --source <identity> [--network <network>] [--force] [--no-deps]` deploys contracts and records contract IDs in `caatinga.artifacts.json`
+- `caatinga generate <contract> [--network <network>]` generates TypeScript bindings from a deployed contract ID
+- `caatinga invoke <contract.method> --source <identity> [args...]` invokes a deployed contract method through the configured workflow
 
 The supported CLI flow is `init -> build -> deploy -> generate -> invoke`.
 
@@ -39,30 +39,30 @@ Unsupported input posture:
 
 ## Error Behavior
 
-`@kaleido-xlm/cli` emits documented `KALEIDO_*` error codes for automation. Consumers should match on the error code, not human-readable text.
+`@caatinga/cli` emits documented `CAATINGA_*` error codes for automation. Consumers should match on the error code, not human-readable text.
 
 Common codes include:
 
-- `KALEIDO_CONFIG_NOT_FOUND`
-- `KALEIDO_INVALID_CONFIG`
-- `KALEIDO_STELLAR_CLI_NOT_FOUND`
-- `KALEIDO_BUILD_FAILED`
-- `KALEIDO_DEPLOY_FAILED`
-- `KALEIDO_BINDINGS_FAILED`
-- `KALEIDO_INVOKE_FAILED`
-- `KALEIDO_CONTRACT_ID_NOT_FOUND`
-- `KALEIDO_SOURCE_ACCOUNT_REQUIRED`
-- `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`
-- `KALEIDO_TEMPLATE_INCOMPATIBLE`
+- `CAATINGA_CONFIG_NOT_FOUND`
+- `CAATINGA_INVALID_CONFIG`
+- `CAATINGA_STELLAR_CLI_NOT_FOUND`
+- `CAATINGA_BUILD_FAILED`
+- `CAATINGA_DEPLOY_FAILED`
+- `CAATINGA_BINDINGS_FAILED`
+- `CAATINGA_INVOKE_FAILED`
+- `CAATINGA_CONTRACT_ID_NOT_FOUND`
+- `CAATINGA_SOURCE_ACCOUNT_REQUIRED`
+- `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND`
+- `CAATINGA_TEMPLATE_INCOMPATIBLE`
 
-## Relationship To `@kaleido-xlm/core`
+## Relationship To `@caatinga/core`
 
-`@kaleido-xlm/cli` is the supported end-user entrypoint for Kaleido's command workflow. It intentionally stays thin and delegates config loading, artifacts, command orchestration, and shared error primitives to `@kaleido-xlm/core`.
+`@caatinga/cli` is the supported end-user entrypoint for Caatinga's command workflow. It intentionally stays thin and delegates config loading, artifacts, command orchestration, and shared error primitives to `@caatinga/core`.
 
-If you want the stable packaged workflow, prefer the CLI contract over importing `@kaleido-xlm/core` directly.
+If you want the stable packaged workflow, prefer the CLI contract over importing `@caatinga/core` directly.
 
 ## Versioning And Stability
 
-This package is the primary supported consumer surface for the Kaleido workflow. Stability applies to the documented commands, inputs, and `KALEIDO_*` error contract.
+This package is the primary supported consumer surface for the Caatinga workflow. Stability applies to the documented commands, inputs, and `CAATINGA_*` error contract.
 
-Undocumented internals, private module paths, and placeholder commands such as `kaleido dev` are not part of the stability promise.
+Undocumented internals, private module paths, and reserved hidden commands such as `caatinga dev` are not part of the stability promise.

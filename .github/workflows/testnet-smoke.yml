@@ -28,11 +28,11 @@ jobs:
 
       - name: Restore Stellar CLI config
         env:
-          KALEIDO_CI_STELLAR_CONFIG_B64: ${{ secrets.KALEIDO_CI_STELLAR_CONFIG_B64 }}
+          CAATINGA_CI_STELLAR_CONFIG_B64: ${{ secrets.CAATINGA_CI_STELLAR_CONFIG_B64 }}
         run: |
-          test -n "$KALEIDO_CI_STELLAR_CONFIG_B64"
+          test -n "$CAATINGA_CI_STELLAR_CONFIG_B64"
           mkdir -p "$HOME/.config/stellar"
-          echo "$KALEIDO_CI_STELLAR_CONFIG_B64" | base64 --decode > "$HOME/.config/stellar/config.toml"
+          echo "$CAATINGA_CI_STELLAR_CONFIG_B64" | base64 --decode > "$HOME/.config/stellar/config.toml"
           chmod 600 "$HOME/.config/stellar/config.toml"
 
       - name: Install dependencies
@@ -45,14 +45,14 @@ jobs:
         id: smoke1
         continue-on-error: true
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app
 
       - name: Smoke retry
         id: smokeretry
         if: steps.smoke1.outcome == 'failure' && steps.smoke1.outputs.transient == 'true'
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app-retry
 
       - name: Smoke gate
@@ -76,8 +76,8 @@ jobs:
           name: testnet-smoke-artifacts
           path: |
             smoke-ci-out/
-            smoke-app/kaleido.artifacts.json
-            smoke-app-retry/kaleido.artifacts.json
+            smoke-app/caatinga.artifacts.json
+            smoke-app-retry/caatinga.artifacts.json
           if-no-files-found: ignore
 
       - name: Remove Stellar CLI config

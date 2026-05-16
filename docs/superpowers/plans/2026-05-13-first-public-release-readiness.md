@@ -1,12 +1,12 @@
-# Kaleido First Public Release Readiness Implementation Plan
+# Caatinga First Public Release Readiness Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Define and complete the remaining work to publish Kaleido safely under `next`/`0.x`, then promote to `v1.0.0`/`latest` only after the public release contract and operational evidence are complete.
+**Goal:** Define and complete the remaining work to publish Caatinga safely under `next`/`0.x`, then promote to `v1.0.0`/`latest` only after the public release contract and operational evidence are complete.
 
 **Architecture:** Split release work into two tracks with different risk boundaries. Track A closes public-consumer documentation, package contract clarity, and publish workflow alignment for pre-v1 distribution. Track B adds the stronger release-management contract and live operational evidence required before `latest`.
 
-**Tech Stack:** Markdown docs, Changesets, pnpm workspace scripts, GitHub Actions workflows, npm dist-tags, Kaleido CLI/core/client packages.
+**Tech Stack:** Markdown docs, Changesets, pnpm workspace scripts, GitHub Actions workflows, npm dist-tags, Caatinga CLI/core/client packages.
 
 ---
 
@@ -68,9 +68,9 @@ Populate `## Interface Contract` with the published packages and supported surfa
 ```md
 ### Published Packages
 
-- `@kaleido-xlm/cli`
-- `@kaleido-xlm/core`
-- `@kaleido-xlm/client`
+- `@caatinga/cli`
+- `@caatinga/core`
+- `@caatinga/client`
 
 ### Supported CLI Flow
 
@@ -78,14 +78,14 @@ Populate `## Interface Contract` with the published packages and supported surfa
 
 ### Supported Client Surface
 
-- `createKaleidoClient`
+- `createCaatingaClient`
 - `client.contract(name).invoke(method)`
 - `client.contract(name).buildXdr(method)`
 - `freighterWalletAdapter`
 
 ### Public Error Contract
 
-Automation may parse `KALEIDO_*` codes and must not parse human-readable messages.
+Automation may parse `CAATINGA_*` codes and must not parse human-readable messages.
 ```
 
 - [ ] **Step 3: Make `next` versus `latest` explicit in the release spec**
@@ -197,22 +197,22 @@ Expected: commit succeeds with only the readiness and README changes staged.
 Replace `packages/cli/README.md` with sections matching this structure:
 
 ```md
-# @kaleido-xlm/cli
+# @caatinga/cli
 
 ## Install
 ## Requirements
 ## Commands
 ## Supported Inputs
 ## Error Behavior
-## Relationship To `@kaleido-xlm/core`
+## Relationship To `@caatinga/core`
 ## Versioning And Stability
 ```
 
 Include this install and smoke block:
 
 ```bash
-npm install -g @kaleido-xlm/cli
-kaleido --help
+npm install -g @caatinga/cli
+caatinga --help
 ```
 
 - [ ] **Step 2: Expand the client package README**
@@ -220,7 +220,7 @@ kaleido --help
 Replace `packages/client/README.md` with sections matching this structure:
 
 ```md
-# @kaleido-xlm/client
+# @caatinga/client
 
 ## Install
 ## What It Solves
@@ -235,18 +235,18 @@ Replace `packages/client/README.md` with sections matching this structure:
 Include this import example:
 
 ```ts
-import { createKaleidoClient } from "@kaleido-xlm/client";
-import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
+import { createCaatingaClient } from "@caatinga/client";
+import { freighterWalletAdapter } from "@caatinga/client/freighter";
 ```
 
-- [ ] **Step 3: Clarify whether `@kaleido-xlm/core` is a direct-consumer package**
+- [ ] **Step 3: Clarify whether `@caatinga/core` is a direct-consumer package**
 
 Update `packages/core/README.md` to explicitly choose one of these positions:
 
 ```md
 ## Supported Use
 
-`@kaleido-xlm/core` is supported for advanced programmatic integration.
+`@caatinga/core` is supported for advanced programmatic integration.
 ```
 
 or
@@ -254,7 +254,7 @@ or
 ```md
 ## Supported Use
 
-`@kaleido-xlm/core` is primarily an internal package for the Kaleido CLI and templates; direct use is advanced and less stable than the CLI contract.
+`@caatinga/core` is primarily an internal package for the Caatinga CLI and templates; direct use is advanced and less stable than the CLI contract.
 ```
 
 Do not leave this ambiguous.
@@ -426,9 +426,9 @@ Create `.changeset/release-readiness-docs.md` with:
 
 ```md
 ---
-'@kaleido-xlm/cli': patch
-'@kaleido-xlm/client': patch
-'@kaleido-xlm/core': patch
+'@caatinga/cli': patch
+'@caatinga/client': patch
+'@caatinga/core': patch
 ---
 
 Publish consumer-facing package documentation and release-process alignment for the first public release track.

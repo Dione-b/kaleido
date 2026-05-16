@@ -1,7 +1,7 @@
-import { KaleidoError, KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido-xlm/core";
+import { CaatingaError, CaatingaErrorCode, type CaatingaArtifacts } from "@caatinga/core";
 
 export function resolveContractId(input: {
-  artifacts: KaleidoArtifacts;
+  artifacts: CaatingaArtifacts;
   network: string;
   contract: string;
   explicitContractId?: string;
@@ -17,9 +17,9 @@ export function resolveContractId(input: {
     return contractId;
   }
 
-  throw new KaleidoError(
+  throw new CaatingaError(
     `No contract artifact found for "${input.contract}" on "${input.network}".`,
-    KaleidoErrorCode.CONTRACT_ARTIFACT_NOT_FOUND,
+    CaatingaErrorCode.CONTRACT_ARTIFACT_NOT_FOUND,
     "Deploy the contract first or pass contractId explicitly."
   );
 }

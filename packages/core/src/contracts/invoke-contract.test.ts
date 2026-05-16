@@ -2,9 +2,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -16,7 +16,7 @@ import { invokeContract, parseInvokeTarget } from "./invoke-contract.js";
 
 const CONTRACT_ID = `C${"3".repeat(55)}`;
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -46,10 +46,10 @@ describe("parseInvokeTarget", () => {
 
   it("rejects invalid target shapes", () => {
     expect(() => parseInvokeTarget("counter")).toThrow(
-      expect.objectContaining({ code: KaleidoErrorCode.INVOKE_TARGET_INVALID })
+      expect.objectContaining({ code: CaatingaErrorCode.INVOKE_TARGET_INVALID })
     );
     expect(() => parseInvokeTarget("counter.increment.extra")).toThrow(
-      expect.objectContaining({ code: KaleidoErrorCode.INVOKE_TARGET_INVALID })
+      expect.objectContaining({ code: CaatingaErrorCode.INVOKE_TARGET_INVALID })
     );
   });
 });
@@ -74,7 +74,7 @@ describe("invokeContract", () => {
   });
 
   it("should_forward_method_and_args_to_stellar_when_artifact_exists", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-invoke-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-invoke-"));
 
     const artifacts = createInitialArtifacts("app");
     artifacts.networks.testnet = {
@@ -117,12 +117,12 @@ describe("invokeContract", () => {
         "--arg1",
         "x"
       ]),
-      { cwd: tmpDir, failureCode: KaleidoErrorCode.INVOKE_FAILED }
+      { cwd: tmpDir, failureCode: CaatingaErrorCode.INVOKE_FAILED }
     );
   });
 
   it("should_map_stellar_invoke_failure_to_INVOKE_FAILED", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-invoke-fail-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-invoke-fail-"));
 
     const artifacts = createInitialArtifacts("app");
     artifacts.networks.testnet = {
@@ -143,9 +143,9 @@ describe("invokeContract", () => {
 
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "contract" && args[1] === "invoke") {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "Command failed: stellar contract invoke",
-          KaleidoErrorCode.INVOKE_FAILED,
+          CaatingaErrorCode.INVOKE_FAILED,
           "stellar stderr here"
         );
       }
@@ -160,6 +160,6 @@ describe("invokeContract", () => {
         source: "alice",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.INVOKE_FAILED });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.INVOKE_FAILED });
   });
 });

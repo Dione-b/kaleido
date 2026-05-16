@@ -21,9 +21,9 @@ describe("publish package manifests", () => {
     });
   }
 
-  it("cli exposes kaleido bin", () => {
+  it("cli exposes caatinga bin", () => {
     const packageJson = JSON.parse(readFileSync(join(repoRoot, "packages/cli/package.json"), "utf8"));
-    expect(packageJson.bin).toEqual({ kaleido: "./dist/index.js" });
+    expect(packageJson.bin).toEqual({ caatinga: "./dist/index.js" });
     expect(packageJson.main).toBe("./dist/index.js");
     expect(packageJson.module).toBe("./dist/index.js");
     expect(packageJson.types).toBe("./dist/index.d.ts");

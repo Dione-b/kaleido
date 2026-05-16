@@ -1,28 +1,28 @@
 # Architecture
 
-This document is the **canonical product and architecture stance** for Kaleido. It complements package-level code and the CLI reference in `docs/cli.md`. Detailed rationale for selected decisions lives in [Architecture Decision Records](./adr/) under `docs/adr/`.
+This document is the **canonical product and architecture stance** for Caatinga. It complements package-level code and the CLI reference in `docs/cli.md`. Detailed rationale for selected decisions lives in [Architecture Decision Records](./adr/) under `docs/adr/`.
 
 ## One-sentence promise
 
-**Kaleido keeps a predictable, reproducible workflow to create, compile, deploy, generate bindings, invoke, and wire browser clients for Soroban contracts—even when Stellar tooling changes operational details.**
+**Caatinga keeps a predictable, reproducible workflow to create, compile, deploy, generate bindings, invoke, and wire browser clients for Soroban contracts—even when Stellar tooling changes operational details.**
 
-That does not mean hiding Stellar reality. Users keep a **stable Kaleido surface** (`kaleido build`, `kaleido deploy`, `kaleido generate`, `kaleido invoke`, `@kaleido-xlm/client`). Changes in flags, stdout, paths, transaction/XDR workflow, and subprocess composition are absorbed behind small adapters, not scattered across user scripts.
+That does not mean hiding Stellar reality. Users keep a **stable Caatinga surface** (`caatinga build`, `caatinga deploy`, `caatinga generate`, `caatinga invoke`, `@caatinga/client`). Changes in flags, stdout, paths, transaction/XDR workflow, and subprocess composition are absorbed behind small adapters, not scattered across user scripts.
 
-## What Kaleido is (and is not)
+## What Caatinga is (and is not)
 
-| Kaleido is | Kaleido is not |
+| Caatinga is | Caatinga is not |
 |------------|----------------|
 | Convention + orchestration + artifacts + frontend/client integration | A second Soroban/Stellar SDK |
-| A thin CLI over `@kaleido-xlm/core` | A place to store private keys or run silent signing |
+| A thin CLI over `@caatinga/core` | A place to store private keys or run silent signing |
 | Template-driven project scaffolding | A hosted registry required for core workflows (future registries are optional) |
 
 **Primary competitor today:** ad-hoc `package.json` scripts. **Possible later overlap:** meta-frameworks in other ecosystems (e.g. Scaffold-ETH-style), only if the workflow and template story mature.
 
-**What Kaleido should do unusually well:** standardize Stellar/Soroban steps, persist **per-network** deployment facts, generate frontend integration from deployed contracts, avoid manual `contractId` wiring in the app, make XDR visible when debugging, support **multi-contract** reproducible deploys later, and lower friction for JS/TS teams.
+**What Caatinga should do unusually well:** standardize Stellar/Soroban steps, persist **per-network** deployment facts, generate frontend integration from deployed contracts, avoid manual `contractId` wiring in the app, make XDR visible when debugging, support **multi-contract** reproducible deploys later, and lower friction for JS/TS teams.
 
 ## Validation roadmap (flows)
 
-1. **Alpha flow (current):** `init → build → deploy → generate → invoke` plus `@kaleido-xlm/client` for browser-side binding/artifact/wallet interop.
+1. **Alpha flow (current):** `init → build → deploy → generate → invoke` plus `@caatinga/client` for browser-side binding/artifact/wallet interop.
 2. **Next architectural proof:** **multi-contract deploy with dependencies** (e.g. deploy token, then marketplace that depends on token’s `contractId`, then generate bindings for both, then invoke across that dependency).
 3. **After that:** upgrade / redeploy with **artifacts history** and clear migration story.
 
@@ -30,12 +30,12 @@ Until (2) is real in the product, treat single-contract demos as necessary but n
 
 ## Package boundaries (monorepo)
 
-- **`@kaleido-xlm/cli`:** argument parsing, terminal UX, delegation to core—no subprocess orchestration except through core APIs.
-- **`@kaleido-xlm/core`:** load `kaleido.config.ts`, validate schemas, resolve networks/contracts, read/write `kaleido.artifacts.json`, run Stellar CLI and related tools via a **single shell layer** (`run-command.ts`). **All `execa` usage stays here.**
-- **`@kaleido-xlm/client`:** thin client/browser interop over generated bindings, artifacts, wallet adapters, `invoke()`, `buildXdr()`, and explicit XDR/raw debug output. It does not own signing keys or serialize SCVal manually.
-- **`packages/templates`:** official templates consumed by `kaleido init` and validated through `kaleido.template.json` before copy.
+- **`@caatinga/cli`:** argument parsing, terminal UX, delegation to core—no subprocess orchestration except through core APIs.
+- **`@caatinga/core`:** load `caatinga.config.ts`, validate schemas, resolve networks/contracts, read/write `caatinga.artifacts.json`, run Stellar CLI and related tools via a **single shell layer** (`run-command.ts`). **All `execa` usage stays here.**
+- **`@caatinga/client`:** thin client/browser interop over generated bindings, artifacts, wallet adapters, `invoke()`, `buildXdr()`, and explicit XDR/raw debug output. It does not own signing keys or serialize SCVal manually.
+- **`packages/templates`:** official templates consumed by `caatinga init` and validated through `caatinga.template.json` before copy.
 
-Deferred unless explicitly rescoped: `kaleido doctor`, CLI XDR commands, `kaleido generate --interop`, full `@kaleido/react` SDK surface, plugin system, RWA-only templates, visual dashboard, custom test runner as **required** core dependencies.
+Deferred unless explicitly rescoped: `caatinga doctor`, CLI XDR commands, `caatinga generate --interop`, full `@caatinga/react` SDK surface, plugin system, RWA-only templates, visual dashboard, custom test runner as **required** core dependencies.
 
 ## Meta-framework boundary: orchestrate workflow, not mental model
 
@@ -43,45 +43,45 @@ Deferred unless explicitly rescoped: `kaleido doctor`, CLI XDR commands, `kaleid
 
 **Should not hide** (users and docs should keep these visible): `contractId`, network passphrase, RPC choice, accounts, wallet signing, XDR, fees, simulation, Soroban data model as understood via official SDKs and generated bindings.
 
-**Red flags (avoid):** Kaleido-owned contract models, hand-rolled Soroban serialization, replacing generated bindings as the primary API, custom signing runtimes parallel to the Stellar ecosystem, or “smart” behavior that obscures what actually hit the network.
+**Red flags (avoid):** Caatinga-owned contract models, hand-rolled Soroban serialization, replacing generated bindings as the primary API, custom signing runtimes parallel to the Stellar ecosystem, or “smart” behavior that obscures what actually hit the network.
 
-Rule of thumb: if Stellar CLI, `stellar-sdk`, Soroban SDK, or generated bindings already own it, Kaleido **composes, validates, or organizes**—it does not reimplement.
+Rule of thumb: if Stellar CLI, `stellar-sdk`, Soroban SDK, or generated bindings already own it, Caatinga **composes, validates, or organizes**—it does not reimplement.
 
 ## Source of truth (MVP)
 
 Local project state is authoritative:
 
 - `contracts/`
-- Generated bindings (path from `kaleido.config.ts`)
-- `kaleido.config.ts`
-- `kaleido.artifacts.json`
+- Generated bindings (path from `caatinga.config.ts`)
+- `caatinga.config.ts`
+- `caatinga.artifacts.json`
 
 No central cache or remote artifact registry is assumed in the core MVP. Optional remote services may exist later but must not be **hard dependencies** of core.
 
-## `kaleido dev`
+## `caatinga dev`
 
-**MVP direction:** opinionated proxy around **Vite + Kaleido validation** (not a plugin marketplace). Future adapters (`vite`, `next`, `astro`, custom) are conceivable only after the core workflow and multi-contract story prove value.
+**MVP direction:** opinionated proxy around **Vite + Caatinga validation** (not a plugin marketplace). Future adapters (`vite`, `next`, `astro`, custom) are conceivable only after the core workflow and multi-contract story prove value.
 
 ## Extensibility
 
 - **Templates:** start as **opinionated snapshots** (`react-vite-counter`, etc.). Parameterized generators (`--tailwind`, wallet flavor, i18n) come later—they expand the test matrix quickly.
-- **Template contract:** every template includes a **`kaleido.template.json` manifest** (name, version, `compatibleCore`, paths) so templates and core semver are validated at `init`—see [ADR 0003](./adr/0003-template-manifest-compatibility.md).
+- **Template contract:** every template includes a **`caatinga.template.json` manifest** (name, version, `compatibleCore`, paths) so templates and core semver are validated at `init`—see [ADR 0003](./adr/0003-template-manifest-compatibility.md).
 - **Plugins:** defer until a concrete need templates cannot cover (e.g. **post-deploy hooks**, CI presets, indexer hooks). First strong candidate is often `postDeploy`; still wait until multi-contract flow is validated.
 
 ## Ecosystem: official vs community templates
 
-- **Official:** live in the Kaleido repo, reviewed, CI-tested, semver-matrices documented.
+- **Official:** live in the Caatinga repo, reviewed, CI-tested, semver-matrices documented.
 - **Community:** installable via Git URL or npm-style packages, **never implicitly trusted**—treat as untrusted code; warn users; avoid auto-running post-install scripts from external templates in MVP-class flows.
 
-**Distribution:** MVP+1 favors **Git + URL** (e.g. `kaleido init my-app --template github:org/repo`). A dedicated template registry is explicitly later—moderation, security, and availability cost.
+**Distribution:** MVP+1 favors **Git + URL** (e.g. `caatinga init my-app --template github:org/repo`). A dedicated template registry is explicitly later—moderation, security, and availability cost.
 
-Suggested naming: `@kaleido/template-*` for official; `@scope/kaleido-template-*` for community.
+Suggested naming: `@caatinga/template-*` for official; `@scope/caatinga-template-*` for community.
 
 ## Networks vs environments
 
 **Today:** artifacts keyed by **network** (same logical contract may differ per network—correct).
 
-**Future (MVP+1):** **environment** (e.g. `staging` vs `production`) can share a network but differ in deployed `contractId`s. Expect either a new artifacts shape version or an explicit `environments` model—design TBD with migration (`kaleido migrate`) when introduced.
+**Future (MVP+1):** **environment** (e.g. `staging` vs `production`) can share a network but differ in deployed `contractId`s. Expect either a new artifacts shape version or an explicit `environments` model—design TBD with migration (`caatinga migrate`) when introduced.
 
 ## Multi-contract
 
@@ -89,37 +89,37 @@ Deploy order **should** be supported in core for declared dependencies (DAG / to
 
 ## CI and secrets
 
-Kaleido does **not** manage long-lived private keys. CI provides identities (`--source ci-deployer`), secrets via the platform, and a configured Stellar CLI on the runner. Kaleido validates config, runs deploy/generate/invoke, updates artifacts, and fails with **clear, stable error codes** (see below).
+Caatinga does **not** manage long-lived private keys. CI provides identities (`--source ci-deployer`), secrets via the platform, and a configured Stellar CLI on the runner. Caatinga validates config, runs deploy/generate/invoke, updates artifacts, and fails with **clear, stable error codes** (see below).
 
 ## Client and frontend SDK
 
-Alpha starts with **`@kaleido-xlm/client`**, not React hooks. The client composes generated bindings, artifacts, network config, and wallet adapters. A future `@kaleido/react` should be thin hooks over this layer and generated bindings: wallet wiring, loading/error helpers, and network context. Avoid a parallel generic Soroban client that bypasses generated types.
+Alpha starts with **`@caatinga/client`**, not React hooks. The client composes generated bindings, artifacts, network config, and wallet adapters. A future `@caatinga/react` should be thin hooks over this layer and generated bindings: wallet wiring, loading/error helpers, and network context. Avoid a parallel generic Soroban client that bypasses generated types.
 
 ## DX beyond CLI
 
-Prefer **`kaleido doctor`** later (bins, config/artifact sanity, optional staleness hints) before investing in VS Code/LSP. Doctor is intentionally outside the alpha release.
+Prefer **`caatinga doctor`** later (bins, config/artifact sanity, optional staleness hints) before investing in VS Code/LSP. Doctor is intentionally outside the alpha release.
 
 ## Errors as public API
 
-Stable **`KALEIDO_*` codes** are part of the contract for CI, support, and docs. New public errors must be added through the central `KaleidoErrorCode` object and documented in [`errors.md`](./errors.md)—see [ADR 0004](./adr/0004-error-codes-as-public-api.md).
+Stable **`CAATINGA_*` codes** are part of the contract for CI, support, and docs. New public errors must be added through the central `CaatingaErrorCode` object and documented in [`errors.md`](./errors.md)—see [ADR 0004](./adr/0004-error-codes-as-public-api.md).
 
 ## Testing strategy vs Stellar CLI drift
 
 Layered approach:
 
-1. Unit tests in `@kaleido-xlm/core`.
+1. Unit tests in `@caatinga/core`.
 2. **Fixtures** of Stellar CLI stdout/stderr per supported CLI generation (parsing is the fragile boundary).
 3. Contract tests with **pinned** Stellar CLI versions in CI.
 4. Optional scheduled smoke against testnet.
 
 ## Versioning and migrations
 
-Semver applies to monorepo packages **and** to serialized formats (`kaleido.artifacts.json` already has a `version` field). Breaking format or command behavior should eventually ship with **`kaleido migrate`**—not required on day one, but fields and ADRs should assume migrations will exist.
+Semver applies to monorepo packages **and** to serialized formats (`caatinga.artifacts.json` already has a `version` field). Breaking format or command behavior should eventually ship with **`caatinga migrate`**—not required on day one, but fields and ADRs should assume migrations will exist.
 
 ## Performance responsibilities
 
 - **Rust / Stellar toolchain:** real compile and WASM output.
-- **Kaleido:** detect stale WASM vs sources when feasible, avoid redundant `generate`, compare WASM hashes, emit clear “run build first” guidance. MVP: basic checks; later: stronger staleness and caching policies.
+- **Caatinga:** detect stale WASM vs sources when feasible, avoid redundant `generate`, compare WASM hashes, emit clear “run build first” guidance. MVP: basic checks; later: stronger staleness and caching policies.
 
 ## Business stance for the core
 
@@ -131,13 +131,13 @@ Semver applies to monorepo packages **and** to serialized formats (`kaleido.arti
 
 | ADR | Status | Topic |
 |-----|--------|--------|
-| [0001](./adr/0001-stable-workflow-over-stellar-cli.md) | Accepted | Stable Kaleido workflow while encapsulating Stellar CLI churn |
+| [0001](./adr/0001-stable-workflow-over-stellar-cli.md) | Accepted | Stable Caatinga workflow while encapsulating Stellar CLI churn |
 | [0002](./adr/0002-local-artifacts-as-source-of-truth.md) | Accepted | Local artifacts and config as source of truth; no central registry in MVP |
 | [0003](./adr/0003-template-manifest-compatibility.md) | Accepted | Template manifest and core compatibility |
-| [0004](./adr/0004-error-codes-as-public-api.md) | Accepted | Stable `KALEIDO_*` error codes and migration |
+| [0004](./adr/0004-error-codes-as-public-api.md) | Accepted | Stable `CAATINGA_*` error codes and migration |
 | [0005](./adr/0005-multi-contract-dependency-deploy.md) | Accepted | Multi-contract `dependsOn` and contractId injection |
 
-**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido-xlm/core` and documented in ADR 0005.
+**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@caatinga/core` and documented in ADR 0005.
 
 ## Related docs
 

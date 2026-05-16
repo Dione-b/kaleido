@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKED_DIR="$ROOT_DIR/packed"
 EXTRACT_DIR="$ROOT_DIR/packed-unpacked-package-jsons"
 CHANGESET_DIR="$ROOT_DIR/.changeset"
-BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/kaleido-ci-snapshot-pack.XXXXXX")"
+BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/caatinga-ci-snapshot-pack.XXXXXX")"
 CHANGESET_BACKUP_DIR="$BACKUP_DIR/.changeset"
 CHANGESET_BACKUP_READY=0
 CHANGESET_EXISTED=0
@@ -24,12 +24,19 @@ cleanup() {
   local file
   local backup_path
 
-  rm -rf "$PACKED_DIR" "$EXTRACT_DIR"
+  rm -rf "$EXTRACT_DIR"
 
   for file in "${SNAPSHOT_RESTORE_FILES[@]}"; do
     backup_path="$BACKUP_DIR/${file#$ROOT_DIR/}"
     if [[ -f "$backup_path" ]]; then
       cp "$backup_path" "$file"
+    fi
+  done
+
+  for template_pkg in "$TEMPLATES_DIR"/*/package.json; do
+    backup_path="$BACKUP_DIR/${template_pkg#$ROOT_DIR/}"
+    if [[ -f "$backup_path" ]]; then
+      cp "$backup_path" "$template_pkg"
     fi
   done
 
@@ -70,7 +77,7 @@ SNAPSHOT_CHANGESET_FILE="$(mktemp "$CHANGESET_DIR/__ci_snapshot__.XXXXXX.md")"
 
 cat > "$SNAPSHOT_CHANGESET_FILE" <<'EOF'
 ---
-"@kaleido-xlm/cli": patch
+"@caatinga/cli": patch
 ---
 
 chore: ci snapshot for pack validation (do not commit)
@@ -78,14 +85,60 @@ EOF
 
 pnpm --dir "$ROOT_DIR" exec changeset version --snapshot smoke
 
+for template_pkg in "$TEMPLATES_DIR"/*/package.json; do
+  mkdir -p "$BACKUP_DIR/$(dirname "${template_pkg#$ROOT_DIR/}")"
+  cp "$template_pkg" "$BACKUP_DIR/${template_pkg#$ROOT_DIR/}"
+done
+
+node --input-type=module -e '
+import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import path from "node:path";
+
+const rootDir = process.argv[1];
+const templatesDir = path.join(rootDir, "packages/templates");
+const packageVersions = {
+  "@caatinga/core": JSON.parse(readFileSync(path.join(rootDir, "packages/core/package.json"), "utf8")).version,
+  "@caatinga/client": JSON.parse(readFileSync(path.join(rootDir, "packages/client/package.json"), "utf8")).version,
+  "@caatinga/cli": JSON.parse(readFileSync(path.join(rootDir, "packages/cli/package.json"), "utf8")).version
+};
+const sections = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies"
+];
+
+for (const entry of readdirSync(templatesDir)) {
+  const templateDir = path.join(templatesDir, entry);
+  if (!statSync(templateDir).isDirectory()) {
+    continue;
+  }
+
+  const packageJsonPath = path.join(templateDir, "package.json");
+  const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+
+  for (const section of sections) {
+    for (const name of Object.keys(pkg[section] ?? {})) {
+      if (Object.hasOwn(packageVersions, name)) {
+        pkg[section][name] = `^${packageVersions[name]}`;
+      }
+    }
+  }
+
+  writeFileSync(packageJsonPath, `${JSON.stringify(pkg, null, 2)}\n`);
+}
+' "$ROOT_DIR"
+
+pnpm --dir "$ROOT_DIR" --filter @caatinga/cli build
+
 ( cd "$ROOT_DIR/packages/core" && pnpm pack --pack-destination "$PACKED_DIR" )
 ( cd "$ROOT_DIR/packages/client" && pnpm pack --pack-destination "$PACKED_DIR" )
 ( cd "$ROOT_DIR/packages/cli" && pnpm pack --pack-destination "$PACKED_DIR" )
 
 shopt -s nullglob
-core_tarball=( "$PACKED_DIR"/kaleido-xlm-core-*.tgz )
-client_tarball=( "$PACKED_DIR"/kaleido-xlm-client-*.tgz )
-cli_tarball=( "$PACKED_DIR"/kaleido-xlm-cli-*.tgz )
+core_tarball=( "$PACKED_DIR"/caatinga-core-*.tgz )
+client_tarball=( "$PACKED_DIR"/caatinga-client-*.tgz )
+cli_tarball=( "$PACKED_DIR"/caatinga-cli-*.tgz )
 if [[ ${#core_tarball[@]} -ne 1 ]]; then
   echo "Expected exactly one core tarball in $PACKED_DIR, found ${#core_tarball[@]}" >&2
   exit 1
@@ -101,7 +154,7 @@ if [[ ${#cli_tarball[@]} -ne 1 ]]; then
   exit 1
 fi
 
-cli_template_path="$(tar -tzf "${cli_tarball[0]}" | grep '^package/templates/react-vite-counter/kaleido.template.json$' || true)"
+cli_template_path="$(tar -tzf "${cli_tarball[0]}" | grep '^package/templates/react-vite-counter/caatinga.template.json$' || true)"
 if [[ -z "$cli_template_path" ]]; then
   echo "CLI tarball is missing bundled templates: ${cli_tarball[0]}" >&2
   exit 1
@@ -127,9 +180,9 @@ import path from "node:path";
 
 const [rootDir, coreVersion, clientVersion, cliVersion] = process.argv.slice(1);
 const packageVersions = {
-  "@kaleido-xlm/core": coreVersion,
-  "@kaleido-xlm/client": clientVersion,
-  "@kaleido-xlm/cli": cliVersion
+  "@caatinga/core": coreVersion,
+  "@caatinga/client": clientVersion,
+  "@caatinga/cli": cliVersion
 };
 const packageJsonPaths = [
   path.join(rootDir, "packages/core/package.json"),
@@ -190,7 +243,7 @@ for (const entry of readdirSync(templatesDir)) {
 
   for (const section of sections) {
     for (const [name, value] of Object.entries(pkg[section] ?? {})) {
-      if (name.startsWith("@kaleido-xlm/")) {
+      if (name.startsWith("@caatinga/")) {
         templateExpected[name] = { section, value };
       }
     }

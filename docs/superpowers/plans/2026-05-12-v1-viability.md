@@ -1,10 +1,10 @@
-# Kaleido v1 Viability Implementation Plan
+# Caatinga v1 Viability Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implement the five required v1 viability specs: Stellar CLI version contract, complete `KALEIDO_*` error surface, npm publish consumer isolation, live testnet smoke CI, and experimental multi-contract dependency deploy.
+**Goal:** Implement the five required v1 viability specs: Stellar CLI version contract, complete `CAATINGA_*` error surface, npm publish consumer isolation, live testnet smoke CI, and experimental multi-contract dependency deploy.
 
-**Architecture:** Keep `@kaleido-xlm/cli` thin and put runtime behavior in `@kaleido-xlm/core`; keep `@kaleido-xlm/client` package validation isolated to packaging/browser-consumer tests. Add dependency deploy as explicit graph resolution plus safe placeholder substitution, not shell/env interpolation.
+**Architecture:** Keep `@caatinga/cli` thin and put runtime behavior in `@caatinga/core`; keep `@caatinga/client` package validation isolated to packaging/browser-consumer tests. Add dependency deploy as explicit graph resolution plus safe placeholder substitution, not shell/env interpolation.
 
 **Tech Stack:** TypeScript, pnpm 9, Turbo, Vitest, Zod, semver, tsup, GitHub Actions, Changesets, Stellar CLI.
 
@@ -28,7 +28,7 @@ Do not tag `v1.0.0` until all tasks are implemented and accepted. Pre-v1 publish
 - Create `packages/core/src/stellar-cli/check-stellar-cli-version.ts`: parse `stellar --version`, enforce range, allow local untested override.
 - Modify `packages/core/src/shell/run-command.ts`: run the Stellar CLI version gate before `stellar ...` commands.
 - Modify CLI command files in `packages/cli/src/commands/*.command.ts`: expose `--allow-untested-stellar-cli` only where commands shell out to Stellar.
-- Modify `packages/core/src/errors/KaleidoError.ts`: add all missing public error codes.
+- Modify `packages/core/src/errors/CaatingaError.ts`: add all missing public error codes.
 - Create `packages/core/src/errors/error-surface.test.ts`: static and docs coverage checks for error codes.
 - Modify `docs/errors.md`: complete table with semver stability.
 - Create `docs/release/error-code-policy.md`: explicit error code semver policy.
@@ -45,7 +45,7 @@ Do not tag `v1.0.0` until all tasks are implemented and accepted. Pre-v1 publish
 - Create `packages/core/src/contracts/resolve-deploy-args.ts`: safe `${contracts.<name>.contractId}` placeholder resolver.
 - Create `packages/core/src/contracts/deploy-contract-graph.ts`: deploy all or selected contract with dependency behavior.
 - Modify `packages/core/src/contracts/deploy-contract.ts`: accept `deployArgs`, `force`, dependency metadata, and reusable deploy inputs.
-- Modify `packages/cli/src/commands/deploy.command.ts`: support `kaleido deploy --network testnet`, `--force`, and `--no-deps`.
+- Modify `packages/cli/src/commands/deploy.command.ts`: support `caatinga deploy --network testnet`, `--force`, and `--no-deps`.
 - Create `packages/templates/marketplace-with-token`: official experimental multi-contract template.
 - Modify `docs/adr/0005-multi-contract-dependency-deploy.md`: promote to Accepted and document trade-offs.
 - Create or modify docs: `docs/stellar-cli-version-contract.md`, `docs/cli.md`, `docs/config.md`, `docs/templates.md`, `docs/testing.md`, `docs/release/v1-readiness.md`.
@@ -57,7 +57,7 @@ Do not tag `v1.0.0` until all tasks are implemented and accepted. Pre-v1 publish
 **Files:**
 - Create: `packages/core/src/stellar-cli/version.ts`
 - Create: `packages/core/src/stellar-cli/check-stellar-cli-version.test.ts`
-- Modify: `packages/core/src/errors/KaleidoError.ts`
+- Modify: `packages/core/src/errors/CaatingaError.ts`
 - Modify: `packages/core/src/index.ts`
 
 - [ ] **Step 1: Add failing tests for version parsing**
@@ -66,7 +66,7 @@ Create `packages/core/src/stellar-cli/check-stellar-cli-version.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import {
   STELLAR_CLI_MIN_VERSION,
   STELLAR_CLI_TESTED_MAX_VERSION,
@@ -84,7 +84,7 @@ describe("Stellar CLI version contract", () => {
   it("fails when version output has no semver", () => {
     expect(() => parseStellarCliVersion("stellar dev build")).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED
+        code: CaatingaErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED
       })
     );
   });
@@ -97,7 +97,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });
@@ -110,7 +110,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+        code: CaatingaErrorCode.UNTESTED_CLI_VERSION
       })
     );
   });
@@ -136,26 +136,26 @@ describe("Stellar CLI version contract", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
 ```
 
 Expected: FAIL because `./version.js` and new error codes do not exist.
 
 - [ ] **Step 3: Add version constants and parser**
 
-Modify `packages/core/src/errors/KaleidoError.ts` to add:
+Modify `packages/core/src/errors/CaatingaError.ts` to add:
 
 ```ts
-STELLAR_CLI_VERSION_PARSE_FAILED: "KALEIDO_STELLAR_CLI_VERSION_PARSE_FAILED",
-UNSUPPORTED_CLI_VERSION: "KALEIDO_UNSUPPORTED_CLI_VERSION",
-UNTESTED_CLI_VERSION: "KALEIDO_UNTESTED_CLI_VERSION",
+STELLAR_CLI_VERSION_PARSE_FAILED: "CAATINGA_STELLAR_CLI_VERSION_PARSE_FAILED",
+UNSUPPORTED_CLI_VERSION: "CAATINGA_UNSUPPORTED_CLI_VERSION",
+UNTESTED_CLI_VERSION: "CAATINGA_UNTESTED_CLI_VERSION",
 ```
 
 Create `packages/core/src/stellar-cli/version.ts`:
 
 ```ts
 import semver from "semver";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 export const STELLAR_CLI_MIN_VERSION = "22.0.0";
 export const STELLAR_CLI_TESTED_MAX_VERSION = "22.0.1";
@@ -164,9 +164,9 @@ export function parseStellarCliVersion(output: string): string {
   const match = output.match(/\b(\d+\.\d+\.\d+)\b/);
 
   if (!match) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       "Could not parse Stellar CLI version.",
-      KaleidoErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED,
+      CaatingaErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED,
       "Run `stellar --version` and check the output."
     );
   }
@@ -179,17 +179,17 @@ export function assertSupportedStellarCliVersion(input: {
   allowUntested: boolean;
 }): string {
   if (semver.lt(input.version, STELLAR_CLI_MIN_VERSION)) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Unsupported Stellar CLI version ${input.version}.`,
-      KaleidoErrorCode.UNSUPPORTED_CLI_VERSION,
+      CaatingaErrorCode.UNSUPPORTED_CLI_VERSION,
       `Install Stellar CLI ${STELLAR_CLI_MIN_VERSION} or newer.`
     );
   }
 
   if (semver.gt(input.version, STELLAR_CLI_TESTED_MAX_VERSION) && !input.allowUntested) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Untested Stellar CLI version ${input.version}.`,
-      KaleidoErrorCode.UNTESTED_CLI_VERSION,
+      CaatingaErrorCode.UNTESTED_CLI_VERSION,
       `Use Stellar CLI <= ${STELLAR_CLI_TESTED_MAX_VERSION}, or pass --allow-untested-stellar-cli for local experiments.`
     );
   }
@@ -209,7 +209,7 @@ export * from "./stellar-cli/version.js";
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
 ```
 
 Expected: PASS.
@@ -217,7 +217,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add packages/core/src/errors/KaleidoError.ts packages/core/src/stellar-cli/version.ts packages/core/src/stellar-cli/check-stellar-cli-version.test.ts packages/core/src/index.ts
+git add packages/core/src/errors/CaatingaError.ts packages/core/src/stellar-cli/version.ts packages/core/src/stellar-cli/check-stellar-cli-version.test.ts packages/core/src/index.ts
 git commit -m "feat: add stellar cli version contract"
 ```
 
@@ -244,7 +244,7 @@ Create `packages/core/src/stellar-cli/run-command-version.test.ts`:
 
 ```ts
 import { describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { checkStellarCliVersion } from "./check-stellar-cli-version.js";
 
 const runCommandMock = vi.hoisted(() => vi.fn());
@@ -267,11 +267,11 @@ describe("checkStellarCliVersion", () => {
     });
   });
 
-  it("normalizes missing stellar binary to KALEIDO_STELLAR_CLI_NOT_FOUND", async () => {
+  it("normalizes missing stellar binary to CAATINGA_STELLAR_CLI_NOT_FOUND", async () => {
     runCommandMock.mockRejectedValueOnce(Object.assign(new Error("not found"), { code: "ENOENT" }));
 
     await expect(checkStellarCliVersion({ allowUntested: false })).rejects.toMatchObject({
-      code: KaleidoErrorCode.STELLAR_CLI_NOT_FOUND
+      code: CaatingaErrorCode.STELLAR_CLI_NOT_FOUND
     });
   });
 });
@@ -282,7 +282,7 @@ describe("checkStellarCliVersion", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/run-command-version.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/stellar-cli/run-command-version.test.ts
 ```
 
 Expected: FAIL because `check-stellar-cli-version.ts` does not exist and `runCommand` has no `skipStellarVersionCheck` option.
@@ -292,7 +292,7 @@ Expected: FAIL because `check-stellar-cli-version.ts` does not exist and `runCom
 Create `packages/core/src/stellar-cli/check-stellar-cli-version.ts`:
 
 ```ts
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { runCommand } from "../shell/run-command.js";
 import { assertSupportedStellarCliVersion, parseStellarCliVersion } from "./version.js";
 
@@ -309,14 +309,14 @@ export async function checkStellarCliVersion(input: {
       allowUntested: input.allowUntested
     });
   } catch (error) {
-    if (error instanceof KaleidoError) {
+    if (error instanceof CaatingaError) {
       throw error;
     }
 
     if (typeof error === "object" && error && "code" in error && error.code === "ENOENT") {
-      throw new KaleidoError(
+      throw new CaatingaError(
         "Stellar CLI was not found.",
-        KaleidoErrorCode.STELLAR_CLI_NOT_FOUND,
+        CaatingaErrorCode.STELLAR_CLI_NOT_FOUND,
         "Install Stellar CLI and ensure `stellar` is in PATH.",
         error
       );
@@ -333,7 +333,7 @@ Modify `packages/core/src/shell/run-command.ts`:
 
 ```ts
 import { execa, type Options } from "execa";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { checkStellarCliVersion } from "../stellar-cli/check-stellar-cli-version.js";
 
 export type RunCommandResult = {
@@ -375,18 +375,18 @@ export async function runCommand(
     };
   } catch (error) {
     if (typeof error === "object" && error && "code" in error && error.code === "ENOENT" && command === "stellar") {
-      throw new KaleidoError(
+      throw new CaatingaError(
         "Stellar CLI was not found.",
-        KaleidoErrorCode.STELLAR_CLI_NOT_FOUND,
+        CaatingaErrorCode.STELLAR_CLI_NOT_FOUND,
         "Install Stellar CLI and ensure `stellar` is in PATH.",
         error
       );
     }
 
     const output = typeof error === "object" && error && "all" in error ? String(error.all) : undefined;
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Command failed: ${command} ${args.join(" ")}`,
-      KaleidoErrorCode.COMMAND_FAILED,
+      CaatingaErrorCode.COMMAND_FAILED,
       output || "Re-run the command with the underlying tool directly for full diagnostics.",
       error
     );
@@ -410,7 +410,7 @@ await runCommand("stellar", args, {
 In each Stellar-backed command (`build`, `deploy`, `generate`, `invoke`), add:
 
 ```ts
-.option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+.option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
 ```
 
 Pass the option to core:
@@ -426,7 +426,7 @@ Do not add this flag to CI workflows.
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts packages/core/src/stellar-cli/run-command-version.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts packages/core/src/stellar-cli/run-command-version.test.ts
 pnpm typecheck
 ```
 
@@ -471,7 +471,7 @@ Create `docs/stellar-cli-version-contract.md`:
 ```md
 # Stellar CLI Version Contract
 
-Kaleido shells out to Stellar CLI for build, deploy, bindings, invoke, and future XDR/doctor commands. Unsupported CLI versions are not assumed safe.
+Caatinga shells out to Stellar CLI for build, deploy, bindings, invoke, and future XDR/doctor commands. Unsupported CLI versions are not assumed safe.
 
 ## Supported Range
 
@@ -480,8 +480,8 @@ Kaleido shells out to Stellar CLI for build, deploy, bindings, invoke, and futur
 
 Runtime behavior:
 
-- Below the minimum: fail with `KALEIDO_UNSUPPORTED_CLI_VERSION`.
-- Above the tested maximum: fail with `KALEIDO_UNTESTED_CLI_VERSION`.
+- Below the minimum: fail with `CAATINGA_UNSUPPORTED_CLI_VERSION`.
+- Above the tested maximum: fail with `CAATINGA_UNTESTED_CLI_VERSION`.
 - Local override: pass `--allow-untested-stellar-cli`.
 - CI must not use the override.
 
@@ -518,7 +518,7 @@ Run:
 
 ```bash
 git diff --check
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
 ```
 
 Expected: both commands exit 0.
@@ -535,7 +535,7 @@ git commit -m "docs: document stellar cli version contract"
 ### Task 4: Complete Error Code Surface
 
 **Files:**
-- Modify: `packages/core/src/errors/KaleidoError.ts`
+- Modify: `packages/core/src/errors/CaatingaError.ts`
 - Create: `packages/core/src/errors/error-surface.test.ts`
 - Modify: `docs/errors.md`
 - Create: `docs/release/error-code-policy.md`
@@ -548,36 +548,36 @@ Create `packages/core/src/errors/error-surface.test.ts`:
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "./KaleidoError.js";
+import { CaatingaErrorCode } from "./CaatingaError.js";
 
 const repoRoot = join(__dirname, "../../../..");
 
 describe("public error surface", () => {
-  it("exports only KALEIDO_* codes", () => {
-    for (const code of Object.values(KaleidoErrorCode)) {
-      expect(code).toMatch(/^KALEIDO_/);
+  it("exports only CAATINGA_* codes", () => {
+    for (const code of Object.values(CaatingaErrorCode)) {
+      expect(code).toMatch(/^CAATINGA_/);
     }
   });
 
   it("documents every exported code in docs/errors.md", () => {
     const docs = readFileSync(join(repoRoot, "docs/errors.md"), "utf8");
 
-    for (const code of Object.values(KaleidoErrorCode)) {
+    for (const code of Object.values(CaatingaErrorCode)) {
       expect(docs).toContain(`\`${code}\``);
     }
   });
 
   it("does not document codes missing from implementation", () => {
     const docs = readFileSync(join(repoRoot, "docs/errors.md"), "utf8");
-    const documented = [...docs.matchAll(/`(KALEIDO_[A-Z0-9_]+)`/g)].map((match) => match[1]);
-    const exported = new Set(Object.values(KaleidoErrorCode));
+    const documented = [...docs.matchAll(/`(CAATINGA_[A-Z0-9_]+)`/g)].map((match) => match[1]);
+    const exported = new Set(Object.values(CaatingaErrorCode));
 
     for (const code of documented) {
       expect(exported.has(code)).toBe(true);
     }
   });
 
-  it("does not construct KaleidoError with raw string codes", () => {
+  it("does not construct CaatingaError with raw string codes", () => {
     const files = [
       "packages/cli/src",
       "packages/core/src",
@@ -588,7 +588,7 @@ describe("public error surface", () => {
       .map((path) => readFileSync(path, "utf8"))
       .join("\n");
 
-    expect(source).not.toMatch(/new KaleidoError\([^)]*,\s*["']KALEIDO_/);
+    expect(source).not.toMatch(/new CaatingaError\([^)]*,\s*["']CAATINGA_/);
   });
 });
 
@@ -611,26 +611,26 @@ function collectTsFiles(path: string): string[] {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/errors/error-surface.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/errors/error-surface.test.ts
 ```
 
 Expected: FAIL until all spec-required codes exist and docs are complete.
 
 - [ ] **Step 3: Add missing codes**
 
-Modify `KaleidoErrorCode` in `packages/core/src/errors/KaleidoError.ts` so the minimum public list includes:
+Modify `CaatingaErrorCode` in `packages/core/src/errors/CaatingaError.ts` so the minimum public list includes:
 
 ```ts
-DEPLOY_FAILED: "KALEIDO_DEPLOY_FAILED",
-BUILD_FAILED: "KALEIDO_BUILD_FAILED",
-BINDINGS_FAILED: "KALEIDO_BINDINGS_FAILED",
-INVOKE_FAILED: "KALEIDO_INVOKE_FAILED",
-INVALID_TEMPLATE_MANIFEST: "KALEIDO_INVALID_TEMPLATE_MANIFEST",
-CONTRACT_DEPENDENCY_NOT_FOUND: "KALEIDO_CONTRACT_DEPENDENCY_NOT_FOUND",
-CONTRACT_DEPENDENCY_CYCLE: "KALEIDO_CONTRACT_DEPENDENCY_CYCLE",
-CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND: "KALEIDO_CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND",
-DEPLOY_ARG_PLACEHOLDER_INVALID: "KALEIDO_DEPLOY_ARG_PLACEHOLDER_INVALID",
-DEPLOY_ARG_PLACEHOLDER_UNRESOLVED: "KALEIDO_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED",
+DEPLOY_FAILED: "CAATINGA_DEPLOY_FAILED",
+BUILD_FAILED: "CAATINGA_BUILD_FAILED",
+BINDINGS_FAILED: "CAATINGA_BINDINGS_FAILED",
+INVOKE_FAILED: "CAATINGA_INVOKE_FAILED",
+INVALID_TEMPLATE_MANIFEST: "CAATINGA_INVALID_TEMPLATE_MANIFEST",
+CONTRACT_DEPENDENCY_NOT_FOUND: "CAATINGA_CONTRACT_DEPENDENCY_NOT_FOUND",
+CONTRACT_DEPENDENCY_CYCLE: "CAATINGA_CONTRACT_DEPENDENCY_CYCLE",
+CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND: "CAATINGA_CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND",
+DEPLOY_ARG_PLACEHOLDER_INVALID: "CAATINGA_DEPLOY_ARG_PLACEHOLDER_INVALID",
+DEPLOY_ARG_PLACEHOLDER_UNRESOLVED: "CAATINGA_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED",
 ```
 
 Keep all existing codes.
@@ -642,13 +642,13 @@ Create `docs/release/error-code-policy.md`:
 ```md
 # Error Code Policy
 
-`KALEIDO_*` error codes are public API. Automation may parse `code`; it must not parse message text.
+`CAATINGA_*` error codes are public API. Automation may parse `code`; it must not parse message text.
 
 ## Semver Rules
 
-- Adding a new `KALEIDO_*` code: minor change.
-- Removing a `KALEIDO_*` code: major change.
-- Renaming a `KALEIDO_*` code: major change.
+- Adding a new `CAATINGA_*` code: minor change.
+- Removing a `CAATINGA_*` code: major change.
+- Renaming a `CAATINGA_*` code: major change.
 - Changing the meaning of a code: major change.
 - Changing message text only: patch change.
 
@@ -666,10 +666,10 @@ Update `docs/errors.md` table header to:
 | --- | --- | --- | --- | --- | --- |
 ```
 
-For every code in `KaleidoErrorCode`, add a row with a concrete CI recommendation and semver stability. Example row:
+For every code in `CaatingaErrorCode`, add a row with a concrete CI recommendation and semver stability. Example row:
 
 ```md
-| `KALEIDO_UNTESTED_CLI_VERSION` | Stellar CLI version is newer than Kaleido's tested maximum. | Local or CI runner upgraded Stellar CLI before Kaleido fixtures were updated. | Use a supported Stellar CLI version, or pass `--allow-untested-stellar-cli` only for local experiments. | Fail CI; do not override in release jobs. | Public code; rename/removal is major. |
+| `CAATINGA_UNTESTED_CLI_VERSION` | Stellar CLI version is newer than Caatinga's tested maximum. | Local or CI runner upgraded Stellar CLI before Caatinga fixtures were updated. | Use a supported Stellar CLI version, or pass `--allow-untested-stellar-cli` only for local experiments. | Fail CI; do not override in release jobs. | Public code; rename/removal is major. |
 ```
 
 - [ ] **Step 6: Run error tests**
@@ -677,7 +677,7 @@ For every code in `KaleidoErrorCode`, add a row with a concrete CI recommendatio
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/errors/error-codes.test.ts packages/core/src/errors/error-surface.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/errors/error-codes.test.ts packages/core/src/errors/error-surface.test.ts
 pnpm typecheck
 ```
 
@@ -730,11 +730,11 @@ describe("publish package manifests", () => {
     });
   }
 
-  it("cli exposes kaleido bin", () => {
+  it("cli exposes caatinga bin", () => {
     const packageJson = JSON.parse(
       readFileSync(join(repoRoot, "packages/cli/package.json"), "utf8")
     );
-    expect(packageJson.bin).toEqual({ kaleido: "./dist/index.js" });
+    expect(packageJson.bin).toEqual({ caatinga: "./dist/index.js" });
   });
 });
 ```
@@ -744,7 +744,7 @@ describe("publish package manifests", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/release/package-manifest.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/release/package-manifest.test.ts
 ```
 
 Expected: FAIL because manifests do not yet have CJS exports/files and contain `workspace:*`.
@@ -755,7 +755,7 @@ For each package, use this shape. Example for `packages/core/package.json`:
 
 ```json
 {
-  "name": "@kaleido-xlm/core",
+  "name": "@caatinga/core",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -777,7 +777,7 @@ For each package, use this shape. Example for `packages/core/package.json`:
 }
 ```
 
-For `@kaleido-xlm/client`, preserve `./freighter` export and add require/types:
+For `@caatinga/client`, preserve `./freighter` export and add require/types:
 
 ```json
 "./freighter": {
@@ -790,7 +790,7 @@ For `@kaleido-xlm/client`, preserve `./freighter` export and add require/types:
 Replace internal published dependencies:
 
 ```json
-"@kaleido-xlm/core": "^0.1.0"
+"@caatinga/core": "^0.1.0"
 ```
 
 Keep `workspace:*` only if a prepack or Changesets step rewrites it before packing; otherwise the consumer isolation test must fail.
@@ -800,9 +800,9 @@ Keep `workspace:*` only if a prepack or Changesets step rewrites it before packi
 If package-level README/LICENSE files are missing, create small package README files and copy/link license content. Minimum `packages/core/README.md`:
 
 ```md
-# @kaleido-xlm/core
+# @caatinga/core
 
-Core config, artifacts, command orchestration, and error primitives for Kaleido.
+Core config, artifacts, command orchestration, and error primitives for Caatinga.
 ```
 
 Repeat for `packages/cli/README.md` and `packages/client/README.md`. Add root `LICENSE` if none exists before using `files: ["LICENSE"]`.
@@ -816,7 +816,7 @@ pnpm build
 test -f packages/core/dist/index.js
 test -f packages/core/dist/index.cjs
 test -f packages/client/dist/freighter.cjs
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/release/package-manifest.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/release/package-manifest.test.ts
 ```
 
 Expected: all commands exit 0.
@@ -846,7 +846,7 @@ Create `.changeset/config.json`:
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [["@kaleido-xlm/cli", "@kaleido-xlm/core", "@kaleido-xlm/client"]],
+  "fixed": [["@caatinga/cli", "@caatinga/core", "@caatinga/client"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
@@ -860,11 +860,11 @@ Modify root `package.json`:
 ```json
 "scripts": {
   "build": "turbo build",
-  "dev": "pnpm --filter @kaleido-xlm/cli dev",
+  "dev": "pnpm --filter @caatinga/cli dev",
   "test": "turbo test",
   "typecheck": "turbo typecheck",
   "changeset": "changeset",
-  "pack:packages": "pnpm -r --filter @kaleido-xlm/cli --filter @kaleido-xlm/core --filter @kaleido-xlm/client pack --pack-destination ./packed",
+  "pack:packages": "pnpm -r --filter @caatinga/cli --filter @caatinga/core --filter @caatinga/client pack --pack-destination ./packed",
   "test:consumer": "bash scripts/consumer-isolation-test.sh"
 }
 ```
@@ -879,13 +879,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKED_DIR="$ROOT_DIR/packed"
-TMP_DIR="${TMPDIR:-/tmp}/kaleido-consumer-test"
+TMP_DIR="${TMPDIR:-/tmp}/caatinga-consumer-test"
 
 rm -rf "$PACKED_DIR" "$TMP_DIR"
 mkdir -p "$PACKED_DIR" "$TMP_DIR"
 
 pnpm --dir "$ROOT_DIR" build
-pnpm --dir "$ROOT_DIR" -r --filter @kaleido-xlm/core --filter @kaleido-xlm/client --filter @kaleido-xlm/cli pack --pack-destination "$PACKED_DIR"
+pnpm --dir "$ROOT_DIR" -r --filter @caatinga/core --filter @caatinga/client --filter @caatinga/cli pack --pack-destination "$PACKED_DIR"
 
 if tar -xOf "$PACKED_DIR"/*.tgz package/package.json | grep -E 'workspace:\*|link:|file:'; then
   echo "Packed package contains a monorepo-only dependency reference." >&2
@@ -894,14 +894,14 @@ fi
 
 cd "$TMP_DIR"
 npm init -y >/dev/null
-npm install "$PACKED_DIR"/kaleido-core-*.tgz "$PACKED_DIR"/kaleido-client-*.tgz "$PACKED_DIR"/kaleido-cli-*.tgz
+npm install "$PACKED_DIR"/caatinga-core-*.tgz "$PACKED_DIR"/caatinga-client-*.tgz "$PACKED_DIR"/caatinga-cli-*.tgz
 
-node --input-type=module -e 'import { defineConfig } from "@kaleido-xlm/core"; console.log(typeof defineConfig)'
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
-npx kaleido --version
-npx kaleido init test-app --template react-vite-counter
-test -f test-app/kaleido.config.ts
-test -f test-app/kaleido.artifacts.json
+node --input-type=module -e 'import { defineConfig } from "@caatinga/core"; console.log(typeof defineConfig)'
+node --input-type=module -e 'import { createCaatingaClient } from "@caatinga/client"; console.log(typeof createCaatingaClient)'
+npx caatinga --version
+npx caatinga init test-app --template react-vite-counter
+test -f test-app/caatinga.config.ts
+test -f test-app/caatinga.artifacts.json
 ```
 
 - [ ] **Step 3: Make script executable**
@@ -920,7 +920,7 @@ Run:
 pnpm test:consumer
 ```
 
-Expected: exits 0; installed packages are from tarballs in `/tmp/kaleido-consumer-test`, not workspace links.
+Expected: exits 0; installed packages are from tarballs in `/tmp/caatinga-consumer-test`, not workspace links.
 
 - [ ] **Step 5: Commit**
 
@@ -1021,7 +1021,7 @@ Create `docs/release/v1-readiness.md`:
 Do not tag `v1.0.0` until these specs are implemented and accepted:
 
 1. Stellar CLI version contract
-2. Complete `KALEIDO_*` error surface
+2. Complete `CAATINGA_*` error surface
 3. npm publish and consumer isolation
 4. live testnet smoke CI
 5. experimental multi-contract dependency deploy
@@ -1077,22 +1077,22 @@ Create `scripts/testnet-smoke.sh`:
 set -euo pipefail
 
 APP_NAME="${1:-smoke-app}"
-IDENTITY_ALIAS="${KALEIDO_CI_IDENTITY_ALIAS:?KALEIDO_CI_IDENTITY_ALIAS is required}"
+IDENTITY_ALIAS="${CAATINGA_CI_IDENTITY_ALIAS:?CAATINGA_CI_IDENTITY_ALIAS is required}"
 
 rm -rf "$APP_NAME"
 
-kaleido --version
+caatinga --version
 stellar --version
-kaleido init "$APP_NAME" --template react-vite-counter
+caatinga init "$APP_NAME" --template react-vite-counter
 cd "$APP_NAME"
 
-kaleido build counter
-kaleido deploy counter --network testnet --source "$IDENTITY_ALIAS"
+caatinga build counter
+caatinga deploy counter --network testnet --source "$IDENTITY_ALIAS"
 
-test -f kaleido.artifacts.json
+test -f caatinga.artifacts.json
 node --input-type=module -e '
 import fs from "node:fs";
-const artifacts = JSON.parse(fs.readFileSync("kaleido.artifacts.json", "utf8"));
+const artifacts = JSON.parse(fs.readFileSync("caatinga.artifacts.json", "utf8"));
 const contractId = artifacts.networks?.testnet?.contracts?.counter?.contractId;
 if (!/^C[A-Z0-9]{55}$/.test(contractId ?? "")) {
   console.error(`Invalid contractId: ${contractId}`);
@@ -1100,10 +1100,10 @@ if (!/^C[A-Z0-9]{55}$/.test(contractId ?? "")) {
 }
 '
 
-kaleido generate counter --network testnet
+caatinga generate counter --network testnet
 test -d src/contracts/generated
 
-kaleido invoke counter.increment --network testnet --source "$IDENTITY_ALIAS"
+caatinga invoke counter.increment --network testnet --source "$IDENTITY_ALIAS"
 ```
 
 - [ ] **Step 2: Make script executable**
@@ -1151,11 +1151,11 @@ jobs:
 
       - name: Restore Stellar CLI config
         env:
-          KALEIDO_CI_STELLAR_CONFIG_B64: ${{ secrets.KALEIDO_CI_STELLAR_CONFIG_B64 }}
+          CAATINGA_CI_STELLAR_CONFIG_B64: ${{ secrets.CAATINGA_CI_STELLAR_CONFIG_B64 }}
         run: |
-          test -n "$KALEIDO_CI_STELLAR_CONFIG_B64"
+          test -n "$CAATINGA_CI_STELLAR_CONFIG_B64"
           mkdir -p "$HOME/.config/stellar"
-          echo "$KALEIDO_CI_STELLAR_CONFIG_B64" | base64 --decode > "$HOME/.config/stellar/config.toml"
+          echo "$CAATINGA_CI_STELLAR_CONFIG_B64" | base64 --decode > "$HOME/.config/stellar/config.toml"
           chmod 600 "$HOME/.config/stellar/config.toml"
 
       - name: Install dependencies
@@ -1171,13 +1171,13 @@ jobs:
         id: smoke1
         continue-on-error: true
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: scripts/testnet-smoke.sh smoke-app
 
       - name: Smoke retry
         if: steps.smoke1.outcome == 'failure'
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: scripts/testnet-smoke.sh smoke-app-retry
 
       - name: Upload smoke artifacts
@@ -1186,8 +1186,8 @@ jobs:
         with:
           name: testnet-smoke-artifacts
           path: |
-            smoke-app/kaleido.artifacts.json
-            smoke-app-retry/kaleido.artifacts.json
+            smoke-app/caatinga.artifacts.json
+            smoke-app-retry/caatinga.artifacts.json
           if-no-files-found: ignore
 
       - name: Remove Stellar CLI config
@@ -1200,7 +1200,7 @@ jobs:
 Modify `docs/testing.md`:
 
 ```md
-Live testnet smoke uses `KALEIDO_CI_IDENTITY_ALIAS` and `KALEIDO_CI_STELLAR_CONFIG_B64`. Kaleido receives only the identity alias through `--source`; secret material is restored into Stellar CLI config and deleted after the job.
+Live testnet smoke uses `CAATINGA_CI_IDENTITY_ALIAS` and `CAATINGA_CI_STELLAR_CONFIG_B64`. Caatinga receives only the identity alias through `--source`; secret material is restored into Stellar CLI config and deleted after the job.
 ```
 
 Modify `docs/release/v1-readiness.md`:
@@ -1245,7 +1245,7 @@ Add to `packages/core/src/config/config.schema.test.ts`:
 
 ```ts
 it("accepts contract dependencies and deploy args", () => {
-  const result = KaleidoConfigSchema.parse({
+  const result = CaatingaConfigSchema.parse({
     project: "marketplace-app",
     defaultNetwork: "testnet",
     contracts: {
@@ -1287,7 +1287,7 @@ Add to `packages/core/src/artifacts/read-write-artifacts.test.ts`:
 
 ```ts
 it("accepts dependency metadata in version 1 artifacts", () => {
-  const artifacts = KaleidoArtifactsSchema.parse({
+  const artifacts = CaatingaArtifactsSchema.parse({
     project: "marketplace-app",
     version: 1,
     networks: {
@@ -1330,7 +1330,7 @@ it("accepts dependency metadata in version 1 artifacts", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
 ```
 
 Expected: FAIL because schema does not accept the new fields.
@@ -1380,7 +1380,7 @@ Modify `docs/config.md` with a multi-contract example matching Spec 05.
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
 pnpm typecheck
 ```
 
@@ -1412,7 +1412,7 @@ Create `packages/core/src/contracts/resolve-deploy-order.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveDeployOrder } from "./resolve-deploy-order.js";
 
 describe("resolveDeployOrder", () => {
@@ -1445,7 +1445,7 @@ describe("resolveDeployOrder", () => {
         },
         includeDependencies: true
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND }));
   });
 
   it("fails for dependency cycles", () => {
@@ -1457,7 +1457,7 @@ describe("resolveDeployOrder", () => {
         },
         includeDependencies: true
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_CYCLE }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_CYCLE }));
   });
 });
 ```
@@ -1468,7 +1468,7 @@ Create `packages/core/src/contracts/resolve-deploy-args.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveDeployArgs } from "./resolve-deploy-args.js";
 
 describe("resolveDeployArgs", () => {
@@ -1515,7 +1515,7 @@ describe("resolveDeployArgs", () => {
         artifacts,
         network: "testnet"
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_INVALID }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.DEPLOY_ARG_PLACEHOLDER_INVALID }));
   });
 
   it("fails when dependency artifact is missing", () => {
@@ -1525,7 +1525,7 @@ describe("resolveDeployArgs", () => {
         artifacts,
         network: "testnet"
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND }));
   });
 });
 ```
@@ -1535,7 +1535,7 @@ describe("resolveDeployArgs", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
 ```
 
 Expected: FAIL because modules do not exist.
@@ -1546,7 +1546,7 @@ Create `packages/core/src/contracts/resolve-deploy-order.ts` with deterministic 
 
 ```ts
 import type { ContractConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 type VisitState = "visiting" | "visited";
 
@@ -1569,10 +1569,10 @@ export function resolveDeployOrder(input: {
     const contract = input.contracts[contractName];
 
     if (!contract) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Contract dependency "${contractName}" was not found.`,
-        KaleidoErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
-        "Add the dependency to kaleido.config.ts or remove it from dependsOn."
+        CaatingaErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
+        "Add the dependency to caatinga.config.ts or remove it from dependsOn."
       );
     }
 
@@ -1581,9 +1581,9 @@ export function resolveDeployOrder(input: {
     }
 
     if (state.get(contractName) === "visiting") {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Contract dependency cycle detected: ${[...stack, contractName].join(" -> ")}.`,
-        KaleidoErrorCode.CONTRACT_DEPENDENCY_CYCLE,
+        CaatingaErrorCode.CONTRACT_DEPENDENCY_CYCLE,
         "Remove the cycle from dependsOn."
       );
     }
@@ -1597,10 +1597,10 @@ export function resolveDeployOrder(input: {
     } else if (contract.dependsOn.length > 0 && input.selectedContract === contractName) {
       for (const dependency of contract.dependsOn) {
         if (!input.contracts[dependency]) {
-          throw new KaleidoError(
+          throw new CaatingaError(
             `Contract dependency "${dependency}" was not found.`,
-            KaleidoErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
-            "Add the dependency to kaleido.config.ts or remove it from dependsOn."
+            CaatingaErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
+            "Add the dependency to caatinga.config.ts or remove it from dependsOn."
           );
         }
       }
@@ -1619,8 +1619,8 @@ export function resolveDeployOrder(input: {
 Create `packages/core/src/contracts/resolve-deploy-args.ts`:
 
 ```ts
-import type { KaleidoArtifacts } from "../artifacts/artifact.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaArtifacts } from "../artifacts/artifact.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const CONTRACT_ID_PLACEHOLDER = /^\$\{contracts\.([A-Za-z0-9_-]+)\.contractId\}$/;
 
@@ -1628,7 +1628,7 @@ export type DeployArgValue = string | number | boolean;
 
 export function resolveDeployArgs(input: {
   deployArgs: Record<string, DeployArgValue>;
-  artifacts: KaleidoArtifacts;
+  artifacts: CaatingaArtifacts;
   network: string;
 }): Record<string, DeployArgValue> {
   const resolved: Record<string, DeployArgValue> = {};
@@ -1641,9 +1641,9 @@ export function resolveDeployArgs(input: {
 
     const match = value.match(CONTRACT_ID_PLACEHOLDER);
     if (!match) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Deploy arg "${key}" contains an unsupported placeholder.`,
-        KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_INVALID,
+        CaatingaErrorCode.DEPLOY_ARG_PLACEHOLDER_INVALID,
         "Use only ${contracts.<contractName>.contractId}."
       );
     }
@@ -1652,9 +1652,9 @@ export function resolveDeployArgs(input: {
     const contractArtifact = input.artifacts.networks[input.network]?.contracts[contractName];
 
     if (!contractArtifact?.contractId) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `No dependency artifact found for "${contractName}" on "${input.network}".`,
-        KaleidoErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND,
+        CaatingaErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND,
         "Deploy the dependency first or run deploy without --no-deps."
       );
     }
@@ -1680,7 +1680,7 @@ export * from "./contracts/resolve-deploy-args.js";
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
 pnpm typecheck
 ```
 
@@ -1711,8 +1711,8 @@ Create `packages/core/src/contracts/deploy-contract-graph.test.ts`:
 
 ```ts
 import { describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { deployContractGraph } from "./deploy-contract-graph.js";
 
 const deployContractMock = vi.hoisted(() => vi.fn());
@@ -1726,7 +1726,7 @@ vi.mock("../artifacts/read-artifacts.js", () => ({
   readArtifacts: readArtifactsMock
 }));
 
-const config: KaleidoConfig = {
+const config: CaatingaConfig = {
   project: "marketplace-app",
   defaultNetwork: "testnet",
   contracts: {
@@ -1806,7 +1806,7 @@ describe("deployContractGraph", () => {
         includeDependencies: false,
         force: false
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND });
   });
 });
 ```
@@ -1816,7 +1816,7 @@ describe("deployContractGraph", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts
 ```
 
 Expected: FAIL because deploy graph module does not exist.
@@ -1827,7 +1827,7 @@ Modify `DeployContractOptions` in `packages/core/src/contracts/deploy-contract.t
 
 ```ts
 export type DeployContractOptions = {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   contractName: string;
   networkName?: string;
   source?: string;
@@ -1839,7 +1839,7 @@ export type DeployContractOptions = {
 };
 ```
 
-Append resolved deploy args to Stellar CLI args using explicit `--` only if the current Stellar CLI deploy command expects init args. If deploy args are not supported by the current CLI command shape, fail with `KALEIDO_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED` rather than silently ignoring them.
+Append resolved deploy args to Stellar CLI args using explicit `--` only if the current Stellar CLI deploy command expects init args. If deploy args are not supported by the current CLI command shape, fail with `CAATINGA_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED` rather than silently ignoring them.
 
 When writing artifacts, include:
 
@@ -1854,14 +1854,14 @@ Create `packages/core/src/contracts/deploy-contract-graph.ts`:
 
 ```ts
 import { readArtifacts } from "../artifacts/read-artifacts.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { deployContract } from "./deploy-contract.js";
 import { resolveDeployArgs } from "./resolve-deploy-args.js";
 import { resolveDeployOrder } from "./resolve-deploy-order.js";
 
 export async function deployContractGraph(options: {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   contractName?: string;
   networkName?: string;
   source?: string;
@@ -1929,7 +1929,7 @@ program
   .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
   .option("--force", "Redeploy contracts even if artifacts already contain contract IDs")
   .option("--no-deps", "Do not deploy missing dependencies for a selected contract")
-  .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+  .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
   .action((contractName: string | undefined, options: {
     network?: string;
     source: string;
@@ -1955,7 +1955,7 @@ program
       logger.info(`Contract: ${contract.name}`);
       logger.info(`Contract ID: ${contract.contractId}`);
     }
-    logger.info("Artifacts updated: kaleido.artifacts.json");
+    logger.info("Artifacts updated: caatinga.artifacts.json");
   }));
 ```
 
@@ -1972,7 +1972,7 @@ export * from "./contracts/deploy-contract-graph.js";
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts packages/core/src/contracts/deploy-contract.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts packages/core/src/contracts/deploy-contract.test.ts
 pnpm typecheck
 ```
 
@@ -1990,9 +1990,9 @@ git commit -m "feat: deploy contracts by dependency graph"
 ### Task 12: Multi-Contract Template and ADR
 
 **Files:**
-- Create: `packages/templates/marketplace-with-token/kaleido.template.json`
-- Create: `packages/templates/marketplace-with-token/kaleido.config.ts`
-- Create: `packages/templates/marketplace-with-token/kaleido.artifacts.json`
+- Create: `packages/templates/marketplace-with-token/caatinga.template.json`
+- Create: `packages/templates/marketplace-with-token/caatinga.config.ts`
+- Create: `packages/templates/marketplace-with-token/caatinga.artifacts.json`
 - Create: `packages/templates/marketplace-with-token/README.md`
 - Create: minimal template source files under `packages/templates/marketplace-with-token`
 - Modify: `packages/core/src/templates/create-project-from-template.test.ts`
@@ -2006,8 +2006,8 @@ Modify `packages/core/src/templates/create-project-from-template.test.ts` to add
 ```ts
 it("ships marketplace-with-token as a multi-contract dependency template", async () => {
   const templatePath = join(templateRoot, "marketplace-with-token");
-  const manifest = JSON.parse(readFileSync(join(templatePath, "kaleido.template.json"), "utf8"));
-  const config = readFileSync(join(templatePath, "kaleido.config.ts"), "utf8");
+  const manifest = JSON.parse(readFileSync(join(templatePath, "caatinga.template.json"), "utf8"));
+  const config = readFileSync(join(templatePath, "caatinga.config.ts"), "utf8");
 
   expect(manifest.name).toBe("marketplace-with-token");
   expect(config).toContain("dependsOn: [\"token\"]");
@@ -2020,21 +2020,21 @@ it("ships marketplace-with-token as a multi-contract dependency template", async
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
 ```
 
 Expected: FAIL because the template does not exist.
 
 - [ ] **Step 3: Create template manifest**
 
-Create `packages/templates/marketplace-with-token/kaleido.template.json`:
+Create `packages/templates/marketplace-with-token/caatinga.template.json`:
 
 ```json
 {
   "name": "marketplace-with-token",
   "version": "0.1.0",
   "description": "Experimental multi-contract Soroban template with token dependency injection.",
-  "kaleido": {
+  "caatinga": {
     "compatibleCore": "^0.1.0",
     "templateVersion": 1
   },
@@ -2047,18 +2047,18 @@ Create `packages/templates/marketplace-with-token/kaleido.template.json`:
     "default": "marketplace"
   },
   "files": {
-    "config": "kaleido.config.ts",
-    "artifacts": "kaleido.artifacts.json"
+    "config": "caatinga.config.ts",
+    "artifacts": "caatinga.artifacts.json"
   }
 }
 ```
 
 - [ ] **Step 4: Create template config**
 
-Create `packages/templates/marketplace-with-token/kaleido.config.ts`:
+Create `packages/templates/marketplace-with-token/caatinga.config.ts`:
 
 ```ts
-import { defineConfig } from "@kaleido-xlm/core";
+import { defineConfig } from "@caatinga/core";
 
 export default defineConfig({
   project: "__PROJECT_NAME__",
@@ -2097,15 +2097,15 @@ Create `packages/templates/marketplace-with-token/README.md`:
 ```md
 # __PROJECT_NAME__
 
-Experimental Kaleido multi-contract template.
+Experimental Caatinga multi-contract template.
 
 ## Deploy
 
 ```bash
 npm install
-npx kaleido build token
-npx kaleido build marketplace
-npx kaleido deploy --network testnet --source alice
+npx caatinga build token
+npx caatinga build marketplace
+npx caatinga deploy --network testnet --source alice
 ```
 
 Deploy order:
@@ -2113,7 +2113,7 @@ Deploy order:
 1. `token`
 2. `marketplace`
 
-`marketplace.deployArgs.tokenContractId` resolves from `${contracts.token.contractId}` after the token deploy writes `kaleido.artifacts.json`.
+`marketplace.deployArgs.tokenContractId` resolves from `${contracts.token.contractId}` after the token deploy writes `caatinga.artifacts.json`.
 ```
 
 - [ ] **Step 6: Create minimal template placeholders**
@@ -2121,7 +2121,7 @@ Deploy order:
 Create:
 
 ```txt
-packages/templates/marketplace-with-token/kaleido.artifacts.json
+packages/templates/marketplace-with-token/caatinga.artifacts.json
 packages/templates/marketplace-with-token/contracts/token/.gitkeep
 packages/templates/marketplace-with-token/contracts/marketplace/.gitkeep
 packages/templates/marketplace-with-token/src/main.ts
@@ -2129,7 +2129,7 @@ packages/templates/marketplace-with-token/package.json
 packages/templates/marketplace-with-token/tsconfig.json
 ```
 
-Use `kaleido.artifacts.json`:
+Use `caatinga.artifacts.json`:
 
 ```json
 {
@@ -2155,11 +2155,11 @@ Accepted
 
 ## Context
 
-Multi-contract deployment is the first Kaleido workflow that is materially more useful than ad-hoc package scripts. Dependents need upstream `contractId`s without unsafe shell interpolation or environment mutation.
+Multi-contract deployment is the first Caatinga workflow that is materially more useful than ad-hoc package scripts. Dependents need upstream `contractId`s without unsafe shell interpolation or environment mutation.
 
 ## Decision
 
-Kaleido core owns `dependsOn`, topological deploy order, and `${contracts.<contractName>.contractId}` placeholder resolution. The placeholder language is intentionally narrow and reads only from `kaleido.artifacts.json`.
+Caatinga core owns `dependsOn`, topological deploy order, and `${contracts.<contractName>.contractId}` placeholder resolution. The placeholder language is intentionally narrow and reads only from `caatinga.artifacts.json`.
 
 ## Consequences
 
@@ -2174,7 +2174,7 @@ Kaleido core owns `dependsOn`, topological deploy order, and `${contracts.<contr
 Run:
 
 ```bash
-pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
+pnpm --filter @caatinga/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
 git diff --check
 ```
 
@@ -2269,4 +2269,4 @@ Type consistency:
 - Stellar CLI override option is consistently named `allowUntestedStellarCli`.
 - Dependency config fields are consistently named `dependsOn` and `deployArgs`.
 - Artifact metadata fields are consistently named `dependencies`, `resolvedDeployArgs`, and `dependencyGraph`.
-- New error code keys map to public `KALEIDO_*` values.
+- New error code keys map to public `CAATINGA_*` values.

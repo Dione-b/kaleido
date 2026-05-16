@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KALEIDO_CORE_VERSION } from "../version.js";
+import { CAATINGA_CORE_VERSION } from "../version.js";
 import { isCoreVersionCompatible } from "./template-manifest.schema.js";
 
 describe("isCoreVersionCompatible", () => {
@@ -12,7 +12,7 @@ describe("isCoreVersionCompatible", () => {
   });
 
   it("uses the centralized core version by default", () => {
-    expect(KALEIDO_CORE_VERSION).toBe("0.1.4");
+    expect(CAATINGA_CORE_VERSION).toBe("0.1.4");
     expect(isCoreVersionCompatible("^0.1.0")).toBe(true);
   });
 });

@@ -1,14 +1,14 @@
-import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
+import { CaatingaError, CaatingaErrorCode } from "@caatinga/core";
 import { resolveContractId } from "../artifacts/resolve-contract-id.js";
 import { createDefaultBindingAdapter } from "../bindings/default-binding-adapter.js";
 import { buildXdr as buildTransactionXdr } from "../xdr/build-xdr.js";
 import type {
-  KaleidoBindingAdapter,
-  KaleidoClientConfig,
-  KaleidoContractRegistration,
-  KaleidoInvokeOptions,
-  KaleidoInvokeResult,
-  KaleidoXdrBuildResult
+  CaatingaBindingAdapter,
+  CaatingaClientConfig,
+  CaatingaContractRegistration,
+  CaatingaInvokeOptions,
+  CaatingaInvokeResult,
+  CaatingaXdrBuildResult
 } from "../types.js";
 
 interface SubmitTransactionLike {
@@ -16,12 +16,12 @@ interface SubmitTransactionLike {
   send?: (input?: { signedXdr: string }) => Promise<unknown> | unknown;
 }
 
-export class KaleidoContractClient {
+export class CaatingaContractClient {
   constructor(
-    private readonly config: KaleidoClientConfig,
+    private readonly config: CaatingaClientConfig,
     private readonly contractName: string,
-    private readonly registration: KaleidoContractRegistration,
-    private readonly bindingAdapter: KaleidoBindingAdapter = createDefaultBindingAdapter(
+    private readonly registration: CaatingaContractRegistration,
+    private readonly bindingAdapter: CaatingaBindingAdapter = createDefaultBindingAdapter(
       registration.binding as never
     )
   ) {}
@@ -30,7 +30,7 @@ export class KaleidoContractClient {
     method: string,
     argsOrOptions?: Record<string, unknown>,
     maybeOptions?: { debugRaw?: boolean }
-  ): Promise<KaleidoXdrBuildResult> {
+  ): Promise<CaatingaXdrBuildResult> {
     const { args, debugRaw } = splitArgsAndOptions(argsOrOptions, maybeOptions);
     const { contractId, transaction } = await this.createTransaction(method, args);
 
@@ -45,9 +45,9 @@ export class KaleidoContractClient {
 
   async invoke<T = unknown>(
     method: string,
-    argsOrOptions?: Record<string, unknown> | KaleidoInvokeOptions,
-    maybeOptions?: KaleidoInvokeOptions
-  ): Promise<KaleidoInvokeResult<T>> {
+    argsOrOptions?: Record<string, unknown> | CaatingaInvokeOptions,
+    maybeOptions?: CaatingaInvokeOptions
+  ): Promise<CaatingaInvokeResult<T>> {
     const { args, debugXdr, debugRaw } = splitInvokeArgsAndOptions(argsOrOptions, maybeOptions);
     const { contractId, transaction } = await this.createTransaction(method, args);
     const xdr = await buildTransactionXdr({
@@ -65,9 +65,9 @@ export class KaleidoContractClient {
         networkPassphrase: this.config.network.networkPassphrase
       });
     } catch (error) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Failed to sign XDR for "${this.contractName}.${method}".`,
-        KaleidoErrorCode.XDR_SIGN_FAILED,
+        CaatingaErrorCode.XDR_SIGN_FAILED,
         "Connect a wallet and approve the transaction.",
         error
       );
@@ -108,13 +108,13 @@ export class KaleidoContractClient {
     try {
       publicKey = await this.config.wallet.getPublicKey();
     } catch (error) {
-      if (error instanceof KaleidoError) {
+      if (error instanceof CaatingaError) {
         throw error;
       }
 
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Wallet is not connected or the public key is unavailable for "${this.contractName}".`,
-        KaleidoErrorCode.WALLET_NOT_CONNECTED,
+        CaatingaErrorCode.WALLET_NOT_CONNECTED,
         "Connect the wallet and grant account access, then retry.",
         error
       );
@@ -142,8 +142,8 @@ function splitArgsAndOptions(
 }
 
 function splitInvokeArgsAndOptions(
-  argsOrOptions?: Record<string, unknown> | KaleidoInvokeOptions,
-  maybeOptions?: KaleidoInvokeOptions
+  argsOrOptions?: Record<string, unknown> | CaatingaInvokeOptions,
+  maybeOptions?: CaatingaInvokeOptions
 ) {
   const looksLikeOptions =
     argsOrOptions !== undefined &&
@@ -151,7 +151,7 @@ function splitInvokeArgsAndOptions(
     maybeOptions === undefined;
 
   if (looksLikeOptions) {
-    const options = argsOrOptions as KaleidoInvokeOptions;
+    const options = argsOrOptions as CaatingaInvokeOptions;
     return {
       args: undefined,
       debugXdr: options.debugXdr ?? false,
@@ -176,9 +176,9 @@ async function submitTransaction(
   const submit = candidate.signAndSend ?? candidate.send;
 
   if (typeof submit !== "function") {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Binding transaction for "${contractName}.${method}" cannot be submitted.`,
-      KaleidoErrorCode.XDR_SUBMIT_FAILED,
+      CaatingaErrorCode.XDR_SUBMIT_FAILED,
       "Regenerate bindings or provide a compatible binding adapter."
     );
   }
@@ -188,13 +188,13 @@ async function submitTransaction(
     assertSubmitResultRecognized(raw, contractName, method);
     return raw;
   } catch (error) {
-    if (error instanceof KaleidoError) {
+    if (error instanceof CaatingaError) {
       throw error;
     }
 
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Failed to submit XDR for "${contractName}.${method}".`,
-      KaleidoErrorCode.XDR_SUBMIT_FAILED,
+      CaatingaErrorCode.XDR_SUBMIT_FAILED,
       "Check wallet signature and RPC connectivity.",
       error
     );
@@ -215,9 +215,9 @@ function assertSubmitResultRecognized(raw: unknown, contractName: string, method
     return;
   }
 
-  throw new KaleidoError(
+  throw new CaatingaError(
     `Submit returned an unrecognized payload for "${contractName}.${method}".`,
-    KaleidoErrorCode.XDR_RESULT_FAILED,
+    CaatingaErrorCode.XDR_RESULT_FAILED,
     "Expected txHash, transactionHash, hash, or result on the submit response. Use debugRaw to inspect the binding output."
   );
 }

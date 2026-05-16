@@ -1,6 +1,6 @@
 import { readArtifacts } from "../artifacts/read-artifacts.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
@@ -12,7 +12,7 @@ export type InvokeTarget = {
 };
 
 export type InvokeContractOptions = {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   target: string;
   args?: string[];
   networkName?: string;
@@ -25,9 +25,9 @@ export function parseInvokeTarget(target: string): InvokeTarget {
   const [contractName, method, extra] = target.split(".");
 
   if (!contractName || !method || extra) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Invalid invoke target "${target}".`,
-      KaleidoErrorCode.INVOKE_TARGET_INVALID,
+      CaatingaErrorCode.INVOKE_TARGET_INVALID,
       "Use the format contract.method, for example counter.increment."
     );
   }
@@ -44,14 +44,14 @@ export async function invokeContract(options: InvokeContractOptions) {
   const contractArtifact = artifacts.networks[network.name]?.contracts[target.contractName];
 
   if (!contractArtifact) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `No deployed artifact found for "${target.contractName}" on "${network.name}".`,
-      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
-      "Run kaleido deploy for this contract and network before invoking it."
+      CaatingaErrorCode.ARTIFACT_NOT_FOUND,
+      "Run caatinga deploy for this contract and network before invoking it."
     );
   }
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido invoke.", {
+  await checkBinary("stellar", "Install Stellar CLI before running caatinga invoke.", {
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
@@ -72,7 +72,7 @@ export async function invokeContract(options: InvokeContractOptions) {
   ], {
     cwd,
     allowUntestedStellarCli: options.allowUntestedStellarCli,
-    failureCode: KaleidoErrorCode.INVOKE_FAILED
+    failureCode: CaatingaErrorCode.INVOKE_FAILED
   });
 
   return {

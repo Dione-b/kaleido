@@ -1,10 +1,10 @@
-# Kaleido v1 Viability Specs
+# Caatinga v1 Viability Specs
 
 Source: critical blockers review.
 
 Implementation order:
 1. `01-stellar-cli-version-contract.md`
-2. `02-kaleido-error-surface-completeness.md`
+2. `02-caatinga-error-surface-completeness.md`
 3. `03-npm-publish-consumer-isolation.md`
 4. `04-live-testnet-smoke-ci.md`
 5. `05-multi-contract-dependency-deploy.md`

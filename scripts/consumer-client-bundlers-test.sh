@@ -5,8 +5,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKED_DIR="${PACKED_DIR:-$ROOT_DIR/packed}"
 
 shopt -s nullglob
-CORE_TGZ=( "$PACKED_DIR"/kaleido-xlm-core-*.tgz )
-CLIENT_TGZ=( "$PACKED_DIR"/kaleido-xlm-client-*.tgz )
+CORE_TGZ=( "$PACKED_DIR"/caatinga-core-*.tgz )
+CLIENT_TGZ=( "$PACKED_DIR"/caatinga-client-*.tgz )
 if [[ ${#CORE_TGZ[@]} -eq 0 || ${#CLIENT_TGZ[@]} -eq 0 ]]; then
   echo "Missing packed tarballs in $PACKED_DIR (run pnpm ci:snapshot-pack or pnpm test:consumer first)." >&2
   exit 1
@@ -15,7 +15,7 @@ fi
 run_fixture() {
   local name="$1"
   local src="$ROOT_DIR/scripts/consumer-client-bundlers/$name"
-  local tmp="${TMPDIR:-/tmp}/kaleido-client-bundler-$name-$$"
+  local tmp="${TMPDIR:-/tmp}/caatinga-client-bundler-$name-$$"
   rm -rf "$tmp"
   cp -a "$src" "$tmp"
   cd "$tmp"
@@ -28,13 +28,13 @@ run_fixture() {
 run_fixture vite
 run_fixture webpack
 
-BARE_TMP="${TMPDIR:-/tmp}/kaleido-client-bare-$$"
+BARE_TMP="${TMPDIR:-/tmp}/caatinga-client-bare-$$"
 rm -rf "$BARE_TMP"
 mkdir -p "$BARE_TMP"
 cd "$BARE_TMP"
 npm init -y >/dev/null
 npm install "${CORE_TGZ[0]}" "${CLIENT_TGZ[0]}"
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
+node --input-type=module -e 'import { createCaatingaClient } from "@caatinga/client"; console.log(typeof createCaatingaClient)'
 cd "$ROOT_DIR"
 rm -rf "$BARE_TMP"
 

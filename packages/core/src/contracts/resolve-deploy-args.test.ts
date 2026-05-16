@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveDeployArgs } from "./resolve-deploy-args.js";
 
 describe("resolveDeployArgs", () => {
@@ -46,7 +46,7 @@ describe("resolveDeployArgs", () => {
         artifacts,
         network: "testnet"
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_INVALID }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.DEPLOY_ARG_PLACEHOLDER_INVALID }));
   });
 
   it("fails when dependency artifact is missing", () => {
@@ -56,6 +56,6 @@ describe("resolveDeployArgs", () => {
         artifacts,
         network: "testnet"
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_ARTIFACT_NOT_FOUND }));
   });
 });

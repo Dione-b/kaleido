@@ -1,20 +1,20 @@
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
-import type { KaleidoConfig, NetworkConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
+import type { CaatingaConfig, NetworkConfig } from "../config/config.schema.js";
 
 export type ResolvedNetwork = {
   name: string;
   config: NetworkConfig;
 };
 
-export function resolveNetwork(config: KaleidoConfig, networkName?: string): ResolvedNetwork {
+export function resolveNetwork(config: CaatingaConfig, networkName?: string): ResolvedNetwork {
   const name = networkName ?? config.defaultNetwork;
   const network = config.networks[name];
 
   if (!network) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Network "${name}" is not configured.`,
-      KaleidoErrorCode.NETWORK_NOT_FOUND,
-      `Add "${name}" to kaleido.config.ts networks, or pass a configured --network value.`
+      CaatingaErrorCode.NETWORK_NOT_FOUND,
+      `Add "${name}" to caatinga.config.ts networks, or pass a configured --network value.`
     );
   }
 

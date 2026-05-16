@@ -2,9 +2,9 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -16,7 +16,7 @@ import { deployContract } from "./deploy-contract.js";
 
 const CONTRACT_ID = `C${"1".repeat(55)}`;
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -56,7 +56,7 @@ describe("deployContract", () => {
   });
 
   it("should_update_artifacts_with_contract_id_when_stellar_succeeds", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(path.dirname(wasmPath), { recursive: true });
     await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
@@ -74,7 +74,7 @@ describe("deployContract", () => {
 
     expect(result.contractId).toBe(CONTRACT_ID);
 
-    const saved = JSON.parse(await readFile(path.join(tmpDir, "kaleido.artifacts.json"), "utf8"));
+    const saved = JSON.parse(await readFile(path.join(tmpDir, "caatinga.artifacts.json"), "utf8"));
     expect(saved.networks.testnet.contracts.counter.contractId).toBe(CONTRACT_ID);
     expect(saved.networks.testnet.contracts.counter.wasmHash).toMatch(/^[a-f0-9]{64}$/);
   });
@@ -87,7 +87,7 @@ describe("deployContract", () => {
       return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
     });
 
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(path.dirname(wasmPath), { recursive: true });
     await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
@@ -107,16 +107,16 @@ describe("deployContract", () => {
   it("should_map_stellar_deploy_command_failures_to_DEPLOY_FAILED", async () => {
     runCommand.mockImplementation(async (command: string, args: string[]) => {
       if (command === "stellar" && args[0] === "contract" && args[1] === "deploy") {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "Command failed: stellar contract deploy",
-          KaleidoErrorCode.DEPLOY_FAILED,
+          CaatingaErrorCode.DEPLOY_FAILED,
           "stellar stderr here"
         );
       }
       return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
     });
 
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(path.dirname(wasmPath), { recursive: true });
     await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
@@ -130,11 +130,11 @@ describe("deployContract", () => {
         source: "alice",
         cwd: tmpDir
       })
-    ).rejects.toMatchObject({ code: KaleidoErrorCode.DEPLOY_FAILED });
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.DEPLOY_FAILED });
   });
 
   it("should_skip_stellar_contract_deploy_when_artifact_has_contractId_and_force_is_false", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-skip-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-skip-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(path.dirname(wasmPath), { recursive: true });
     await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
@@ -171,7 +171,7 @@ describe("deployContract", () => {
   });
 
   it("should_throw_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED_when_resolved_args_still_contain_placeholders", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-deploy-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-"));
     const wasmPath = path.join(tmpDir, "rel", "counter.wasm");
     await mkdir(path.dirname(wasmPath), { recursive: true });
     await writeFile(wasmPath, Buffer.from("wasm-bytes"), "utf8");
@@ -187,7 +187,7 @@ describe("deployContract", () => {
         resolvedDeployArgs: { initArg: "${contracts.x}" }
       })
     ).rejects.toMatchObject({
-      code: KaleidoErrorCode.DEPLOY_ARG_PLACEHOLDER_UNRESOLVED
+      code: CaatingaErrorCode.DEPLOY_ARG_PLACEHOLDER_UNRESOLVED
     });
   });
 });

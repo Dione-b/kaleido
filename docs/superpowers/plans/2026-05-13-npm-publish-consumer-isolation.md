@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Garantir que `@kaleido-xlm/cli`, `@kaleido-xlm/core` e `@kaleido-xlm/client` funcionem fora do monorepo antes do publish, com validação de pack, ausência de `workspace:*` nos tarballs, teste de consumidor real e checagem de bundlers para o client.
+**Goal:** Garantir que `@caatinga/cli`, `@caatinga/core` e `@caatinga/client` funcionem fora do monorepo antes do publish, com validação de pack, ausência de `workspace:*` nos tarballs, teste de consumidor real e checagem de bundlers para o client.
 
 **Architecture:** Manter Changesets e `turbo` como hoje; estender scripts bash de isolamento (`scripts/`), adicionar um script só de CI que gera um changeset efêmero + `changeset version --snapshot smoke` antes do pack para espelhar o release; fixtures mínimas de consumidor Vite/webpack sob `scripts/consumer-client-bundlers/` instaladas via `npm install` apontando para `.tgz` em `packed/`; CI passa a executar pack pós-snapshot, grep em `package.json` extraídos, `pnpm publish -r --dry-run`, e o fluxo de consumidor estendido (install + build no app gerado).
 
@@ -13,16 +13,16 @@
 | Arquivo | Responsabilidade |
 |---------|------------------|
 | `scripts/ci-snapshot-pack.sh` | Gera changeset efêmero, roda `pnpm changeset version --snapshot smoke`, `pnpm pack` nos três pacotes, extrai `package/package.json` de cada `.tgz` para um diretório temporário e falha se houver `workspace:*`, `link:`, ou `file:` |
-| `scripts/consumer-isolation-test.sh` | Fluxo completo de consumidor: build, pack (ou recebe `PACKED_DIR`), grep nos `.tgz`, projeto em `/tmp`, `npm install` dos `.tgz`, smoke imports, `npx kaleido`, `init`, `cd` app, `npm install`, `npm run build` |
-| `scripts/consumer-client-bundlers-test.sh` | Para cada fixture (Vite, webpack), copia para temp, `npm install` com caminhos absolutos dos `.tgz` de `@kaleido-xlm/core` e `@kaleido-xlm/client`, `npm run build` |
-| `scripts/consumer-client-bundlers/vite/` | App Vite mínimo que importa `createKaleidoClient` |
-| `scripts/consumer-client-bundlers/webpack/` | App webpack mínimo que importa `createKaleidoClient` |
+| `scripts/consumer-isolation-test.sh` | Fluxo completo de consumidor: build, pack (ou recebe `PACKED_DIR`), grep nos `.tgz`, projeto em `/tmp`, `npm install` dos `.tgz`, smoke imports, `npx caatinga`, `init`, `cd` app, `npm install`, `npm run build` |
+| `scripts/consumer-client-bundlers-test.sh` | Para cada fixture (Vite, webpack), copia para temp, `npm install` com caminhos absolutos dos `.tgz` de `@caatinga/core` e `@caatinga/client`, `npm run build` |
+| `scripts/consumer-client-bundlers/vite/` | App Vite mínimo que importa `createCaatingaClient` |
+| `scripts/consumer-client-bundlers/webpack/` | App webpack mínimo que importa `createCaatingaClient` |
 | `package.json` (raiz) | Scripts `test:consumer`, `test:consumer:client-bundlers`, `ci:snapshot-pack`, `publish:dry-run` |
 | `.github/workflows/ci.yml` | Passos: `bash scripts/ci-snapshot-pack.sh`, `pnpm publish:dry-run`, `pnpm test:consumer`, `pnpm test:consumer:client-bundlers` |
 | `.github/workflows/release.yml` | Garantir ordem alinhada à spec; opcionalmente usar tag do input no dispatch (documentado) |
 | `packages/core/src/release/package-manifest.test.ts` | (Opcional) Assert extra: subpath `./freighter` no `client` |
 
-**Não criar** `@kaleido/react` neste plano (spec: “Add later”).
+**Não criar** `@caatinga/react` neste plano (spec: “Add later”).
 
 ---
 
@@ -52,7 +52,7 @@ Adicionar um `it` que valida o bloco `exports["./freighter"]` com `types`, `impo
 
 - [ ] **Step 2: Run test**
 
-Run: `pnpm --filter @kaleido-xlm/core exec vitest run src/release/package-manifest.test.ts -v`
+Run: `pnpm --filter @caatinga/core exec vitest run src/release/package-manifest.test.ts -v`
 
 Expected: PASS (o manifest já está correto; o teste documenta o contrato de publish).
 
@@ -93,7 +93,7 @@ fi
 
 cat > "$ROOT_DIR/.changeset/__ci_snapshot__.md" <<'EOF'
 ---
-"@kaleido-xlm/cli": patch
+"@caatinga/cli": patch
 ---
 
 chore: ci snapshot for pack validation (do not commit)
@@ -182,14 +182,14 @@ git commit -m "chore: add publish dry-run script"
 
 - Modify: `scripts/consumer-isolation-test.sh`
 
-- [ ] **Step 1: Append steps after `npx kaleido init`**
+- [ ] **Step 1: Append steps after `npx caatinga init`**
 
-Substituir o final do script (após `npx kaleido init test-app --template react-vite-counter`) por:
+Substituir o final do script (após `npx caatinga init test-app --template react-vite-counter`) por:
 
 ```bash
-npx kaleido init test-app --template react-vite-counter
-test -f test-app/kaleido.config.ts
-test -f test-app/kaleido.artifacts.json
+npx caatinga init test-app --template react-vite-counter
+test -f test-app/caatinga.config.ts
+test -f test-app/caatinga.artifacts.json
 
 cd test-app
 npm install
@@ -237,7 +237,7 @@ git commit -m "test: extend consumer isolation with template npm build"
 
 ---
 
-### Task 5: Fixtures + script — Vite e webpack consumindo `@kaleido-xlm/client` empacotado
+### Task 5: Fixtures + script — Vite e webpack consumindo `@caatinga/client` empacotado
 
 **Files:**
 
@@ -258,15 +258,15 @@ git commit -m "test: extend consumer isolation with template npm build"
 
 ```json
 {
-  "name": "kaleido-client-consumer-vite",
+  "name": "caatinga-client-consumer-vite",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "vite build"
   },
   "dependencies": {
-    "@kaleido-xlm/client": "0.0.0-placeholder",
-    "@kaleido-xlm/core": "0.0.0-placeholder"
+    "@caatinga/client": "0.0.0-placeholder",
+    "@caatinga/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
@@ -283,7 +283,7 @@ import { defineConfig } from "vite";
 export default defineConfig({});
 ```
 
-(App SPA: `vite build` usa `index.html` → `src/main.ts` e empacota `@kaleido-xlm/client` no bundle.)
+(App SPA: `vite build` usa `index.html` → `src/main.ts` e empacota `@caatinga/client` no bundle.)
 
 `scripts/consumer-client-bundlers/vite/index.html`:
 
@@ -298,9 +298,9 @@ export default defineConfig({});
 `scripts/consumer-client-bundlers/vite/src/main.ts`:
 
 ```typescript
-import { createKaleidoClient } from "@kaleido-xlm/client";
+import { createCaatingaClient } from "@caatinga/client";
 
-console.log(typeof createKaleidoClient);
+console.log(typeof createCaatingaClient);
 ```
 
 `scripts/consumer-client-bundlers/vite/tsconfig.json`:
@@ -325,14 +325,14 @@ console.log(typeof createKaleidoClient);
 
 ```json
 {
-  "name": "kaleido-client-consumer-webpack",
+  "name": "caatinga-client-consumer-webpack",
   "private": true,
   "scripts": {
     "build": "webpack --config webpack.config.cjs"
   },
   "dependencies": {
-    "@kaleido-xlm/client": "0.0.0-placeholder",
-    "@kaleido-xlm/core": "0.0.0-placeholder"
+    "@caatinga/client": "0.0.0-placeholder",
+    "@caatinga/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "webpack": "^5.97.1",
@@ -368,9 +368,9 @@ module.exports = {
 `scripts/consumer-client-bundlers/webpack/src/index.js`:
 
 ```javascript
-import { createKaleidoClient } from "@kaleido-xlm/client";
+import { createCaatingaClient } from "@caatinga/client";
 
-console.log(typeof createKaleidoClient);
+console.log(typeof createCaatingaClient);
 ```
 
 - [ ] **Step 3: Create runner script**
@@ -385,8 +385,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKED_DIR="${PACKED_DIR:-$ROOT_DIR/packed}"
 
 shopt -s nullglob
-CORE_TGZ=( "$PACKED_DIR"/kaleido-core-*.tgz )
-CLIENT_TGZ=( "$PACKED_DIR"/kaleido-client-*.tgz )
+CORE_TGZ=( "$PACKED_DIR"/caatinga-core-*.tgz )
+CLIENT_TGZ=( "$PACKED_DIR"/caatinga-client-*.tgz )
 if [[ ${#CORE_TGZ[@]} -eq 0 || ${#CLIENT_TGZ[@]} -eq 0 ]]; then
   echo "Missing packed tarballs in $PACKED_DIR (run pnpm ci:snapshot-pack or pnpm test:consumer first)." >&2
   exit 1
@@ -395,7 +395,7 @@ fi
 run_fixture() {
   local name="$1"
   local src="$ROOT_DIR/scripts/consumer-client-bundlers/$name"
-  local tmp="${TMPDIR:-/tmp}/kaleido-client-bundler-$name-$$"
+  local tmp="${TMPDIR:-/tmp}/caatinga-client-bundler-$name-$$"
   rm -rf "$tmp"
   cp -a "$src" "$tmp"
   cd "$tmp"
@@ -408,13 +408,13 @@ run_fixture() {
 run_fixture vite
 run_fixture webpack
 
-BARE_TMP="${TMPDIR:-/tmp}/kaleido-client-bare-$$"
+BARE_TMP="${TMPDIR:-/tmp}/caatinga-client-bare-$$"
 rm -rf "$BARE_TMP"
 mkdir -p "$BARE_TMP"
 cd "$BARE_TMP"
 npm init -y >/dev/null
 npm install "${CORE_TGZ[0]}" "${CLIENT_TGZ[0]}"
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
+node --input-type=module -e 'import { createCaatingaClient } from "@caatinga/client"; console.log(typeof createCaatingaClient)'
 cd "$ROOT_DIR"
 rm -rf "$BARE_TMP"
 
@@ -581,13 +581,13 @@ git commit -m "chore: ignore ci pack artifacts"
 
 O template `react-vite-counter` usa `npm run build` → `tsc && vite build` e **não** exige Rust nem Stellar CLI para esse build. Portanto **um único** `consumer-isolation-test.sh` atende à spec hoje.
 
-Se no futuro um template passar a exigir Stellar CLI no `npm run build`, extrair para `scripts/consumer-runtime-test.sh` os passos `cd test-app && npm install && npm run build` e manter `scripts/consumer-packaging-test.sh` apenas até `npx kaleido init` + smoke de imports — não é necessário neste plano até o template mudar.
+Se no futuro um template passar a exigir Stellar CLI no `npm run build`, extrair para `scripts/consumer-runtime-test.sh` os passos `cd test-app && npm install && npm run build` e manter `scripts/consumer-packaging-test.sh` apenas até `npx caatinga init` + smoke de imports — não é necessário neste plano até o template mudar.
 
 ---
 
 ## Self-review (checklist interno)
 
-1. **Cobertura da spec:** exports/types/files/bin (já no repo + teste freighter); Changesets (existente); `release.yml` + `consumer-isolation-test.sh` (estendidos); dry-run + snapshot pack; consumidor fora do monorepo com `npx kaleido init` + install + build; client em Vite + webpack + ESM bare; grep `workspace:*` nos manifests empacotados; publish com `--provenance` (já).
+1. **Cobertura da spec:** exports/types/files/bin (já no repo + teste freighter); Changesets (existente); `release.yml` + `consumer-isolation-test.sh` (estendidos); dry-run + snapshot pack; consumidor fora do monorepo com `npx caatinga init` + install + build; client em Vite + webpack + ESM bare; grep `workspace:*` nos manifests empacotados; publish com `--provenance` (já).
 2. **Placeholders:** nenhum TBD remanescente; comandos e paths explícitos.
 3. **Consistência:** `PACKED_DIR` e `SKIP_PACK` usados de forma uniforme entre CI e scripts.
 

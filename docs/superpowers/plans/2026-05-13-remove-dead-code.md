@@ -2,7 +2,7 @@
 
 > **Para workers agentic:** SUB-SKILL OBRIGATÓRIA: use `superpowers:subagent-driven-development` (recomendado) ou `superpowers:executing-plans` para implementar este plano passo a passo. Os passos usam checkbox (`- [ ]`) para rastreio.
 
-**Goal:** Eliminar código morto, símbolos e importações TypeScript sem uso e dependências de `package.json` realmente não referenciadas no monorepo `@kaleido/*`, mantendo build, typecheck e testes verdes — sem analisar `node_modules` nem `pnpm-lock.yaml` (ferramentas já as ignoram por padrão).
+**Goal:** Eliminar código morto, símbolos e importações TypeScript sem uso e dependências de `package.json` realmente não referenciadas no monorepo `@caatinga/*`, mantendo build, typecheck e testes verdes — sem analisar `node_modules` nem `pnpm-lock.yaml` (ferramentas já as ignoram por padrão).
 
 **Architecture:** (1) Endurecer o compilador com `noUnusedLocals` e `noUnusedParameters` em `tsconfig.base.json` (somente os pacotes que estendem esse base: `packages/core`, `packages/cli`, `packages/client`; templates têm `tsconfig.json` próprio). Para parâmetros exigidos pela assinatura mas não usados, usar nome com prefixo `_` (ex.: `_value`). (2) Corrigir todos os diagnósticos TS. (3) Opcionalmente rodar **Knip** na raiz com `ignoreWorkspaces: ["packages/templates/*"]` para dependências/exportações mortas (`__PROJECT_NAME__` nos templates quebra análise útil neles). TDD literal não se aplica a remoção pura; use `pnpm typecheck` e `pnpm test` como barreira.
 
@@ -35,7 +35,7 @@
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm typecheck
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm typecheck
 ```
 
 Expected: concluir com sucesso (exit code 0). Se falhar, corrigir o baseline antes de prosseguir.
@@ -50,7 +50,7 @@ Somente se não houver mudanças; caso contrário pule. Não há commit neste ta
 
 ---
 
-### Task 2: Ativar `noUnusedLocals` / `noUnusedParameters` e corrigir violações em `@kaleido-xlm/core`
+### Task 2: Ativar `noUnusedLocals` / `noUnusedParameters` e corrigir violações em `@caatinga/core`
 
 **Files:**
 - Modify: `tsconfig.base.json`
@@ -64,7 +64,7 @@ Somente se não houver mudanças; caso contrário pule. Não há commit neste ta
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm exec tsc --noEmit -p packages/core/tsconfig.json --noUnusedLocals --noUnusedParameters 2>&1
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm exec tsc --noEmit -p packages/core/tsconfig.json --noUnusedLocals --noUnusedParameters 2>&1
 ```
 
 Expected: **FAIL** (exit code 2) com exatamente estes quatro diagnósticos `TS6133`:
@@ -159,7 +159,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm typecheck
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm typecheck
 ```
 
 Expected: **PASS** (exit code 0).
@@ -169,7 +169,7 @@ Expected: **PASS** (exit code 0).
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm test
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm test
 ```
 
 Expected: **PASS** (exit code 0).
@@ -177,7 +177,7 @@ Expected: **PASS** (exit code 0).
 - [ ] **Step 9: Commit**
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && git add tsconfig.base.json packages/core/src/artifacts/read-write-artifacts.test.ts packages/core/src/contracts/build-contract.test.ts packages/core/src/contracts/generate-bindings.test.ts packages/core/src/contracts/invoke-contract.test.ts && git commit -m "chore: enforce unused locals/parameters and fix core test imports"
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && git add tsconfig.base.json packages/core/src/artifacts/read-write-artifacts.test.ts packages/core/src/contracts/build-contract.test.ts packages/core/src/contracts/generate-bindings.test.ts packages/core/src/contracts/invoke-contract.test.ts && git commit -m "chore: enforce unused locals/parameters and fix core test imports"
 ```
 
 ---
@@ -193,7 +193,7 @@ cd /home/dionebastos/Documentos/PROJETOS/kaleido && git add tsconfig.base.json p
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm add -D knip@5
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm add -D knip@5
 ```
 
 Expected: `package.json` e `pnpm-lock.yaml` atualizados (lockfile é efeito colateral do pnpm; **não** editar o lock manualmente).
@@ -228,7 +228,7 @@ Conteúdo completo do arquivo (chaves de `workspaces` são caminhos relativos à
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm exec knip
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm exec knip
 ```
 
 Expected: exit code 0 após resolver todos os achados **reais** (dependências não usadas, exportações não usadas). Se Knip listar um export público intencional da API (`packages/*/src/index.ts`), adicionar anotação documentada pelo Knip (ex.: comentário `/** knipignore */` na exportação ou entrada em `knip.json` via `ignoreExports`) — só suprimir com justificativa de API pública.
@@ -248,7 +248,7 @@ Dentro de `"scripts"`, adicionar a chave:
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm typecheck && pnpm test && pnpm knip
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm typecheck && pnpm test && pnpm knip
 ```
 
 Expected: tudo **PASS**.
@@ -256,7 +256,7 @@ Expected: tudo **PASS**.
 - [ ] **Step 6: Commit**
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && git add package.json pnpm-lock.yaml knip.json && git add -u packages/*/package.json && git commit -m "chore: add knip for unused deps and exports"
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && git add package.json pnpm-lock.yaml knip.json && git add -u packages/*/package.json && git commit -m "chore: add knip for unused deps and exports"
 ```
 
 (Ajuste `git add` para incluir apenas arquivos que de fato mudaram após a limpeza do Knip.)

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido-xlm/core";
-import type { KaleidoClientConfig } from "../types.js";
-import { createKaleidoClient } from "./create-kaleido-client.js";
+import { CaatingaErrorCode, type CaatingaArtifacts } from "@caatinga/core";
+import type { CaatingaClientConfig } from "../types.js";
+import { createCaatingaClient } from "./create-caatinga-client.js";
 
-const artifacts: KaleidoArtifacts = {
+const artifacts: CaatingaArtifacts = {
   project: "counter-app",
   version: 1,
   networks: {
@@ -61,18 +61,18 @@ function createClientConfig(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe("createKaleidoClient", () => {
+describe("createCaatingaClient", () => {
   it("should_throw_CONTRACT_NOT_FOUND_when_contract_name_is_unregistered", () => {
-    const client = createKaleidoClient(createClientConfig());
+    const client = createCaatingaClient(createClientConfig());
 
     expect(() => client.contract("unknown")).toThrowError(
-      expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_NOT_FOUND })
+      expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_NOT_FOUND })
     );
   });
 
   it("invokes a binding method through wallet signing", async () => {
     const config = createClientConfig();
-    const client = createKaleidoClient(config);
+    const client = createCaatingaClient(config);
 
     const result = await client.contract("counter").invoke("increment");
 
@@ -92,13 +92,13 @@ describe("createKaleidoClient", () => {
   });
 
   it("omits xdr unless debugXdr is enabled", async () => {
-    const client = createKaleidoClient(createClientConfig());
+    const client = createCaatingaClient(createClientConfig());
 
     await expect(client.contract("counter").invoke("increment")).resolves.not.toHaveProperty("xdr");
   });
 
   it("includes xdr when debugXdr is enabled", async () => {
-    const client = createKaleidoClient(createClientConfig());
+    const client = createCaatingaClient(createClientConfig());
 
     await expect(client.contract("counter").invoke("increment", { debugXdr: true })).resolves.toMatchObject({
       xdr: {
@@ -111,7 +111,7 @@ describe("createKaleidoClient", () => {
 
   it("builds xdr without asking the wallet to sign", async () => {
     const config = createClientConfig();
-    const client = createKaleidoClient(config);
+    const client = createCaatingaClient(config);
 
     await expect(client.contract("counter").buildXdr("increment")).resolves.toEqual({
       contract: "counter",
@@ -123,7 +123,7 @@ describe("createKaleidoClient", () => {
     expect(config.wallet.signTransaction).not.toHaveBeenCalled();
   });
 
-  it("maps wallet signing failures to KALEIDO_XDR_SIGN_FAILED", async () => {
+  it("maps wallet signing failures to CAATINGA_XDR_SIGN_FAILED", async () => {
     const config = createClientConfig({
       wallet: {
         getPublicKey: vi.fn(async () => "GPUBLIC"),
@@ -132,10 +132,10 @@ describe("createKaleidoClient", () => {
         })
       }
     });
-    const client = createKaleidoClient(config);
+    const client = createCaatingaClient(config);
 
     await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
-      code: KaleidoErrorCode.XDR_SIGN_FAILED
+      code: CaatingaErrorCode.XDR_SIGN_FAILED
     });
   });
 
@@ -147,15 +147,15 @@ describe("createKaleidoClient", () => {
     }
 
     const base = createClientConfig();
-    const client = createKaleidoClient({
+    const client = createCaatingaClient({
       ...base,
       contracts: {
         counter: { binding: { Client: ClientWithoutXdr } }
       }
-    } as KaleidoClientConfig);
+    } as CaatingaClientConfig);
 
     await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
-      code: KaleidoErrorCode.XDR_BUILD_FAILED
+      code: CaatingaErrorCode.XDR_BUILD_FAILED
     });
   });
 
@@ -171,15 +171,15 @@ describe("createKaleidoClient", () => {
     }
 
     const base = createClientConfig();
-    const client = createKaleidoClient({
+    const client = createCaatingaClient({
       ...base,
       contracts: {
         counter: { binding: { Client: ClientWithoutSubmit } }
       }
-    } as KaleidoClientConfig);
+    } as CaatingaClientConfig);
 
     await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
-      code: KaleidoErrorCode.XDR_SUBMIT_FAILED
+      code: CaatingaErrorCode.XDR_SUBMIT_FAILED
     });
   });
 
@@ -198,15 +198,15 @@ describe("createKaleidoClient", () => {
     }
 
     const base = createClientConfig();
-    const client = createKaleidoClient({
+    const client = createCaatingaClient({
       ...base,
       contracts: {
         counter: { binding: { Client: ClientWithFailingSubmit } }
       }
-    } as KaleidoClientConfig);
+    } as CaatingaClientConfig);
 
     await expect(client.contract("counter").invoke("increment")).rejects.toMatchObject({
-      code: KaleidoErrorCode.XDR_SUBMIT_FAILED
+      code: CaatingaErrorCode.XDR_SUBMIT_FAILED
     });
   });
 });

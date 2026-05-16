@@ -6,7 +6,7 @@ Required before v1.
 
 ## Problem
 
-Kaleido depends on Stellar CLI behavior for build, deploy, bindings, invoke and XDR-related commands. If Stellar CLI output or flags change, Kaleido can parse incorrect data and write invalid `kaleido.artifacts.json`.
+Caatinga depends on Stellar CLI behavior for build, deploy, bindings, invoke and XDR-related commands. If Stellar CLI output or flags change, Caatinga can parse incorrect data and write invalid `caatinga.artifacts.json`.
 
 ## Goal
 
@@ -14,7 +14,7 @@ Declare, enforce and test a supported Stellar CLI version range.
 
 ## External contract
 
-Kaleido uses Stellar CLI as the operational backend for:
+Caatinga uses Stellar CLI as the operational backend for:
 
 - `stellar contract build`
 - `stellar contract deploy`
@@ -23,11 +23,11 @@ Kaleido uses Stellar CLI as the operational backend for:
 - `stellar xdr`
 - `stellar doctor`
 
-Kaleido must not assume untested Stellar CLI versions are safe.
+Caatinga must not assume untested Stellar CLI versions are safe.
 
 ## Required decisions
 
-Set these constants in `@kaleido-xlm/core`:
+Set these constants in `@caatinga/core`:
 
 ```ts
 export const STELLAR_CLI_MIN_VERSION = "x.y.z";
@@ -49,7 +49,7 @@ Rules:
 packages/core/src/stellar-cli/version.ts
 packages/core/src/stellar-cli/check-stellar-cli-version.ts
 packages/core/src/shell/run-command.ts
-packages/core/src/errors/KaleidoError.ts
+packages/core/src/errors/CaatingaError.ts
 docs/stellar-cli-version-contract.md
 ```
 
@@ -60,9 +60,9 @@ export function parseStellarCliVersion(output: string): string {
   const match = output.match(/\b(\d+\.\d+\.\d+)\b/);
 
   if (!match) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       "Could not parse Stellar CLI version.",
-      KaleidoErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED,
+      CaatingaErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED,
       "Run `stellar --version` and check the output."
     );
   }
@@ -84,10 +84,10 @@ await checkStellarCliVersion({
 ### New error codes
 
 ```txt
-KALEIDO_STELLAR_CLI_NOT_FOUND
-KALEIDO_STELLAR_CLI_VERSION_PARSE_FAILED
-KALEIDO_UNSUPPORTED_CLI_VERSION
-KALEIDO_UNTESTED_CLI_VERSION
+CAATINGA_STELLAR_CLI_NOT_FOUND
+CAATINGA_STELLAR_CLI_VERSION_PARSE_FAILED
+CAATINGA_UNSUPPORTED_CLI_VERSION
+CAATINGA_UNTESTED_CLI_VERSION
 ```
 
 ## Fixture naming
@@ -131,8 +131,8 @@ Why CI must not use the override
 
 ```txt
 stellar --version is checked at runtime
-unsupported versions fail with KALEIDO_UNSUPPORTED_CLI_VERSION
-untested newer versions fail with KALEIDO_UNTESTED_CLI_VERSION
+unsupported versions fail with CAATINGA_UNSUPPORTED_CLI_VERSION
+untested newer versions fail with CAATINGA_UNTESTED_CLI_VERSION
 fixtures include Stellar CLI semver in filename
 docs declare supported version range
 CI runs fixture tests for at least two Stellar CLI versions

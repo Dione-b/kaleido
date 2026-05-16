@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { buildContract, loadConfig } from "@kaleido-xlm/core";
+import { buildContract, loadConfig } from "@caatinga/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
@@ -8,7 +8,7 @@ export function registerBuildCommand(program: Command): void {
     .command("build")
     .description("Build a configured Soroban contract")
     .argument("[contract]", "Contract name", "counter")
-    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
     .action((contractName: string, options: { allowUntestedStellarCli?: boolean }) => runCliAction(async () => {
       const config = await loadConfig();
       const result = await buildContract({

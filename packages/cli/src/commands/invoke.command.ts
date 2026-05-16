@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { invokeContract, loadConfig } from "@kaleido-xlm/core";
+import { invokeContract, loadConfig } from "@caatinga/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
@@ -11,7 +11,7 @@ export function registerInvokeCommand(program: Command): void {
     .argument("[args...]", "Arguments forwarded to Stellar CLI after the method name")
     .option("-n, --network <network>", "Configured network name")
     .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
-    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
     .allowUnknownOption(true)
     .allowExcessArguments(true)
     .action((target: string, args: string[], options: {

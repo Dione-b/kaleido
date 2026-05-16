@@ -1,7 +1,7 @@
 {
-  "name": "@kaleido-xlm/core",
+  "name": "@caatinga/core",
   "version": "0.1.4",
-  "description": "Core config, artifacts, command orchestration, and error primitives for Kaleido Stellar/Soroban toolkit",
+  "description": "Core config, artifacts, command orchestration, and error primitives for Caatinga/Soroban toolkit",
   "keywords": [
     "stellar",
     "soroban",
@@ -9,15 +9,15 @@
     "smart-contracts",
     "blockchain",
     "artifacts",
-    "kaleido"
+    "caatinga"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Dione-b/kaleido.git",
+    "url": "git+https://github.com/Dione-b/caatinga.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/Dione-b/kaleido#readme",
-  "author": "Kaleido Stellar contributors",
+  "homepage": "https://github.com/Dione-b/caatinga#readme",
+  "author": "Caatinga contributors",
   "license": "MIT",
   "engines": {
     "node": ">=20"

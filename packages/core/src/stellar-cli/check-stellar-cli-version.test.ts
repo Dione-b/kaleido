@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import {
   STELLAR_CLI_MIN_VERSION,
   STELLAR_CLI_TESTED_MAX_VERSION,
@@ -17,7 +17,7 @@ describe("Stellar CLI version contract", () => {
   it("fails when version output has no semver", () => {
     expect(() => parseStellarCliVersion("stellar dev build")).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED
+        code: CaatingaErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED
       })
     );
   });
@@ -30,7 +30,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });
@@ -43,7 +43,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });
@@ -74,7 +74,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+        code: CaatingaErrorCode.UNTESTED_CLI_VERSION
       })
     );
   });
@@ -87,7 +87,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+        code: CaatingaErrorCode.UNTESTED_CLI_VERSION
       })
     );
   });
@@ -112,7 +112,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });

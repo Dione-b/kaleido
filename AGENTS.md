@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-Kaleido is a pnpm workspace managed by Turbo. Main packages live under `packages/`: `core` contains config, templates, shell orchestration, networks, and errors; `client` contains browser/Node contract-client helpers and wallet adapters; `cli` contains the `kaleido` command and handlers. Reusable templates live in `packages/templates/`. Docs and ADRs live in `docs/`. Consumer and packaging checks live in `scripts/`, with sample apps under `examples/`.
+Caatinga is a pnpm workspace managed by Turbo. Main packages live under `packages/`: `core` contains config, templates, shell orchestration, networks, and errors; `client` contains browser/Node contract-client helpers and wallet adapters; `cli` contains the `caatinga` command and handlers. Reusable templates live in `packages/templates/`. Docs and ADRs live in `docs/`. Consumer and packaging checks live in `scripts/`, with sample apps under `examples/`.
 
 Tests are colocated with source files and use `*.test.ts`, for example `packages/core/src/config/load-config.test.ts`.
 
@@ -18,11 +18,11 @@ Use pnpm 9.15.4 and Node 20 or newer.
 - `pnpm knip`: detect unused files, exports, and dependencies.
 - `pnpm ci:publish-matrix`: run build, tests, package snapshots, dry-run publish, and consumer checks.
 
-For package-specific work, use filters, for example `pnpm --filter @kaleido-xlm/core test`.
+For package-specific work, use filters, for example `pnpm --filter @caatinga/core test`.
 
 ## Coding Style & Naming Conventions
 
-This repository is TypeScript ESM-first with strict compiler settings. Keep code explicit, typed, and small. Prefer named exports for reusable library APIs. Use kebab-case for command and utility files (`load-config.ts`, `init.command.ts`) and PascalCase only for classes/types that require it (`KaleidoError.ts`). Preserve public error codes and package exports as compatibility contracts.
+This repository is TypeScript ESM-first with strict compiler settings. Keep code explicit, typed, and small. Prefer named exports for reusable library APIs. Use kebab-case for command and utility files (`load-config.ts`, `init.command.ts`) and PascalCase only for classes/types that require it (`CaatingaError.ts`). Preserve public error codes and package exports as compatibility contracts.
 
 No formatter config is currently committed; follow the existing two-space JSON style and conventional TypeScript formatting in nearby files.
 
@@ -38,4 +38,4 @@ Pull requests should include motivation, behavior, tests, and release impact. Li
 
 ## Security & Configuration Tips
 
-Do not commit secrets, wallet keys, private artifacts, or local `.env` files. Treat `kaleido.artifacts.json`, template manifests, exported package paths, and documented error codes as public contracts; changing them requires a compatibility note and rollback plan.
+Do not commit secrets, wallet keys, private artifacts, or local `.env` files. Treat `caatinga.artifacts.json`, template manifests, exported package paths, and documented error codes as public contracts; changing them requires a compatibility note and rollback plan.

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Prepare a `0.1.3` lockstep release for `@kaleido-xlm/cli`, `@kaleido-xlm/core`, and `@kaleido-xlm/client` that proves `kaleido init` works from packed consumer artifacts without `KALEIDO_TEMPLATES_DIR`.
+**Goal:** Prepare a `0.1.3` lockstep release for `@caatinga/cli`, `@caatinga/core`, and `@caatinga/client` that proves `caatinga init` works from packed consumer artifacts without `CAATINGA_TEMPLATES_DIR`.
 
 **Architecture:** Harden the release gates instead of changing runtime behavior first: fail fast when the CLI tarball omits bundled templates, run the consumer-isolation flow exactly as a real consumer would, then generate a fixed-version patch release through Changesets. Verification is the product here, so the plan ends only after fresh pack and consumer evidence succeeds.
 
@@ -26,7 +26,7 @@ bash -n scripts/ci-snapshot-pack.sh
 bash scripts/ci-snapshot-pack.sh
 ```
 
-Expected before the fix: snapshot-pack would not fail if the CLI tarball omitted `package/templates/react-vite-counter/kaleido.template.json`, and consumer isolation would still bypass the failure through `KALEIDO_TEMPLATES_DIR`.
+Expected before the fix: snapshot-pack would not fail if the CLI tarball omitted `package/templates/react-vite-counter/caatinga.template.json`, and consumer isolation would still bypass the failure through `CAATINGA_TEMPLATES_DIR`.
 
 - [ ] **Step 2: Run the current checks to verify the gap exists**
 
@@ -46,15 +46,15 @@ Keep these exact behaviors in the scripts:
 
 ```bash
 # scripts/consumer-isolation-test.sh
-_kcore=( "$PACKED_DIR"/kaleido-xlm-core-*.tgz )
-_kclient=( "$PACKED_DIR"/kaleido-xlm-client-*.tgz )
-_kcli=( "$PACKED_DIR"/kaleido-xlm-cli-*.tgz )
+_kcore=( "$PACKED_DIR"/caatinga-core-*.tgz )
+_kclient=( "$PACKED_DIR"/caatinga-client-*.tgz )
+_kcli=( "$PACKED_DIR"/caatinga-cli-*.tgz )
 if [[ ${#_kcore[@]} -eq 0 || ${#_kclient[@]} -eq 0 || ${#_kcli[@]} -eq 0 ]]; then
   echo "Missing packed tarballs in $PACKED_DIR" >&2
   exit 1
 fi
 
-if ! tar -tzf "${_kcli[0]}" | grep -q '^package/templates/react-vite-counter/kaleido.template.json$'; then
+if ! tar -tzf "${_kcli[0]}" | grep -q '^package/templates/react-vite-counter/caatinga.template.json$'; then
   echo "CLI tarball is missing bundled templates: ${_kcli[0]}" >&2
   exit 1
 fi
@@ -65,13 +65,13 @@ npm install "${_kcore[0]}" "${_kclient[0]}" "${_kcli[0]}"
 ```bash
 # scripts/ci-snapshot-pack.sh
 shopt -s nullglob
-cli_tarball=( "$PACKED_DIR"/kaleido-xlm-cli-*.tgz )
+cli_tarball=( "$PACKED_DIR"/caatinga-cli-*.tgz )
 if [[ ${#cli_tarball[@]} -eq 0 ]]; then
   echo "Missing CLI tarball in $PACKED_DIR" >&2
   exit 1
 fi
 
-if ! tar -tzf "${cli_tarball[0]}" | grep -q '^package/templates/react-vite-counter/kaleido.template.json$'; then
+if ! tar -tzf "${cli_tarball[0]}" | grep -q '^package/templates/react-vite-counter/caatinga.template.json$'; then
   echo "CLI tarball is missing bundled templates: ${cli_tarball[0]}" >&2
   exit 1
 fi
@@ -87,7 +87,7 @@ bash -n scripts/ci-snapshot-pack.sh
 bash scripts/ci-snapshot-pack.sh
 ```
 
-Expected: all commands pass, and `ci-snapshot-pack` prints the CLI tarball contents including `templates/react-vite-counter/kaleido.template.json`.
+Expected: all commands pass, and `ci-snapshot-pack` prints the CLI tarball contents including `templates/react-vite-counter/caatinga.template.json`.
 
 - [ ] **Step 5: Commit**
 
@@ -123,12 +123,12 @@ Create `.changeset/cli-template-release-repair.md` with:
 
 ```md
 ---
-"@kaleido-xlm/cli": patch
-"@kaleido-xlm/core": patch
-"@kaleido-xlm/client": patch
+"@caatinga/cli": patch
+"@caatinga/core": patch
+"@caatinga/client": patch
 ---
 
-fix release validation so packed CLI tarballs must include bundled templates and consumer init is exercised without KALEIDO_TEMPLATES_DIR
+fix release validation so packed CLI tarballs must include bundled templates and consumer init is exercised without CAATINGA_TEMPLATES_DIR
 ```
 
 - [ ] **Step 3: Generate the version bump and changelogs**
@@ -204,17 +204,17 @@ Run:
 pnpm ci:snapshot-pack
 ```
 
-Expected: exit code `0` and explicit tarball evidence that the CLI package includes `templates/react-vite-counter/kaleido.template.json`.
+Expected: exit code `0` and explicit tarball evidence that the CLI package includes `templates/react-vite-counter/caatinga.template.json`.
 
 - [ ] **Step 5: Run the real consumer-isolation flow**
 
 Run:
 
 ```bash
-NPM_CONFIG_CACHE=/tmp/kaleido-npm-cache bash scripts/consumer-isolation-test.sh
+NPM_CONFIG_CACHE=/tmp/caatinga-npm-cache bash scripts/consumer-isolation-test.sh
 ```
 
-Expected: exit code `0`; `npx kaleido init test-app --template react-vite-counter` succeeds without `KALEIDO_TEMPLATES_DIR`; generated app builds successfully.
+Expected: exit code `0`; `npx caatinga init test-app --template react-vite-counter` succeeds without `CAATINGA_TEMPLATES_DIR`; generated app builds successfully.
 
 - [ ] **Step 6: Record the handoff commands**
 

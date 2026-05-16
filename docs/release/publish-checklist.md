@@ -2,7 +2,7 @@
 
 ## Before `next`
 
-- verify package READMEs are current for `@kaleido-xlm/cli`, `@kaleido-xlm/client`, and `@kaleido-xlm/core`
+- verify package READMEs are current for `@caatinga/cli`, `@caatinga/client`, and `@caatinga/core`
 - verify `.github/workflows/release.yml` is aligned with the pre-v1 dist-tag policy
 - run `pnpm typecheck`
 - run `pnpm build`

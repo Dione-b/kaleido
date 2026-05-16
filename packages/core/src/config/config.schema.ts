@@ -14,7 +14,7 @@ export const NetworkConfigSchema = z.object({
   networkPassphrase: z.string().min(1)
 });
 
-export const KaleidoConfigSchema = z.object({
+export const CaatingaConfigSchema = z.object({
   project: z.string().min(1),
   defaultNetwork: z.string().min(1).default("testnet"),
   contracts: z.record(z.string().min(1), ContractConfigSchema).refine(
@@ -31,6 +31,6 @@ export const KaleidoConfigSchema = z.object({
   })
 });
 
-export type KaleidoConfig = z.infer<typeof KaleidoConfigSchema>;
+export type CaatingaConfig = z.infer<typeof CaatingaConfigSchema>;
 export type ContractConfig = z.infer<typeof ContractConfigSchema>;
 export type NetworkConfig = z.infer<typeof NetworkConfigSchema>;

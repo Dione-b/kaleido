@@ -5,15 +5,15 @@ import { registerDevCommand } from "./commands/dev.command.js";
 import { registerGenerateCommand } from "./commands/generate.command.js";
 import { registerInitCommand } from "./commands/init.command.js";
 import { registerInvokeCommand } from "./commands/invoke.command.js";
-import { KALEIDO_CLI_VERSION } from "./version.js";
+import { CAATINGA_CLI_VERSION } from "./version.js";
 
 export function createProgram(): Command {
   const program = new Command();
 
   program
-    .name("kaleido")
+    .name("caatinga")
     .description("Developer toolkit for Stellar/Soroban dApps")
-    .version(KALEIDO_CLI_VERSION);
+    .version(CAATINGA_CLI_VERSION);
 
   registerInitCommand(program);
   registerDevCommand(program);

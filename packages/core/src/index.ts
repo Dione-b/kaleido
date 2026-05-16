@@ -1,9 +1,9 @@
-export { KaleidoError, KaleidoErrorCode, toKaleidoError } from "./errors/KaleidoError.js";
-export { KALEIDO_CORE_VERSION } from "./version.js";
+export { CaatingaError, CaatingaErrorCode, toCaatingaError } from "./errors/CaatingaError.js";
+export { CAATINGA_CORE_VERSION } from "./version.js";
 
 export {
-  KaleidoConfigSchema,
-  type KaleidoConfig,
+  CaatingaConfigSchema,
+  type CaatingaConfig,
   type ContractConfig,
   type NetworkConfig
 } from "./config/config.schema.js";
@@ -11,8 +11,8 @@ export { defineConfig } from "./config/define-config.js";
 export { loadConfig, type LoadConfigOptions } from "./config/load-config.js";
 
 export {
-  KaleidoArtifactsSchema,
-  type KaleidoArtifacts,
+  CaatingaArtifactsSchema,
+  type CaatingaArtifacts,
   type ContractArtifact
 } from "./artifacts/artifact.schema.js";
 export { readArtifacts } from "./artifacts/read-artifacts.js";

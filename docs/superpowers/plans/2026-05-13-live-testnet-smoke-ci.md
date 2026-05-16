@@ -4,9 +4,9 @@
 
 **Goal:** Garantir que o CI de smoke na testnet da Stellar cumpra a spec `04-live-testnet-smoke-ci.md`: fluxo completo `init → build → deploy → generate → invoke`, identidade só por alias, asserções explícitas, artefatos de diagnóstico, retry apenas para falha transitória de rede e documentação operacional para o gate de release (3 runs verdes consecutivos).
 
-**Architecture:** Manter o fluxo em `scripts/testnet-smoke.sh` orquestrando o CLI já empacotado no monorepo; extrair a política “transitório vs não-retry” para uma função pura em `@kaleido-xlm/core` (testada com Vitest) consumida pelo script via `node` após `pnpm build`. O workflow GitHub Actions grava `GITHUB_OUTPUT` quando o script sai com código `2` (transitório) para condicionar um único retry; saída `1` falha o job sem retry. Artefatos versionados e log consolidado ficam sob um diretório no repositório raiz antes do upload.
+**Architecture:** Manter o fluxo em `scripts/testnet-smoke.sh` orquestrando o CLI já empacotado no monorepo; extrair a política “transitório vs não-retry” para uma função pura em `@caatinga/core` (testada com Vitest) consumida pelo script via `node` após `pnpm build`. O workflow GitHub Actions grava `GITHUB_OUTPUT` quando o script sai com código `2` (transitório) para condicionar um único retry; saída `1` falha o job sem retry. Artefatos versionados e log consolidado ficam sob um diretório no repositório raiz antes do upload.
 
-**Tech Stack:** Bash, Node 20, pnpm, Vitest, GitHub Actions, `@kaleido-xlm/core` (tsup bundle via `src/index.ts`).
+**Tech Stack:** Bash, Node 20, pnpm, Vitest, GitHub Actions, `@caatinga/core` (tsup bundle via `src/index.ts`).
 
 ---
 
@@ -14,8 +14,8 @@
 
 | File | Responsibility |
 |------|----------------|
-| `packages/core/src/ci/is-transient-testnet-smoke-failure.ts` | Classifica texto de log (stderr/stdout capturado) como falha transitória de testnet **após** excluir erros de versão CLI e códigos `KALEIDO_*` de parser/config que não devem retry. |
-| `packages/core/src/ci/is-transient-testnet-smoke-failure.test.ts` | Vitest: casos positivos (timeout, 503, ECONNRESET), negativos (`KALEIDO_UNSUPPORTED_CLI_VERSION`, `KALEIDO_INVALID_CONFIG`), e borda (vazio). |
+| `packages/core/src/ci/is-transient-testnet-smoke-failure.ts` | Classifica texto de log (stderr/stdout capturado) como falha transitória de testnet **após** excluir erros de versão CLI e códigos `CAATINGA_*` de parser/config que não devem retry. |
+| `packages/core/src/ci/is-transient-testnet-smoke-failure.test.ts` | Vitest: casos positivos (timeout, 503, ECONNRESET), negativos (`CAATINGA_UNSUPPORTED_CLI_VERSION`, `CAATINGA_INVALID_CONFIG`), e borda (vazio). |
 | `packages/core/src/index.ts` | Re-export público da função de classificação. |
 | `scripts/testnet-smoke.sh` | Fluxo spec; `tee` de log; arquivos de versão; validações pós-passos; saída `0` / `1` / `2`; escreve `transient=true` em `GITHUB_OUTPUT` antes de `exit 2`. |
 | `.github/workflows/testnet-smoke.yml` | Triggers já corretos; ajustar retry condicional; expandir `upload-artifact`. |
@@ -24,7 +24,7 @@
 
 ---
 
-### Task 1: Classificador de falha transitória (`@kaleido-xlm/core`)
+### Task 1: Classificador de falha transitória (`@caatinga/core`)
 
 **Files:**
 
@@ -51,18 +51,18 @@ describe("isTransientTestnetSmokeFailure", () => {
 
   it("should_return_false_when_log_contains_unsupported_cli_code", () => {
     expect(
-      isTransientTestnetSmokeFailure("Error KALEIDO_UNSUPPORTED_CLI_VERSION: bump stellar")
+      isTransientTestnetSmokeFailure("Error CAATINGA_UNSUPPORTED_CLI_VERSION: bump stellar")
     ).toBe(false);
   });
 
   it("should_return_false_when_log_contains_version_parse_failure", () => {
     expect(
-      isTransientTestnetSmokeFailure("KALEIDO_STELLAR_CLI_VERSION_PARSE_FAILED")
+      isTransientTestnetSmokeFailure("CAATINGA_STELLAR_CLI_VERSION_PARSE_FAILED")
     ).toBe(false);
   });
 
   it("should_return_false_when_log_contains_invalid_config", () => {
-    expect(isTransientTestnetSmokeFailure("KALEIDO_INVALID_CONFIG")).toBe(false);
+    expect(isTransientTestnetSmokeFailure("CAATINGA_INVALID_CONFIG")).toBe(false);
   });
 
   it("should_return_false_when_empty", () => {
@@ -76,7 +76,7 @@ describe("isTransientTestnetSmokeFailure", () => {
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/ci/is-transient-testnet-smoke-failure.test.ts
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/ci/is-transient-testnet-smoke-failure.test.ts
 ```
 
 Expected: FAIL (module not found or function not exported).
@@ -86,13 +86,13 @@ Expected: FAIL (module not found or function not exported).
 Create `packages/core/src/ci/is-transient-testnet-smoke-failure.ts`:
 
 ```typescript
-const NO_RETRY_KALEIDO_SUBSTRINGS = [
-  "KALEIDO_UNSUPPORTED_CLI_VERSION",
-  "KALEIDO_UNTESTED_CLI_VERSION",
-  "KALEIDO_STELLAR_CLI_VERSION_PARSE_FAILED",
-  "KALEIDO_STELLAR_CLI_NOT_FOUND",
-  "KALEIDO_INVALID_CONFIG",
-  "KALEIDO_CONFIG_NOT_FOUND"
+const NO_RETRY_CAATINGA_SUBSTRINGS = [
+  "CAATINGA_UNSUPPORTED_CLI_VERSION",
+  "CAATINGA_UNTESTED_CLI_VERSION",
+  "CAATINGA_STELLAR_CLI_VERSION_PARSE_FAILED",
+  "CAATINGA_STELLAR_CLI_NOT_FOUND",
+  "CAATINGA_INVALID_CONFIG",
+  "CAATINGA_CONFIG_NOT_FOUND"
 ];
 
 const TRANSIENT_PATTERN =
@@ -102,7 +102,7 @@ export function isTransientTestnetSmokeFailure(logText: string): boolean {
   if (!logText.trim()) {
     return false;
   }
-  for (const marker of NO_RETRY_KALEIDO_SUBSTRINGS) {
+  for (const marker of NO_RETRY_CAATINGA_SUBSTRINGS) {
     if (logText.includes(marker)) {
       return false;
     }
@@ -122,7 +122,7 @@ export { isTransientTestnetSmokeFailure } from "./ci/is-transient-testnet-smoke-
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/ci/is-transient-testnet-smoke-failure.test.ts
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/ci/is-transient-testnet-smoke-failure.test.ts
 ```
 
 Expected: PASS.
@@ -130,7 +130,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido
+cd /home/dionebastos/Documentos/PROJETOS/caatinga
 git add packages/core/src/ci/is-transient-testnet-smoke-failure.ts packages/core/src/ci/is-transient-testnet-smoke-failure.test.ts packages/core/src/index.ts
 git commit -m "feat(core): classify transient testnet smoke failures for CI retry"
 ```
@@ -158,10 +158,10 @@ export PATH="$ROOT_DIR/node_modules/.bin:$PATH"
 CORE_INDEX="${ROOT_DIR}/packages/core/dist/index.js"
 
 APP_NAME="${1:-smoke-app}"
-IDENTITY_ALIAS="${KALEIDO_CI_IDENTITY_ALIAS:?KALEIDO_CI_IDENTITY_ALIAS is required}"
+IDENTITY_ALIAS="${CAATINGA_CI_IDENTITY_ALIAS:?CAATINGA_CI_IDENTITY_ALIAS is required}"
 ARTIFACT_DIR="$ROOT_DIR/smoke-ci-out"
 LOG_FILE="$ARTIFACT_DIR/${APP_NAME}-smoke.log"
-KALEIDO_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-kaleido-version.txt"
+CAATINGA_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-caatinga-version.txt"
 STELLAR_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-stellar-version.txt"
 
 mkdir -p "$ARTIFACT_DIR"
@@ -202,13 +202,13 @@ run_step() {
   fi
 }
 
-log "=== kaleido-version ==="
+log "=== caatinga-version ==="
 set +e
-kaleido --version 2>&1 | tee "$KALEIDO_VERSION_FILE" | tee -a "$LOG_FILE"
+caatinga --version 2>&1 | tee "$CAATINGA_VERSION_FILE" | tee -a "$LOG_FILE"
 ec_kv=${PIPESTATUS[0]}
 set -e
 if [[ "$ec_kv" -ne 0 ]]; then
-  classify_and_exit "$ec_kv" "kaleido-version"
+  classify_and_exit "$ec_kv" "caatinga-version"
 fi
 
 log "=== stellar-version ==="
@@ -222,17 +222,17 @@ fi
 
 rm -rf "$ROOT_DIR/$APP_NAME"
 
-run_step "init" kaleido init "$APP_NAME" --template react-vite-counter
+run_step "init" caatinga init "$APP_NAME" --template react-vite-counter
 cd "$ROOT_DIR/$APP_NAME"
 
-run_step "build" kaleido build counter
-run_step "deploy" kaleido deploy counter --network testnet --source "$IDENTITY_ALIAS"
+run_step "build" caatinga build counter
+run_step "deploy" caatinga deploy counter --network testnet --source "$IDENTITY_ALIAS"
 
 log "=== artifacts-contract-id ==="
 set +e
 node --input-type=module -e '
 import fs from "node:fs";
-const artifacts = JSON.parse(fs.readFileSync("kaleido.artifacts.json", "utf8"));
+const artifacts = JSON.parse(fs.readFileSync("caatinga.artifacts.json", "utf8"));
 const contractId = artifacts.networks?.testnet?.contracts?.counter?.contractId;
 if (!/^C[A-Z0-9]{55}$/.test(contractId ?? "")) {
   console.error(`Invalid contractId: ${contractId}`);
@@ -244,14 +244,14 @@ set -e
 if [[ "$ec_art" -ne 0 ]]; then
   classify_and_exit "$ec_art" "artifacts-contract-id"
 fi
-test -f kaleido.artifacts.json
+test -f caatinga.artifacts.json
 
-run_step "generate" kaleido generate counter --network testnet
+run_step "generate" caatinga generate counter --network testnet
 test -d src/contracts/generated
 
 set +e
 INVOKE_OUT="$(mktemp)"
-kaleido invoke counter.increment --network testnet --source "$IDENTITY_ALIAS" 2>&1 | tee "$INVOKE_OUT" | tee -a "$LOG_FILE"
+caatinga invoke counter.increment --network testnet --source "$IDENTITY_ALIAS" 2>&1 | tee "$INVOKE_OUT" | tee -a "$LOG_FILE"
 INV_EC=${PIPESTATUS[0]}
 set -e
 if [[ "$INV_EC" -ne 0 ]]; then
@@ -272,7 +272,7 @@ exit 0
 Run:
 
 ```bash
-bash -n /home/dionebastos/Documentos/PROJETOS/kaleido/scripts/testnet-smoke.sh
+bash -n /home/dionebastos/Documentos/PROJETOS/caatinga/scripts/testnet-smoke.sh
 ```
 
 Expected: exit code 0.
@@ -301,14 +301,14 @@ Use exactly this block (after `pnpm build`). The `Smoke gate` step treats a skip
         id: smoke1
         continue-on-error: true
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app
 
       - name: Smoke retry
         id: smokeretry
         if: steps.smoke1.outcome == 'failure' && steps.smoke1.outputs.transient == 'true'
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app-retry
 
       - name: Smoke gate
@@ -332,8 +332,8 @@ Use exactly this block (after `pnpm build`). The `Smoke gate` step treats a skip
           name: testnet-smoke-artifacts
           path: |
             smoke-ci-out/
-            smoke-app/kaleido.artifacts.json
-            smoke-app-retry/kaleido.artifacts.json
+            smoke-app/caatinga.artifacts.json
+            smoke-app-retry/caatinga.artifacts.json
           if-no-files-found: ignore
 ```
 
@@ -342,7 +342,7 @@ Use exactly this block (after `pnpm build`). The `Smoke gate` step treats a skip
 Run:
 
 ```bash
-python3 -c "import yaml; yaml.safe_load(open('/home/dionebastos/Documentos/PROJETOS/kaleido/.github/workflows/testnet-smoke.yml'))"
+python3 -c "import yaml; yaml.safe_load(open('/home/dionebastos/Documentos/PROJETOS/caatinga/.github/workflows/testnet-smoke.yml'))"
 ```
 
 Expected: no exception.
@@ -356,18 +356,18 @@ git commit -m "ci: gate testnet smoke retry on transient failures and upload log
 
 ---
 
-### Task 4: Alternativa `KALEIDO_CI_SECRET_KEY` (somente documentação)
+### Task 4: Alternativa `CAATINGA_CI_SECRET_KEY` (somente documentação)
 
 **Files:**
 
 - Modify: `docs/testing.md` (mesmo bloco da Task 5)
 
-**Rationale:** O `stellar keys add` da CLI atual não aceita chave secreta não interativa na linha de comando (`--secret-key` é interativo / deprecated). O caminho suportado continua sendo restaurar `config.toml` completo via `KALEIDO_CI_STELLAR_CONFIG_B64` (ou gerar esse blob fora do CI com a identidade já registrada).
+**Rationale:** O `stellar keys add` da CLI atual não aceita chave secreta não interativa na linha de comando (`--secret-key` é interativo / deprecated). O caminho suportado continua sendo restaurar `config.toml` completo via `CAATINGA_CI_STELLAR_CONFIG_B64` (ou gerar esse blob fora do CI com a identidade já registrada).
 
 - [ ] **Step 1: Append to `docs/testing.md` (after the smoke exit-codes paragraph from Task 5)**
 
 ```markdown
-If you cannot use a pre-built `config.toml` blob, create one locally with `stellar keys` (or fund a throwaway account), then base64-encode the resulting `~/.config/stellar/config.toml` for `KALEIDO_CI_STELLAR_CONFIG_B64`. Do not commit raw keys; do not pass secret material to `kaleido --source`.
+If you cannot use a pre-built `config.toml` blob, create one locally with `stellar keys` (or fund a throwaway account), then base64-encode the resulting `~/.config/stellar/config.toml` for `CAATINGA_CI_STELLAR_CONFIG_B64`. Do not commit raw keys; do not pass secret material to `caatinga --source`.
 ```
 
 - [ ] **Step 2: Commit**
@@ -390,10 +390,10 @@ git commit -m "docs: clarify CI identity secret handling without broken stellar 
 
 - [ ] **Step 1: Extend `docs/testing.md`**
 
-After the paragraph that mentions `KALEIDO_CI_IDENTITY_ALIAS` and `KALEIDO_CI_STELLAR_CONFIG_B64`, append:
+After the paragraph that mentions `CAATINGA_CI_IDENTITY_ALIAS` and `CAATINGA_CI_STELLAR_CONFIG_B64`, append:
 
 ```markdown
-Smoke script exit codes: `0` success; `1` hard failure (no retry — includes Kaleido/parser/CLI version errors); `2` classified transient testnet failure (workflow may run one retry). Artifacts include `smoke-ci-out/*-smoke.log`, `*-kaleido-version.txt`, `*-stellar-version.txt`, and the app `kaleido.artifacts.json`. Prefer `KALEIDO_CI_STELLAR_CONFIG_B64` plus `KALEIDO_CI_IDENTITY_ALIAS`; never pass raw secrets to `kaleido --source`. For the spec’s `KALEIDO_CI_SECRET_KEY` alternative, see the paragraph below on baking keys into `config.toml` offline.
+Smoke script exit codes: `0` success; `1` hard failure (no retry — includes Caatinga/parser/CLI version errors); `2` classified transient testnet failure (workflow may run one retry). Artifacts include `smoke-ci-out/*-smoke.log`, `*-caatinga-version.txt`, `*-stellar-version.txt`, and the app `caatinga.artifacts.json`. Prefer `CAATINGA_CI_STELLAR_CONFIG_B64` plus `CAATINGA_CI_IDENTITY_ALIAS`; never pass raw secrets to `caatinga --source`. For the spec’s `CAATINGA_CI_SECRET_KEY` alternative, see the paragraph below on baking keys into `config.toml` offline.
 ```
 
 - [ ] **Step 2: Optional line in v1 readiness**
@@ -422,7 +422,7 @@ git commit -m "docs: describe testnet smoke exit codes and release verification"
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido
+cd /home/dionebastos/Documentos/PROJETOS/caatinga
 pnpm install --frozen-lockfile
 pnpm build
 pnpm test
@@ -448,7 +448,7 @@ Only if fixes were needed from verification; otherwise no commit.
 | Asserções (exit 0, artifacts, contractId regex, bindings dir, invoke success) | Task 2 |
 | Retry transitório uma vez; sem retry em erro parser/CLI | Tasks 1–3 |
 | Schedule + dispatch + release | Já em `testnet-smoke.yml` |
-| Artefatos: artifacts json, logs, versões stellar/kaleido | Tasks 2–3 |
+| Artefatos: artifacts json, logs, versões stellar/caatinga | Tasks 2–3 |
 | Gate release 3 runs / 7 dias | Documentação operacional Task 5 (não automatizável só no YAML sem API externa) |
 
 **Gap aceito:** “Require 3 consecutive successful scheduled runs before tag v1.0.0” permanece processo humano + Actions UI; não exige app externa no escopo desta spec.

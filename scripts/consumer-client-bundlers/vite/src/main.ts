@@ -1,3 +1,3 @@
-import { createKaleidoClient } from "@kaleido-xlm/client";
+import { createCaatingaClient } from "@caatinga/client";
 
-console.log(typeof createKaleidoClient);
+console.log(typeof createCaatingaClient);

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../../src/errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../../src/errors/CaatingaError.js";
 
-describe("KaleidoErrorCode", () => {
-  it("all public error codes use KALEIDO_ prefix", () => {
-    for (const code of Object.values(KaleidoErrorCode)) {
-      expect(code.startsWith("KALEIDO_")).toBe(true);
+describe("CaatingaErrorCode", () => {
+  it("all public error codes use CAATINGA_ prefix", () => {
+    for (const code of Object.values(CaatingaErrorCode)) {
+      expect(code.startsWith("CAATINGA_")).toBe(true);
     }
   });
 });
