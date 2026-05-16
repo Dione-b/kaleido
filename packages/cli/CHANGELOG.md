@@ -1,5 +1,13 @@
 # @caatinga/cli
 
+## 0.2.1
+
+### Patch Changes
+
+- f0f3ed7: Fix official template `compatibleCore` ranges for core 0.2.x and add CI/tests so bundled templates stay aligned with `CAATINGA_CORE_VERSION`.
+- Updated dependencies [f0f3ed7]
+  - @caatinga/core@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
