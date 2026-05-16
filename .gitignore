@@ -16,3 +16,4 @@ coverage
 smoke-ci-out/
 smoke-app/
 smoke-app-retry/
+docs/superpowers/specs/
