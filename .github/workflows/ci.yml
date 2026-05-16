@@ -24,7 +24,7 @@ jobs:
           cache: pnpm
 
       - name: Install Stellar CLI
-        uses: stellar/stellar-cli@v22.8.1
+        uses: stellar/stellar-cli@v25.2.0
 
       - name: Verify Stellar CLI version
         run: stellar --version

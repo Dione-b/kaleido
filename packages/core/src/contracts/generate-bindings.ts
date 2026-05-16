@@ -6,6 +6,7 @@ import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
+import { buildStellarNetworkArgs } from "../stellar-cli/build-stellar-network-args.js";
 
 export type GenerateBindingsOptions = {
   config: CaatingaConfig;
@@ -45,10 +46,7 @@ export async function generateBindings(options: GenerateBindingsOptions) {
     "--output-dir",
     outputDir,
     "--overwrite",
-    "--rpc-url",
-    network.config.rpcUrl,
-    "--network-passphrase",
-    network.config.networkPassphrase
+    ...buildStellarNetworkArgs(network)
   ], {
     cwd,
     allowUntestedStellarCli: options.allowUntestedStellarCli,

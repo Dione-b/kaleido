@@ -1,6 +1,7 @@
 import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import type { NetworkConfig } from "../config/config.schema.js";
 import { runCommand } from "../shell/run-command.js";
+import { buildStellarNetworkArgsFromConfig } from "./build-stellar-network-args.js";
 import { parseContractId } from "./parse-contract-id.js";
 
 const TX_HASH_REGEX = /Transaction hash is ([a-f0-9]{64})/i;
@@ -82,10 +83,7 @@ export async function resolveContractIdFromDeploySalt(options: {
     saltHex,
     "--source-account",
     options.source,
-    "--rpc-url",
-    options.network.rpcUrl,
-    "--network-passphrase",
-    options.network.networkPassphrase
+    ...buildStellarNetworkArgsFromConfig(options.network)
   ], {
     cwd: options.cwd,
     allowUntestedStellarCli: options.allowUntestedStellarCli,

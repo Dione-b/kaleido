@@ -4,7 +4,7 @@ Caatinga shells out to Stellar CLI for current build, deploy, bindings, and invo
 
 ## Supported Range
 
-- Minimum: `22.0.0`
+- Minimum: `23.0.0` (22.x cannot sign `stellar contract invoke`; Caatinga rejects it up front)
 - Tested maximum: `25.2.0`
 
 Runtime behavior:
@@ -33,4 +33,4 @@ Run these only on a developer machine when you accept compatibility risk:
 
 ## CI Rule
 
-CI installs Stellar CLI via `stellar/stellar-cli@v22.8.1` in `.github/workflows/ci.yml` (adjust the tag when raising `STELLAR_CLI_TESTED_MAX_VERSION`). Parser fixture tests run on every push and pull request. The override flag is for local experiments only because CI is the release boundary.
+CI installs Stellar CLI via `stellar/stellar-cli@v25.2.0` in `.github/workflows/ci.yml` (adjust the tag when raising `STELLAR_CLI_TESTED_MAX_VERSION`). Parser fixture tests run on every push and pull request. The override flag is for local experiments only because CI is the release boundary.

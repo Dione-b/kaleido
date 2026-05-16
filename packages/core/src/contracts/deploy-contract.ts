@@ -7,6 +7,7 @@ import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
+import { buildStellarNetworkArgs } from "../stellar-cli/build-stellar-network-args.js";
 import { parseContractId } from "../stellar-cli/parse-contract-id.js";
 import { tryRecoverContractIdFromDeployFailure } from "../stellar-cli/recover-deploy-contract-id.js";
 import { buildDependencyGraph } from "./dependency-graph.js";
@@ -106,10 +107,7 @@ export async function deployContract(options: DeployContractOptions) {
     contract.wasmPath,
     "--source-account",
     source,
-    "--rpc-url",
-    network.config.rpcUrl,
-    "--network-passphrase",
-    network.config.networkPassphrase,
+    ...buildStellarNetworkArgs(network),
     ...constructorArgs
   ];
 

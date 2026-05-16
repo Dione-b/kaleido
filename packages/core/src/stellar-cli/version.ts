@@ -1,7 +1,8 @@
 import semver from "semver";
 import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
-export const STELLAR_CLI_MIN_VERSION = "22.0.0";
+// 22.x fails to sign `stellar contract invoke` (xdr value invalid); 23.0.0+ is required.
+export const STELLAR_CLI_MIN_VERSION = "23.0.0";
 export const STELLAR_CLI_TESTED_MAX_VERSION = "25.2.0";
 
 const STELLAR_CLI_SEMVER_REGEX = /\b(\d+\.\d+\.\d+(?:-[0-9A-Za-z-.]+)?(?:\+[0-9A-Za-z-.]+)?)\b/;

@@ -48,13 +48,26 @@ describe("Stellar CLI version contract", () => {
     );
   });
 
+  it("rejects 22.x because invoke signing is broken below 23.0.0", () => {
+    expect(() =>
+      assertSupportedStellarCliVersion({
+        version: "22.8.1",
+        allowUntested: false
+      })
+    ).toThrowError(
+      expect.objectContaining({
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
+      })
+    );
+  });
+
   it("accepts the minimum supported version boundary", () => {
     expect(
       assertSupportedStellarCliVersion({
-        version: "22.0.0",
+        version: "23.0.0",
         allowUntested: false
       })
-    ).toBe("22.0.0");
+    ).toBe("23.0.0");
   });
 
   it("accepts the tested maximum version boundary", () => {
@@ -122,7 +135,7 @@ describe("Stellar CLI version contract", () => {
   });
 
   it("declares concrete supported range constants", () => {
-    expect(STELLAR_CLI_MIN_VERSION).toBe("22.0.0");
+    expect(STELLAR_CLI_MIN_VERSION).toBe("23.0.0");
     expect(STELLAR_CLI_TESTED_MAX_VERSION).toBe("25.2.0");
   });
 });

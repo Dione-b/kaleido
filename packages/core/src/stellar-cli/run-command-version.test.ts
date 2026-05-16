@@ -17,12 +17,12 @@ describe("checkStellarCliVersion", () => {
     }));
     const { checkStellarCliVersion } = await import("./check-stellar-cli-version.js");
     runCommandMock.mockResolvedValueOnce({
-      stdout: "stellar 22.0.1",
+      stdout: "stellar 25.2.0",
       stderr: "",
-      all: "stellar 22.0.1"
+      all: "stellar 25.2.0"
     });
 
-    await expect(checkStellarCliVersion({ allowUntested: false })).resolves.toBe("22.0.1");
+    await expect(checkStellarCliVersion({ allowUntested: false })).resolves.toBe("25.2.0");
     expect(runCommandMock).toHaveBeenCalledWith("stellar", ["--version"], {
       skipStellarVersionCheck: true
     });
@@ -57,7 +57,7 @@ describe("runCommand Stellar CLI version gate", () => {
 
   it("checks the Stellar CLI version before running stellar commands", async () => {
     const { runCommand } = await import("../shell/run-command.js");
-    checkStellarCliVersionMock.mockResolvedValueOnce("22.0.1");
+    checkStellarCliVersionMock.mockResolvedValueOnce("25.2.0");
     execaMock.mockResolvedValueOnce({ stdout: "ok", stderr: "", all: "ok" });
 
     await expect(runCommand("stellar", ["contract", "build"])).resolves.toEqual({
@@ -100,7 +100,7 @@ describe("runCommand Stellar CLI version gate", () => {
 
   it("normalizes missing stellar binary to CAATINGA_STELLAR_CLI_NOT_FOUND", async () => {
     const { runCommand } = await import("../shell/run-command.js");
-    checkStellarCliVersionMock.mockResolvedValueOnce("22.0.1");
+    checkStellarCliVersionMock.mockResolvedValueOnce("25.2.0");
     execaMock.mockRejectedValueOnce(Object.assign(new Error("not found"), { code: "ENOENT" }));
 
     await expect(runCommand("stellar", ["contract", "build"])).rejects.toMatchObject({
