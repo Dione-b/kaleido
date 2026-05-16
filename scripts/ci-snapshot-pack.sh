@@ -4,15 +4,71 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKED_DIR="$ROOT_DIR/packed"
 EXTRACT_DIR="$ROOT_DIR/packed-unpacked-package-jsons"
+CHANGESET_DIR="$ROOT_DIR/.changeset"
+BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/kaleido-ci-snapshot-pack.XXXXXX")"
+CHANGESET_BACKUP_DIR="$BACKUP_DIR/.changeset"
+CHANGESET_BACKUP_READY=0
+CHANGESET_EXISTED=0
+SNAPSHOT_CHANGESET_FILE=""
+TEMPLATES_DIR="$ROOT_DIR/packages/templates"
+SNAPSHOT_RESTORE_FILES=(
+  "$ROOT_DIR/packages/core/package.json"
+  "$ROOT_DIR/packages/client/package.json"
+  "$ROOT_DIR/packages/cli/package.json"
+  "$ROOT_DIR/packages/core/CHANGELOG.md"
+  "$ROOT_DIR/packages/client/CHANGELOG.md"
+  "$ROOT_DIR/packages/cli/CHANGELOG.md"
+)
 
-rm -rf "$PACKED_DIR" "$EXTRACT_DIR" "$ROOT_DIR/.changeset/__ci_snapshot__.md"
+cleanup() {
+  local file
+  local backup_path
+
+  rm -rf "$PACKED_DIR" "$EXTRACT_DIR"
+
+  for file in "${SNAPSHOT_RESTORE_FILES[@]}"; do
+    backup_path="$BACKUP_DIR/${file#$ROOT_DIR/}"
+    if [[ -f "$backup_path" ]]; then
+      cp "$backup_path" "$file"
+    fi
+  done
+
+  if [[ "$CHANGESET_BACKUP_READY" == "1" && "$CHANGESET_EXISTED" == "1" && -d "$CHANGESET_BACKUP_DIR" ]]; then
+    rm -rf "$CHANGESET_DIR"
+    cp -R "$CHANGESET_BACKUP_DIR" "$CHANGESET_DIR"
+  elif [[ "$CHANGESET_EXISTED" == "0" ]]; then
+    rm -rf "$CHANGESET_DIR"
+  fi
+
+  rm -rf "$BACKUP_DIR"
+}
+
+trap cleanup EXIT
+
+rm -rf "$PACKED_DIR" "$EXTRACT_DIR"
 mkdir -p "$PACKED_DIR" "$EXTRACT_DIR"
 
-if [[ ! -d "$ROOT_DIR/packages/core/dist" ]]; then
-  pnpm --dir "$ROOT_DIR" build
-fi
+pnpm --dir "$ROOT_DIR" build
 
-cat > "$ROOT_DIR/.changeset/__ci_snapshot__.md" <<'EOF'
+if [[ -d "$CHANGESET_DIR" ]]; then
+  cp -R "$CHANGESET_DIR" "$CHANGESET_BACKUP_DIR"
+  if [[ ! -d "$CHANGESET_BACKUP_DIR" ]]; then
+    echo "Failed to capture .changeset backup in $CHANGESET_BACKUP_DIR" >&2
+    exit 1
+  fi
+  CHANGESET_EXISTED=1
+fi
+CHANGESET_BACKUP_READY=1
+
+for file in "${SNAPSHOT_RESTORE_FILES[@]}"; do
+  mkdir -p "$BACKUP_DIR/$(dirname "${file#$ROOT_DIR/}")"
+  cp "$file" "$BACKUP_DIR/${file#$ROOT_DIR/}"
+done
+
+mkdir -p "$CHANGESET_DIR"
+SNAPSHOT_CHANGESET_FILE="$(mktemp "$CHANGESET_DIR/__ci_snapshot__.XXXXXX.md")"
+
+cat > "$SNAPSHOT_CHANGESET_FILE" <<'EOF'
 ---
 "@kaleido-xlm/cli": patch
 ---
@@ -27,13 +83,220 @@ pnpm --dir "$ROOT_DIR" exec changeset version --snapshot smoke
 ( cd "$ROOT_DIR/packages/cli" && pnpm pack --pack-destination "$PACKED_DIR" )
 
 shopt -s nullglob
+core_tarball=( "$PACKED_DIR"/kaleido-xlm-core-*.tgz )
+client_tarball=( "$PACKED_DIR"/kaleido-xlm-client-*.tgz )
+cli_tarball=( "$PACKED_DIR"/kaleido-xlm-cli-*.tgz )
+if [[ ${#core_tarball[@]} -ne 1 ]]; then
+  echo "Expected exactly one core tarball in $PACKED_DIR, found ${#core_tarball[@]}" >&2
+  exit 1
+fi
+
+if [[ ${#client_tarball[@]} -ne 1 ]]; then
+  echo "Expected exactly one client tarball in $PACKED_DIR, found ${#client_tarball[@]}" >&2
+  exit 1
+fi
+
+if [[ ${#cli_tarball[@]} -ne 1 ]]; then
+  echo "Expected exactly one CLI tarball in $PACKED_DIR, found ${#cli_tarball[@]}" >&2
+  exit 1
+fi
+
+cli_template_path="$(tar -tzf "${cli_tarball[0]}" | grep '^package/templates/react-vite-counter/kaleido.template.json$' || true)"
+if [[ -z "$cli_template_path" ]]; then
+  echo "CLI tarball is missing bundled templates: ${cli_tarball[0]}" >&2
+  exit 1
+fi
+
+echo "CLI template evidence: $cli_template_path"
+
+cli_template_package_json_path="$(tar -tzf "${cli_tarball[0]}" | grep '^package/templates/react-vite-counter/package.json$' || true)"
+if [[ -z "$cli_template_package_json_path" ]]; then
+  echo "CLI tarball is missing bundled template package.json: ${cli_tarball[0]}" >&2
+  exit 1
+fi
+
+echo "CLI template package evidence: $cli_template_package_json_path"
+
+packed_core_version="$(tar -xOf "${core_tarball[0]}" package/package.json | node --input-type=module -e 'import { readFileSync } from "node:fs"; const pkg = JSON.parse(readFileSync(0, "utf8")); process.stdout.write(pkg.version);')"
+packed_client_version="$(tar -xOf "${client_tarball[0]}" package/package.json | node --input-type=module -e 'import { readFileSync } from "node:fs"; const pkg = JSON.parse(readFileSync(0, "utf8")); process.stdout.write(pkg.version);')"
+packed_cli_version="$(tar -xOf "${cli_tarball[0]}" package/package.json | node --input-type=module -e 'import { readFileSync } from "node:fs"; const pkg = JSON.parse(readFileSync(0, "utf8")); process.stdout.write(pkg.version);')"
+
+export EXPECTED_PACKED_INTERNAL_VERSIONS="$(node --input-type=module -e '
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+const [rootDir, coreVersion, clientVersion, cliVersion] = process.argv.slice(1);
+const packageVersions = {
+  "@kaleido-xlm/core": coreVersion,
+  "@kaleido-xlm/client": clientVersion,
+  "@kaleido-xlm/cli": cliVersion
+};
+const packageJsonPaths = [
+  path.join(rootDir, "packages/core/package.json"),
+  path.join(rootDir, "packages/client/package.json"),
+  path.join(rootDir, "packages/cli/package.json")
+];
+const sections = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies"
+];
+const expectedByPackage = {};
+
+for (const packageJsonPath of packageJsonPaths) {
+  const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  const expected = {};
+
+  for (const section of sections) {
+    for (const [name, value] of Object.entries(pkg[section] ?? {})) {
+      if (Object.hasOwn(packageVersions, name)) {
+        expected[name] = {
+          section,
+          value: value.replace(/^([\^~])?\d+\.\d+\.\d+(?:[-+][^\\s]+)?$/, (_, prefix = "") => `${prefix}${packageVersions[name]}`)
+        };
+      }
+    }
+  }
+
+  expectedByPackage[pkg.name] = expected;
+}
+
+process.stdout.write(JSON.stringify(expectedByPackage));
+' "$ROOT_DIR" "$packed_core_version" "$packed_client_version" "$packed_cli_version")"
+
+export EXPECTED_TEMPLATE_INTERNAL_RANGES="$(node --input-type=module -e '
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import path from "node:path";
+
+const templatesDir = process.argv[1];
+const sections = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies"
+];
+const expected = {};
+
+for (const entry of readdirSync(templatesDir)) {
+  const templateDir = path.join(templatesDir, entry);
+  if (!statSync(templateDir).isDirectory()) {
+    continue;
+  }
+
+  const packageJsonPath = path.join(templateDir, "package.json");
+  const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  const templateExpected = {};
+
+  for (const section of sections) {
+    for (const [name, value] of Object.entries(pkg[section] ?? {})) {
+      if (name.startsWith("@kaleido-xlm/")) {
+        templateExpected[name] = { section, value };
+      }
+    }
+  }
+
+  if (Object.keys(templateExpected).length > 0) {
+    expected[entry] = templateExpected;
+  }
+}
+
+process.stdout.write(JSON.stringify(expected));
+' "$TEMPLATES_DIR")"
+
 for t in "$PACKED_DIR"/*.tgz; do
   base="$(basename "$t" .tgz)"
   mkdir -p "$EXTRACT_DIR/$base"
   tar -xzf "$t" -C "$EXTRACT_DIR/$base" package/package.json
-  if grep -qE 'workspace:\*|link:|file:' "$EXTRACT_DIR/$base/package/package.json"; then
-    echo "Packed package $t contains monorepo-only dependency reference." >&2
+  if ! node --input-type=module -e '
+import { readFileSync } from "node:fs";
+
+const pkg = JSON.parse(readFileSync(process.argv[1], "utf8"));
+const sections = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies"
+];
+const expectedInternalVersions = JSON.parse(process.env.EXPECTED_PACKED_INTERNAL_VERSIONS ?? "{}");
+const expectedForPackage = expectedInternalVersions[pkg.name] ?? {};
+
+for (const section of sections) {
+  for (const [name, value] of Object.entries(pkg[section] ?? {})) {
+    if (/^(workspace:|link:|file:)/.test(value)) {
+      console.error(`${section}.${name}=${value}`);
+      process.exit(1);
+    }
+
+    const expectedDependency = expectedForPackage[name];
+    if (expectedDependency && value !== expectedDependency.value) {
+      console.error(
+        `${section}.${name} expected ${expectedDependency.value} but found ${value}`
+      );
+      process.exit(1);
+    }
+  }
+}
+
+for (const [name, expectation] of Object.entries(expectedForPackage)) {
+  const actualValue = pkg[expectation.section]?.[name];
+  if (actualValue !== expectation.value) {
+    console.error(
+      `${expectation.section}.${name} expected ${expectation.value} but found ${actualValue ?? "missing"}`
+    );
+    process.exit(1);
+  }
+}
+' "$EXTRACT_DIR/$base/package/package.json"; then
+    echo "Packed package $t failed dependency validation." >&2
     cat "$EXTRACT_DIR/$base/package/package.json" >&2
+    exit 1
+  fi
+done
+
+mapfile -t bundled_template_names < <(node --input-type=module -e '
+const expectedInternalRanges = JSON.parse(process.env.EXPECTED_TEMPLATE_INTERNAL_RANGES ?? "{}");
+for (const templateName of Object.keys(expectedInternalRanges)) {
+  console.log(templateName);
+}
+')
+
+for template_name in "${bundled_template_names[@]}"; do
+  if ! tar -xOf "${cli_tarball[0]}" "package/templates/${template_name}/package.json" | node --input-type=module -e '
+import { readFileSync } from "node:fs";
+
+const pkg = JSON.parse(readFileSync(0, "utf8"));
+const templateName = process.argv[1];
+const expectedInternalRanges = JSON.parse(process.env.EXPECTED_TEMPLATE_INTERNAL_RANGES ?? "{}");
+const expected = expectedInternalRanges[templateName] ?? {};
+const sections = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies"
+];
+
+for (const section of sections) {
+  for (const [name, value] of Object.entries(pkg[section] ?? {})) {
+    if (/^(workspace:|link:|file:)/.test(value)) {
+      console.error(`${templateName}:${section}.${name}=${value}`);
+      process.exit(1);
+    }
+  }
+}
+
+for (const [name, expectation] of Object.entries(expected)) {
+  const actualRange = pkg[expectation.section]?.[name];
+  if (actualRange !== expectation.value) {
+    console.error(
+      `${templateName}:${expectation.section}.${name} expected ${expectation.value} but found ${actualRange ?? "missing"}`
+    );
+    process.exit(1);
+  }
+}
+' "$template_name"; then
+    echo "Bundled CLI template package.json failed internal dependency validation." >&2
+    tar -xOf "${cli_tarball[0]}" "package/templates/${template_name}/package.json" >&2 || true
     exit 1
   fi
 done

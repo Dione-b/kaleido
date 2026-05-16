@@ -1,5 +1,14 @@
 # @kaleido-xlm/cli
 
+## 0.1.3
+
+### Patch Changes
+
+- fix release validation so packed CLI tarballs must include bundled templates and consumer init is exercised without KALEIDO_TEMPLATES_DIR
+- update the generated contract build-path and Stellar CLI compatibility notes to match the supported `wasm32-unknown-unknown` flow and the current maximum tested Stellar CLI version `25.2.0`
+- Updated dependencies
+  - @kaleido-xlm/core@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

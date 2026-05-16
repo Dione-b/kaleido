@@ -1,6 +1,6 @@
 {
   "name": "@kaleido-xlm/client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Browser and Node client for Soroban smart contracts — connects generated bindings, Kaleido Stellar artifacts, and wallet adapters",
   "keywords": [
     "stellar",
@@ -51,7 +51,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kaleido-xlm/core": "^0.1.2"
+    "@kaleido-xlm/core": "^0.1.3"
   },
   "devDependencies": {
     "tsup": "^8.3.5",

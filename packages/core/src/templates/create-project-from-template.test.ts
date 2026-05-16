@@ -8,6 +8,35 @@ import { createProjectFromTemplate } from "./create-project-from-template.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+async function readPackageJson<T>(packageJsonPath: string): Promise<T> {
+  return JSON.parse(await readFile(packageJsonPath, "utf8")) as T;
+}
+
+function collectInternalDependencies(packageJson: {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+}): Record<string, { section: string; value: string }> {
+  const sections = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies"
+  ] as const;
+  const expectations: Record<string, { section: string; value: string }> = {};
+
+  for (const section of sections) {
+    for (const [name, value] of Object.entries(packageJson[section] ?? {})) {
+      if (name.startsWith("@kaleido-xlm/")) {
+        expectations[name] = { section, value };
+      }
+    }
+  }
+
+  return expectations;
+}
+
 describe("createProjectFromTemplate", () => {
   let tmpDir: string;
 
@@ -134,17 +163,63 @@ describe("createProjectFromTemplate", () => {
     expect(config).toContain("tokenContractId: \"${contracts.token.contractId}\"");
   });
 
-  it("should_include_client_dependencies_in_react_vite_counter_template", async () => {
+  it("should_pin_internal_dependency_ranges_for_official_templates", async () => {
+    const templateRoot = path.resolve(__dirname, "../../../templates");
+    const packageVersions = await Promise.all([
+      readPackageJson<{ version: string }>(path.resolve(__dirname, "../../../client/package.json")),
+      readPackageJson<{ version: string }>(path.resolve(__dirname, "../../package.json")),
+      readPackageJson<{ version: string }>(path.resolve(__dirname, "../../../cli/package.json"))
+    ]);
+    const [clientPackageJson, corePackageJson, cliPackageJson] = packageVersions;
+    const expectedInternalDependencies = {
+      "@kaleido-xlm/client": {
+        section: "dependencies",
+        value: `^${clientPackageJson.version}`
+      },
+      "@kaleido-xlm/core": {
+        section: "dependencies",
+        value: `^${corePackageJson.version}`
+      },
+      "@kaleido-xlm/cli": {
+        section: "devDependencies",
+        value: `^${cliPackageJson.version}`
+      }
+    } satisfies Record<string, { section: string; value: string }>;
+
+    const templateExpectations = [
+      {
+        template: "react-vite-counter",
+        expected: expectedInternalDependencies
+      },
+      {
+        template: "marketplace-with-token",
+        expected: {
+          "@kaleido-xlm/core": expectedInternalDependencies["@kaleido-xlm/core"],
+          "@kaleido-xlm/cli": expectedInternalDependencies["@kaleido-xlm/cli"]
+        }
+      }
+    ];
+
+    for (const { template, expected } of templateExpectations) {
+      const packageJson = await readPackageJson<{
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+        peerDependencies?: Record<string, string>;
+        optionalDependencies?: Record<string, string>;
+      }>(path.join(templateRoot, template, "package.json"));
+      expect(collectInternalDependencies(packageJson)).toEqual(expected);
+    }
+  });
+
+  it("should_include_public_dependencies_in_react_vite_counter_template", async () => {
     const templatePackageJsonPath = path.resolve(
       __dirname,
       "../../../templates/react-vite-counter/package.json"
     );
-    const packageJson = JSON.parse(await readFile(templatePackageJsonPath, "utf8")) as {
+    const packageJson = await readPackageJson<{
       dependencies?: Record<string, string>;
-      devDependencies?: Record<string, string>;
-    };
+    }>(templatePackageJsonPath);
 
-    expect(packageJson.dependencies?.["@kaleido-xlm/client"]).toBe("^0.1.0");
     expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
   });
 

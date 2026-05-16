@@ -8,10 +8,10 @@
     "kaleido:deploy": "kaleido deploy --network testnet"
   },
   "dependencies": {
-    "@kaleido-xlm/core": "^0.1.0"
+    "@kaleido-xlm/core": "^0.1.3"
   },
   "devDependencies": {
-    "@kaleido-xlm/cli": "^0.1.0",
+    "@kaleido-xlm/cli": "^0.1.3",
     "typescript": "^5.7.2"
   }
 }

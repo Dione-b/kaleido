@@ -12,8 +12,8 @@
     "kaleido:generate": "kaleido generate counter"
   },
   "dependencies": {
-    "@kaleido-xlm/client": "^0.1.0",
-    "@kaleido-xlm/core": "^0.1.0",
+    "@kaleido-xlm/client": "^0.1.3",
+    "@kaleido-xlm/core": "^0.1.3",
     "@stellar/freighter-api": "^4.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.0.6",
@@ -21,7 +21,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@kaleido-xlm/cli": "^0.1.0",
+    "@kaleido-xlm/cli": "^0.1.3",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "typescript": "^5.7.2"

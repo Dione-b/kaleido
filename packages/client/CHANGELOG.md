@@ -1,5 +1,13 @@
 # @kaleido-xlm/client
 
+## 0.1.3
+
+### Patch Changes
+
+- fix release validation so packed CLI tarballs must include bundled templates and consumer init is exercised without KALEIDO_TEMPLATES_DIR
+- Updated dependencies
+  - @kaleido-xlm/core@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
