@@ -1,7 +1,7 @@
 {
   "name": "@kaleido-xlm/client",
   "version": "0.1.2",
-  "description": "Browser and Node client for Soroban smart contracts — connects generated bindings, Kaleido artifacts, and wallet adapters",
+  "description": "Browser and Node client for Soroban smart contracts — connects generated bindings, Kaleido Stellar artifacts, and wallet adapters",
   "keywords": [
     "stellar",
     "soroban",
@@ -19,7 +19,7 @@
     "directory": "packages/client"
   },
   "homepage": "https://github.com/Dione-b/kaleido#readme",
-  "author": "Kaleido contributors",
+  "author": "Kaleido Stellar contributors",
   "license": "MIT",
   "engines": {
     "node": ">=20"

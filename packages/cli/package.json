@@ -1,7 +1,7 @@
 {
   "name": "@kaleido-xlm/cli",
   "version": "0.1.2",
-  "description": "Developer toolkit CLI for building dApps on Stellar/Soroban",
+  "description": "Kaleido Stellar CLI for building dApps on Stellar/Soroban",
   "keywords": [
     "stellar",
     "soroban",
@@ -18,7 +18,7 @@
     "directory": "packages/cli"
   },
   "homepage": "https://github.com/Dione-b/kaleido#readme",
-  "author": "Kaleido contributors",
+  "author": "Kaleido Stellar contributors",
   "license": "MIT",
   "engines": {
     "node": ">=20"
