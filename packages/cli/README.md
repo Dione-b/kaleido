@@ -15,11 +15,11 @@ Inside a generated project, prefer `npx caatinga` so the project-local workflow 
 
 - Node.js `>=20`
 - [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) `>=23.0.0` and `<=25.2.0` on `PATH` (22.x breaks `caatinga invoke` signing)
-- Rust stable and the `wasm32-unknown-unknown` target (contract builds)
+- Rust 1.84.0 or newer with the `wasm32v1-none` target (contract builds)
 - A funded Stellar CLI identity for `deploy` and `invoke` (for example `alice`)
 
 ```bash
-rustup target add wasm32-unknown-unknown
+rustup target add wasm32v1-none
 stellar keys generate alice --fund --network testnet
 ```
 

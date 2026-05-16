@@ -20,7 +20,7 @@ npm install -g @caatinga/cli
 
 - Node.js 20+
 - [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) 23.x–25.2.x on your `PATH` (22.x breaks `caatinga invoke`)
-- Rust + `wasm32-unknown-unknown` (to compile contracts)
+- Rust 1.84.0 or newer with the wasm32v1-none target.
 - A funded Stellar CLI identity (e.g. `alice`)
 
 ```bash

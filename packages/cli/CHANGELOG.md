@@ -31,7 +31,7 @@
 ### Patch Changes
 
 - fix release validation so packed CLI tarballs must include bundled templates and consumer init is exercised without CAATINGA_TEMPLATES_DIR
-- update the generated contract build-path and Stellar CLI compatibility notes to match the supported `wasm32-unknown-unknown` flow and the current maximum tested Stellar CLI version `25.2.0`
+- update the generated contract build-path and Stellar CLI compatibility notes to match the then-supported Stellar CLI flow and the current maximum tested Stellar CLI version `25.2.0`
 - Updated dependencies
   - @caatinga/core@0.1.3
 

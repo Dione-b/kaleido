@@ -55,6 +55,6 @@ await client.contract("counter").invoke("increment");
 ## Requirements
 
 - Node.js ≥ 20
-- Rust with the `wasm32-unknown-unknown` target for the supported Stellar CLI 22.x flow
-- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) ≥ 22.0.0
+- Rust 1.84.0 or newer with the `wasm32v1-none` target
+- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) `>=23.0.0` and `<=25.2.0`
 - A Stellar CLI identity for deploy/invoke operations

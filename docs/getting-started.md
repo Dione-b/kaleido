@@ -6,15 +6,14 @@ Caatinga alpha supports the CLI path first, then optional browser/client integra
 
 - Node.js 20+
 - pnpm 9+ for repository development
-- Rust stable
-- `wasm32-unknown-unknown` Rust target
+- Rust 1.84.0 or newer with the wasm32v1-none target.
 - Stellar CLI
 - A local Stellar CLI identity for CLI deploy/invoke, for example `alice`
 - Optional: Freighter or another wallet adapter for browser-side `@caatinga/client` calls
 
 ```bash
 rustc --version
-rustup target add wasm32-unknown-unknown
+rustup target add wasm32v1-none
 stellar --version
 ```
 
