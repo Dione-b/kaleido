@@ -12,7 +12,7 @@ describe("isCoreVersionCompatible", () => {
   });
 
   it("uses the centralized core version by default", () => {
-    expect(KALEIDO_CORE_VERSION).toBe("0.1.0");
+    expect(KALEIDO_CORE_VERSION).toBe("0.1.4");
     expect(isCoreVersionCompatible("^0.1.0")).toBe(true);
   });
 });

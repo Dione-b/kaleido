@@ -1,5 +1,12 @@
 # @kaleido-xlm/cli
 
+## 0.1.4
+
+### Patch Changes
+
+- Fix the published CLI version output and normalize absolute init paths to project directory names.
+  - @kaleido-xlm/core@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

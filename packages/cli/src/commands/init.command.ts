@@ -14,21 +14,23 @@ export function registerInitCommand(program: Command): void {
     .action((projectName: string, options: { template: string }) => runCliAction(async () => {
       const templateDir = await resolveTemplateDir(options.template);
       const targetDir = path.resolve(process.cwd(), projectName);
+      const normalizedProjectName = path.basename(targetDir);
+      const projectDirectory = path.isAbsolute(projectName) ? targetDir : projectName;
 
       const result = await createProjectFromTemplate({
-        projectName,
+        projectName: normalizedProjectName,
         targetDir,
         templateDir
       });
 
       logger.success("Project created");
       logger.info("");
-      logger.info(`Project: ${projectName}`);
+      logger.info(`Project: ${normalizedProjectName}`);
       logger.info(`Template: ${result.template.name}@${result.template.version}`);
       logger.info(`Path: ${targetDir}`);
       logger.info("");
       logger.info("Next steps:");
-      logger.info(`  cd ${projectName}`);
+      logger.info(`  cd ${projectDirectory}`);
       logger.info("  npm install");
       logger.info("  npx kaleido build counter");
     }));
