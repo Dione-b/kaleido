@@ -1,5 +1,11 @@
 # @caatinga/core
 
+## 0.2.0
+
+### Minor Changes
+
+- Initial release of Caatinga — developer toolkit for building dApps on Stellar/Soroban.
+
 ## 0.1.4
 
 ## 0.1.3
