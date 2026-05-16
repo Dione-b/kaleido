@@ -1,6 +1,19 @@
 {
   "name": "@kaleido/core",
   "version": "0.1.0",
+  "description": "Core config, artifacts, command orchestration, and error primitives for Kaleido Stellar/Soroban toolkit",
+  "keywords": ["stellar", "soroban", "dapp", "smart-contracts", "blockchain", "artifacts", "kaleido"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dione-b/kaleido.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Dione-b/kaleido#readme",
+  "author": "Kaleido contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

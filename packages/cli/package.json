@@ -1,6 +1,19 @@
 {
   "name": "@kaleido/cli",
   "version": "0.1.0",
+  "description": "Developer toolkit CLI for building dApps on Stellar/Soroban",
+  "keywords": ["stellar", "soroban", "cli", "dapp", "smart-contracts", "blockchain", "web3", "kaleido"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dione-b/kaleido.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/Dione-b/kaleido#readme",
+  "author": "Kaleido contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "bin": {
     "kaleido": "./dist/index.js"

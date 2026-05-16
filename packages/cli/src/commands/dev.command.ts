@@ -11,3 +11,5 @@ export function registerDevCommand(program: Command): void {
       logger.info("Use kaleido build, deploy, generate, and invoke directly.");
     }));
 }
+
+
