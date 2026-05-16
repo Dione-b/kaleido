@@ -1,5 +1,7 @@
 # @caatinga/cli
 
+Developer toolkit for Stellar / Soroban dApps — `init`, `build`, `deploy`, `generate`, and `invoke`.
+
 ## Install
 
 ```bash
@@ -7,62 +9,120 @@ npm install -g @caatinga/cli
 caatinga --help
 ```
 
+Inside a generated project, prefer `npx caatinga` so the project-local workflow stays explicit.
+
 ## Requirements
 
 - Node.js `>=20`
-- Stellar CLI `>=22.0.0` and `<=25.2.0` available on `PATH`
-- A Caatinga project with `caatinga.config.ts` for project commands such as `build`, `deploy`, `generate`, and `invoke`
+- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) `>=22.0.0` and `<=25.2.0` on `PATH`
+- Rust stable and the `wasm32-unknown-unknown` target (contract builds)
+- A funded Stellar CLI identity for `deploy` and `invoke` (for example `alice`)
 
-If your local machine is on a newer Stellar CLI, `--allow-untested-stellar-cli` is the local-only escape hatch. CI and release workflows should stay on the supported range.
+```bash
+rustup target add wasm32-unknown-unknown
+stellar keys generate alice --fund --network testnet
+```
+
+If your machine runs a newer Stellar CLI, `--allow-untested-stellar-cli` is the local-only escape hatch. CI and release workflows must stay on the supported range.
+
+## Quick start
+
+```bash
+caatinga init my-dapp
+cd my-dapp
+npm install
+
+npx caatinga build counter
+npx caatinga deploy counter --network testnet --source alice
+npx caatinga generate counter --network testnet
+npx caatinga invoke counter.increment --network testnet --source alice
+```
+
+`deploy` writes contract IDs to `caatinga.artifacts.json`. `generate` creates TypeScript bindings under the path configured in `caatinga.config.ts` (templates default to `contracts/generated/`).
 
 ## Commands
 
-- `caatinga init <projectName>` creates a project from a bundled template and writes `caatinga.artifacts.json`
-- `caatinga build [contract]` builds one configured contract through Stellar CLI and defaults to `counter` when omitted
-- `caatinga deploy [contract] --source <identity> [--network <network>] [--force] [--no-deps]` deploys contracts and records contract IDs in `caatinga.artifacts.json`
-- `caatinga generate <contract> [--network <network>]` generates TypeScript bindings from a deployed contract ID
-- `caatinga invoke <contract.method> --source <identity> [args...]` invokes a deployed contract method through the configured workflow
+| Command | What it does |
+| --- | --- |
+| `caatinga init <projectName>` | Create a project from a bundled template and write `caatinga.artifacts.json` |
+| `caatinga build [contract]` | Compile contract WASM through Stellar CLI (default contract: `counter`) |
+| `caatinga deploy [contract]` | Deploy one contract or the full configured graph; record IDs in artifacts |
+| `caatinga generate <contract>` | Generate TypeScript bindings from a deployed contract ID |
+| `caatinga invoke <contract.method>` | Invoke a deployed contract method; extra args forward to Stellar CLI |
 
 The supported CLI flow is `init -> build -> deploy -> generate -> invoke`.
 
-## Supported Inputs
+### `init`
 
-- `--source` accepts a Stellar CLI identity alias (for example `alice`) that can sign transactions; public `G...` addresses are rejected
-- `--network <network>` selects a configured network such as `testnet`
-- `invoke` expects a `<contract.method>` target and forwards extra args to the underlying Stellar contract invocation
-- `deploy --no-deps` is supported only when deploying a single named contract
+- `-t, --template <name>` selects a bundled template (default: `react-vite-counter`)
+- Official templates: `react-vite-counter` (single counter dApp), `marketplace-with-token` (experimental multi-contract layout with `dependsOn` and deploy-arg placeholders)
+- `init` validates `caatinga.template.json` before copying files
+
+### `build`
+
+- `[contract]` defaults to `counter` when omitted
+- `--allow-untested-stellar-cli` allows a Stellar CLI newer than Caatinga's tested maximum (local only)
+
+### `deploy`
+
+- Omit `[contract]` to deploy the full configured dependency graph
+- `-n, --network <network>` selects a network from `caatinga.config.ts` (for example `testnet`)
+- `-s, --source <identity>` is required; must be a Stellar CLI identity alias that can sign (for example `alice`)
+- `--force` redeploys even when artifacts already store a contract ID
+- `--no-deps` skips dependency deployment for a single named contract (`--no-deps` requires `[contract]`)
+- `--allow-untested-stellar-cli` for local experiments only
+
+Dependencies listed in `dependsOn` deploy first unless `--no-deps` is set. Deploy args may reference `${contracts.<name>.contractId}` placeholders resolved from artifacts.
+
+### `generate` and `invoke`
+
+- `-n, --network <network>` selects the network used to resolve deployed contract IDs
+- `invoke` expects `<contract.method>` (for example `counter.increment`) and forwards `[args...]` to the underlying Stellar invocation
+- Both accept `--allow-untested-stellar-cli` for local experiments only
+
+`caatinga dev` is reserved, hidden in pre-v1 builds, and not part of the stability promise. Use your frontend dev server (for example Vite) alongside the commands above.
+
+## Supported inputs
+
+- `--source` accepts a Stellar CLI identity alias that can sign transactions; public `G...` addresses and secret keys are rejected
+- `--network` must match a network defined in `caatinga.config.ts`
+- Project commands require `caatinga.config.ts` in the working directory
 
 Unsupported input posture:
 
 - secret keys and seed phrases are not supported CLI inputs
-- undocumented private flags or internal repo file paths are not part of the package contract
+- undocumented private flags, internal repo paths, and hidden commands are not part of the package contract
 
-## Error Behavior
+## Error behavior
 
-`@caatinga/cli` emits documented `CAATINGA_*` error codes for automation. Consumers should match on the error code, not human-readable text.
+`@caatinga/cli` emits documented `CAATINGA_*` error codes for automation. Match on the error code, not human-readable text.
 
-Common codes include:
+Common codes:
 
-- `CAATINGA_CONFIG_NOT_FOUND`
-- `CAATINGA_INVALID_CONFIG`
-- `CAATINGA_STELLAR_CLI_NOT_FOUND`
-- `CAATINGA_BUILD_FAILED`
-- `CAATINGA_DEPLOY_FAILED`
-- `CAATINGA_BINDINGS_FAILED`
-- `CAATINGA_INVOKE_FAILED`
-- `CAATINGA_CONTRACT_ID_NOT_FOUND`
-- `CAATINGA_SOURCE_ACCOUNT_REQUIRED`
-- `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND`
-- `CAATINGA_TEMPLATE_INCOMPATIBLE`
+- `CAATINGA_CONFIG_NOT_FOUND`, `CAATINGA_INVALID_CONFIG`
+- `CAATINGA_STELLAR_CLI_NOT_FOUND`, `CAATINGA_UNSUPPORTED_CLI_VERSION`, `CAATINGA_UNTESTED_CLI_VERSION`
+- `CAATINGA_BUILD_FAILED`, `CAATINGA_DEPLOY_FAILED`, `CAATINGA_BINDINGS_FAILED`, `CAATINGA_INVOKE_FAILED`
+- `CAATINGA_CONTRACT_ID_NOT_FOUND`, `CAATINGA_SOURCE_ACCOUNT_REQUIRED`, `CAATINGA_UNSAFE_SOURCE_ACCOUNT`
+- `CAATINGA_CONTRACT_DEPENDENCY_NOT_FOUND`, `CAATINGA_CONTRACT_DEPENDENCY_CYCLE`
+- `CAATINGA_DEPLOY_ARG_PLACEHOLDER_INVALID`, `CAATINGA_DEPLOY_ARG_PLACEHOLDER_UNRESOLVED`
+- `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND`, `CAATINGA_TEMPLATE_INCOMPATIBLE`
 
-## Relationship To `@caatinga/core`
+Full table: [docs/errors.md](https://github.com/Dione-b/caatinga/blob/main/docs/errors.md)
 
-`@caatinga/cli` is the supported end-user entrypoint for Caatinga's command workflow. It intentionally stays thin and delegates config loading, artifacts, command orchestration, and shared error primitives to `@caatinga/core`.
+## Browser and client apps
 
-If you want the stable packaged workflow, prefer the CLI contract over importing `@caatinga/core` directly.
+For wallet-backed invocation in the browser, use [`@caatinga/client`](https://www.npmjs.com/package/@caatinga/client) with generated bindings and `caatinga.artifacts.json`.
 
-## Versioning And Stability
+## Relationship to `@caatinga/core`
 
-This package is the primary supported consumer surface for the Caatinga workflow. Stability applies to the documented commands, inputs, and `CAATINGA_*` error contract.
+`@caatinga/cli` is the supported end-user entrypoint. It stays thin and delegates config loading, artifacts, command orchestration, Stellar CLI version checks, and shared errors to `@caatinga/core`.
 
-Undocumented internals, private module paths, and reserved hidden commands such as `caatinga dev` are not part of the stability promise.
+Prefer the CLI contract over importing `@caatinga/core` directly unless you are building advanced tooling on Caatinga internals.
+
+## Versioning and stability
+
+Stability applies to the documented commands, inputs, templates bundled with the published CLI, and `CAATINGA_*` error codes.
+
+Undocumented internals, private module paths, and hidden commands such as `caatinga dev` are not part of the stability promise.
+
+Further reference: [CLI docs](https://github.com/Dione-b/caatinga/blob/main/docs/cli.md), [config](https://github.com/Dione-b/caatinga/blob/main/docs/config.md), [Stellar CLI version contract](https://github.com/Dione-b/caatinga/blob/main/docs/stellar-cli-version-contract.md).
