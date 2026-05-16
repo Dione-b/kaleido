@@ -51,7 +51,10 @@ describe("getTemplateCompatibilityIssue", () => {
       contracts: {
         path: "contracts"
       },
-      files: {}
+      files: {
+        config: "caatinga.config.ts",
+        artifacts: "caatinga.artifacts.json"
+      }
     }, "0.2.0");
 
     expect(issue).toEqual({
