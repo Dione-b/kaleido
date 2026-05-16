@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "build": "turbo build",
-    "dev": "pnpm --filter @kaleido/cli dev",
+    "dev": "pnpm --filter @kaleido-xlm/cli dev",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "knip": "knip --no-config-hints",

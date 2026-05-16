@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido/core";
+import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido-xlm/core";
 import { createKaleidoClient } from "./create-kaleido-client.js";
 
 const artifacts: KaleidoArtifacts = {

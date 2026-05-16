@@ -10,7 +10,7 @@ Error codes are public API. If user-facing errors are undocumented or unstable, 
 
 ## Goal
 
-Every user-facing failure path in `@kaleido/cli`, `@kaleido/core`, and `@kaleido/client` must expose a documented `KALEIDO_*` code.
+Every user-facing failure path in `@kaleido-xlm/cli`, `@kaleido-xlm/core`, and `@kaleido-xlm/client` must expose a documented `KALEIDO_*` code.
 
 ## Scope
 

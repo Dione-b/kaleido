@@ -17,8 +17,8 @@ If parsing and subprocess details leak into the CLI or userland, the project bec
 ## Decision
 
 1. **User-visible stability** is defined at the **Kaleido CLI command surface** and the **serialized project files** (`kaleido.config.ts`, `kaleido.artifacts.json`), not at every Stellar CLI flag.
-2. **All adaptation** to Stellar CLI invocation, stdout/stderr interpretation, and path normalization lives in **`@kaleido/core`**, behind a small shell abstraction (`run-command` and contract/network helpers).
-3. **`@kaleido/cli`** remains a thin layer: parse args, print structured errors, call core services.
+2. **All adaptation** to Stellar CLI invocation, stdout/stderr interpretation, and path normalization lives in **`@kaleido-xlm/core`**, behind a small shell abstraction (`run-command` and contract/network helpers).
+3. **`@kaleido-xlm/cli`** remains a thin layer: parse args, print structured errors, call core services.
 4. **Testing** must treat Stellar CLI as an unstable dependency: unit tests plus **versioned fixtures** of CLI output for parsers; CI matrix against supported Stellar CLI versions when feasible.
 
 ## Consequences

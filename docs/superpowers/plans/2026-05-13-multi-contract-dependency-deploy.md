@@ -6,7 +6,7 @@
 
 **Architecture:** O núcleo já concentra `dependsOn` e `deployArgs` em `ContractConfigSchema`, ordenação DFS com detecção de ciclo em `resolveDeployOrder`, resolução estrita de placeholders em `resolveDeployArgs`, orquestração em `deployContractGraph` e persistência de `dependencyGraph` / `dependencies` / `resolvedDeployArgs` via `updateArtifact`. Este plano prioriza **verificação**, **extração do módulo `dependency-graph.ts` como na spec**, **lacunas de teste** (`--force`, deploy completo sem nome de contrato, skip quando artefato existe) e **correção de drift** em `docs/architecture.md` (tabela ADR 0005 ainda marca Draft).
 
-**Tech Stack:** pnpm workspaces, TypeScript, Vitest, Zod (`config` + `artifacts`), Commander (`@kaleido/cli`), `@kaleido/core`.
+**Tech Stack:** pnpm workspaces, TypeScript, Vitest, Zod (`config` + `artifacts`), Commander (`@kaleido-xlm/cli`), `@kaleido-xlm/core`.
 
 **Nota de contexto:** A skill *writing-plans* recomenda worktree dedicado (brainstorming). Use um worktree limpo se a branch atual misturar outras mudanças.
 
@@ -56,7 +56,7 @@ Expected: exit code `0`.
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido/core test
+cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido-xlm/core test
 ```
 
 Expected: Vitest conclui com sucesso; em especial `resolve-deploy-order.test.ts`, `resolve-deploy-args.test.ts`, `deploy-contract-graph.test.ts`, `deploy-contract.test.ts`, `error-surface.test.ts`.
@@ -210,7 +210,7 @@ Substituir o parágrafo:
 por:
 
 ```markdown
-**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido/core` and documented in ADR 0005.
+**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido-xlm/core` and documented in ADR 0005.
 ```
 
 - [ ] **Step 2: Commit**
@@ -463,7 +463,7 @@ Somente se houve correções de última hora.
 
 1. **Spec coverage:** `dependsOn` / grafo acíclico / ordem / placeholders / CLI `--no-deps` / artefatos / códigos de erro / template / ADR → cobertos por baseline + Tasks 2–7.  
 2. **Placeholder scan:** Nenhum TBD; passos com código ou comandos concretos.  
-3. **Consistência:** `buildDependencyGraph` permanece com a mesma assinatura após extração; exports públicos de `@kaleido/core` preservados.
+3. **Consistência:** `buildDependencyGraph` permanece com a mesma assinatura após extração; exports públicos de `@kaleido-xlm/core` preservados.
 
 **Gaps intencionais:** Não duplicar testes já presentes em `resolve-deploy-order.test.ts` e `resolve-deploy-args.test.ts` além do smoke em `dependency-graph.test.ts`.
 

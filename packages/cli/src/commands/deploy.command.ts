@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { deployContractGraph, KaleidoError, KaleidoErrorCode, loadConfig } from "@kaleido/core";
+import { deployContractGraph, KaleidoError, KaleidoErrorCode, loadConfig } from "@kaleido-xlm/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 

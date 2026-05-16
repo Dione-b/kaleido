@@ -6,14 +6,14 @@ This document is the **canonical product and architecture stance** for Kaleido. 
 
 **Kaleido keeps a predictable, reproducible workflow to create, compile, deploy, generate bindings, invoke, and wire browser clients for Soroban contracts—even when Stellar tooling changes operational details.**
 
-That does not mean hiding Stellar reality. Users keep a **stable Kaleido surface** (`kaleido build`, `kaleido deploy`, `kaleido generate`, `kaleido invoke`, `@kaleido/client`). Changes in flags, stdout, paths, transaction/XDR workflow, and subprocess composition are absorbed behind small adapters, not scattered across user scripts.
+That does not mean hiding Stellar reality. Users keep a **stable Kaleido surface** (`kaleido build`, `kaleido deploy`, `kaleido generate`, `kaleido invoke`, `@kaleido-xlm/client`). Changes in flags, stdout, paths, transaction/XDR workflow, and subprocess composition are absorbed behind small adapters, not scattered across user scripts.
 
 ## What Kaleido is (and is not)
 
 | Kaleido is | Kaleido is not |
 |------------|----------------|
 | Convention + orchestration + artifacts + frontend/client integration | A second Soroban/Stellar SDK |
-| A thin CLI over `@kaleido/core` | A place to store private keys or run silent signing |
+| A thin CLI over `@kaleido-xlm/core` | A place to store private keys or run silent signing |
 | Template-driven project scaffolding | A hosted registry required for core workflows (future registries are optional) |
 
 **Primary competitor today:** ad-hoc `package.json` scripts. **Possible later overlap:** meta-frameworks in other ecosystems (e.g. Scaffold-ETH-style), only if the workflow and template story mature.
@@ -22,7 +22,7 @@ That does not mean hiding Stellar reality. Users keep a **stable Kaleido surface
 
 ## Validation roadmap (flows)
 
-1. **Alpha flow (current):** `init → build → deploy → generate → invoke` plus `@kaleido/client` for browser-side binding/artifact/wallet interop.
+1. **Alpha flow (current):** `init → build → deploy → generate → invoke` plus `@kaleido-xlm/client` for browser-side binding/artifact/wallet interop.
 2. **Next architectural proof:** **multi-contract deploy with dependencies** (e.g. deploy token, then marketplace that depends on token’s `contractId`, then generate bindings for both, then invoke across that dependency).
 3. **After that:** upgrade / redeploy with **artifacts history** and clear migration story.
 
@@ -30,9 +30,9 @@ Until (2) is real in the product, treat single-contract demos as necessary but n
 
 ## Package boundaries (monorepo)
 
-- **`@kaleido/cli`:** argument parsing, terminal UX, delegation to core—no subprocess orchestration except through core APIs.
-- **`@kaleido/core`:** load `kaleido.config.ts`, validate schemas, resolve networks/contracts, read/write `kaleido.artifacts.json`, run Stellar CLI and related tools via a **single shell layer** (`run-command.ts`). **All `execa` usage stays here.**
-- **`@kaleido/client`:** thin client/browser interop over generated bindings, artifacts, wallet adapters, `invoke()`, `buildXdr()`, and explicit XDR/raw debug output. It does not own signing keys or serialize SCVal manually.
+- **`@kaleido-xlm/cli`:** argument parsing, terminal UX, delegation to core—no subprocess orchestration except through core APIs.
+- **`@kaleido-xlm/core`:** load `kaleido.config.ts`, validate schemas, resolve networks/contracts, read/write `kaleido.artifacts.json`, run Stellar CLI and related tools via a **single shell layer** (`run-command.ts`). **All `execa` usage stays here.**
+- **`@kaleido-xlm/client`:** thin client/browser interop over generated bindings, artifacts, wallet adapters, `invoke()`, `buildXdr()`, and explicit XDR/raw debug output. It does not own signing keys or serialize SCVal manually.
 - **`packages/templates`:** official templates consumed by `kaleido init` and validated through `kaleido.template.json` before copy.
 
 Deferred unless explicitly rescoped: `kaleido doctor`, CLI XDR commands, `kaleido generate --interop`, full `@kaleido/react` SDK surface, plugin system, RWA-only templates, visual dashboard, custom test runner as **required** core dependencies.
@@ -93,7 +93,7 @@ Kaleido does **not** manage long-lived private keys. CI provides identities (`--
 
 ## Client and frontend SDK
 
-Alpha starts with **`@kaleido/client`**, not React hooks. The client composes generated bindings, artifacts, network config, and wallet adapters. A future `@kaleido/react` should be thin hooks over this layer and generated bindings: wallet wiring, loading/error helpers, and network context. Avoid a parallel generic Soroban client that bypasses generated types.
+Alpha starts with **`@kaleido-xlm/client`**, not React hooks. The client composes generated bindings, artifacts, network config, and wallet adapters. A future `@kaleido/react` should be thin hooks over this layer and generated bindings: wallet wiring, loading/error helpers, and network context. Avoid a parallel generic Soroban client that bypasses generated types.
 
 ## DX beyond CLI
 
@@ -107,7 +107,7 @@ Stable **`KALEIDO_*` codes** are part of the contract for CI, support, and docs.
 
 Layered approach:
 
-1. Unit tests in `@kaleido/core`.
+1. Unit tests in `@kaleido-xlm/core`.
 2. **Fixtures** of Stellar CLI stdout/stderr per supported CLI generation (parsing is the fragile boundary).
 3. Contract tests with **pinned** Stellar CLI versions in CI.
 4. Optional scheduled smoke against testnet.
@@ -137,7 +137,7 @@ Semver applies to monorepo packages **and** to serialized formats (`kaleido.arti
 | [0004](./adr/0004-error-codes-as-public-api.md) | Accepted | Stable `KALEIDO_*` error codes and migration |
 | [0005](./adr/0005-multi-contract-dependency-deploy.md) | Accepted | Multi-contract `dependsOn` and contractId injection |
 
-**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido/core` and documented in ADR 0005.
+**0001–0005** are ratified; multi-contract deploy sequencing and placeholder resolution are implemented in `@kaleido-xlm/core` and documented in ADR 0005.
 
 ## Related docs
 

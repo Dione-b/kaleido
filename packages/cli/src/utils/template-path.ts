@@ -1,7 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { KaleidoError, KaleidoErrorCode } from "@kaleido/core";
+import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
 
 export async function resolveTemplateDir(templateName: string): Promise<string> {
   const envTemplatesDir = process.env.KALEIDO_TEMPLATES_DIR;

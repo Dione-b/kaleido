@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Prepare an auditable internal `v0.1.0-alpha` release that includes the CLI/core MVP, `@kaleido/client`, and a counter template smoke path.
+**Goal:** Prepare an auditable internal `v0.1.0-alpha` release that includes the CLI/core MVP, `@kaleido-xlm/client`, and a counter template smoke path.
 
 **Architecture:** Keep the release gate deterministic: unit tests and workspace build run without testnet, wallet, or secret keys. The template/client confidence comes from static package/docs checks plus documented manual smoke steps, not from live network CI.
 
@@ -40,7 +40,7 @@ it("should_include_client_dependencies_in_react_vite_counter_template", async ()
     devDependencies?: Record<string, string>;
   };
 
-  expect(packageJson.dependencies?.["@kaleido/client"]).toBe("^0.1.0");
+  expect(packageJson.dependencies?.["@kaleido-xlm/client"]).toBe("^0.1.0");
   expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
 });
 ```
@@ -50,10 +50,10 @@ it("should_include_client_dependencies_in_react_vite_counter_template", async ()
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/templates/create-project-from-template.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/templates/create-project-from-template.test.ts
 ```
 
-Expected: FAIL because `packages/templates/react-vite-counter/package.json` does not yet include `@kaleido/client` or `@stellar/freighter-api`.
+Expected: FAIL because `packages/templates/react-vite-counter/package.json` does not yet include `@kaleido-xlm/client` or `@stellar/freighter-api`.
 
 - [ ] **Step 3: Add template dependencies**
 
@@ -61,8 +61,8 @@ Change `packages/templates/react-vite-counter/package.json` dependencies to incl
 
 ```json
 "dependencies": {
-  "@kaleido/client": "^0.1.0",
-  "@kaleido/core": "^0.1.0",
+  "@kaleido-xlm/client": "^0.1.0",
+  "@kaleido-xlm/core": "^0.1.0",
   "@stellar/freighter-api": "^4.0.0",
   "@vitejs/plugin-react": "^4.3.4",
   "vite": "^6.0.6",
@@ -76,7 +76,7 @@ Change `packages/templates/react-vite-counter/package.json` dependencies to incl
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/templates/create-project-from-template.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/templates/create-project-from-template.test.ts
 ```
 
 Expected: PASS.
@@ -122,8 +122,8 @@ Use a Stellar CLI identity alias or public account address for `--source`; do no
 After `kaleido generate`, wire generated bindings to the client:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 
@@ -196,9 +196,9 @@ Internal alpha release for Kaleido.
 
 ## Included
 
-- `@kaleido/cli`
-- `@kaleido/core`
-- `@kaleido/client`
+- `@kaleido-xlm/cli`
+- `@kaleido-xlm/core`
+- `@kaleido-xlm/client`
 - `react-vite-counter` official template
 
 ## Supported Alpha Flow
@@ -213,7 +213,7 @@ kaleido invoke counter.increment --network testnet --source <identity-or-G-addre
 
 ## Client Alpha Flow
 
-`@kaleido/client` supports generated binding registration, artifact-based `contractId` lookup, wallet signing through `KaleidoWalletAdapter`, `invoke()`, `buildXdr()`, and explicit `debugXdr`/`debugRaw` output.
+`@kaleido-xlm/client` supports generated binding registration, artifact-based `contractId` lookup, wallet signing through `KaleidoWalletAdapter`, `invoke()`, `buildXdr()`, and explicit `debugXdr`/`debugRaw` output.
 
 ## Non-goals
 
@@ -240,7 +240,7 @@ pnpm test
 
 - `react-vite-counter` uses `wasm32v1-none`.
 - `react-vite-counter` documents `init -> build -> deploy -> generate -> invoke`.
-- `react-vite-counter` documents `@kaleido/client` with generated bindings, artifacts, and Freighter.
+- `react-vite-counter` documents `@kaleido-xlm/client` with generated bindings, artifacts, and Freighter.
 - No default CI step requires testnet, Freighter, or secret keys.
 
 ## Tag
@@ -304,7 +304,7 @@ Run:
 pnpm typecheck
 ```
 
-Expected: PASS for `@kaleido/core`, `@kaleido/client`, and `@kaleido/cli`.
+Expected: PASS for `@kaleido-xlm/core`, `@kaleido-xlm/client`, and `@kaleido-xlm/cli`.
 
 - [ ] **Step 3: Verify build**
 
@@ -314,7 +314,7 @@ Run:
 pnpm build
 ```
 
-Expected: PASS for `@kaleido/core`, `@kaleido/client`, and `@kaleido/cli`.
+Expected: PASS for `@kaleido-xlm/core`, `@kaleido-xlm/client`, and `@kaleido-xlm/cli`.
 
 - [ ] **Step 4: Verify tests**
 
@@ -411,7 +411,7 @@ Do not create the tag unless explicitly instructed.
 
 ## Self-Review
 
-- Spec coverage: covers `@kaleido/client` inclusion, README/client/errors docs, template compatibility, deterministic CI, frozen install, full checks, release notes, and auditable working tree.
+- Spec coverage: covers `@kaleido-xlm/client` inclusion, README/client/errors docs, template compatibility, deterministic CI, frozen install, full checks, release notes, and auditable working tree.
 - Scope control: excludes `doctor`, CLI XDR, `generate --interop`, React hooks, multi-contract deploy, live testnet CI, and npm publishing.
 - Placeholder scan: no `TBD`, no `TODO`, no unbounded "handle/process" requirements.
 - Type consistency: client package names, command names, release tag, and file paths match the approved spec.

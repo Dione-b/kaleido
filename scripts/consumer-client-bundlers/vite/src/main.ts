@@ -1,3 +1,3 @@
-import { createKaleidoClient } from "@kaleido/client";
+import { createKaleidoClient } from "@kaleido-xlm/client";
 
 console.log(typeof createKaleidoClient);

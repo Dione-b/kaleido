@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Garantir que todo caminho de falha voltado ao usuário em `@kaleido/cli`, `@kaleido/core` e `@kaleido/client` exponha um código `KALEIDO_*` estável via `KaleidoError`, com enum centralizado, documentação completa, política de semver publicada e testes que disparem cada código exportado.
+**Goal:** Garantir que todo caminho de falha voltado ao usuário em `@kaleido-xlm/cli`, `@kaleido-xlm/core` e `@kaleido-xlm/client` exponha um código `KALEIDO_*` estável via `KaleidoError`, com enum centralizado, documentação completa, política de semver publicada e testes que disparem cada código exportado.
 
 **Architecture:** Manter `KaleidoError` como tipo único de falha pública; centralizar strings de código em `KaleidoErrorCode` (arquivo dedicado); estender `runCommand` (e pontos do client) com códigos de falha específicos onde hoje só existe `COMMAND_FAILED` ou erro genérico; reforçar invariantes com testes estáticos (árvore de fontes) e testes de comportamento por código.
 
-**Tech Stack:** TypeScript, pnpm, Vitest, turbo, execa (via `runCommand`), workspaces `@kaleido/core` / `@kaleido/client` / `@kaleido/cli`.
+**Tech Stack:** TypeScript, pnpm, Vitest, turbo, execa (via `runCommand`), workspaces `@kaleido-xlm/core` / `@kaleido-xlm/client` / `@kaleido-xlm/cli`.
 
 ---
 
@@ -40,7 +40,7 @@
 
 - Create: `packages/core/src/errors/KaleidoErrorCode.ts`
 - Modify: `packages/core/src/errors/KaleidoError.ts` (remover objeto `KaleidoErrorCode`; importar tipo/const; reexportar)
-- Test: `pnpm --filter @kaleido/core exec vitest run packages/core/src/errors/error-surface.test.ts` (ajustar path relativo ao cwd do pacote)
+- Test: `pnpm --filter @kaleido-xlm/core exec vitest run packages/core/src/errors/error-surface.test.ts` (ajustar path relativo ao cwd do pacote)
 
 - [ ] **Step 1: Criar `KaleidoErrorCode.ts` com o conteúdo completo abaixo**
 
@@ -128,8 +128,8 @@ export function toKaleidoError(error: unknown): KaleidoError {
 Run (a partir da raiz do monorepo):
 
 ```bash
-pnpm --filter @kaleido/core run typecheck
-pnpm --filter @kaleido/core run test
+pnpm --filter @kaleido-xlm/core run typecheck
+pnpm --filter @kaleido-xlm/core run test
 ```
 
 Expected: PASS (imports `../errors/KaleidoError.js` continuam recebendo `KaleidoErrorCode` via reexport).
@@ -191,7 +191,7 @@ describe("runCommand", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core exec vitest run src/shell/run-command.test.ts -v
+pnpm --filter @kaleido-xlm/core exec vitest run src/shell/run-command.test.ts -v
 ```
 
 Expected: FAIL (propriedade `failureCode` ainda não existe).
@@ -247,8 +247,8 @@ failureCode: KaleidoErrorCode.INVOKE_FAILED
 - [ ] **Step 4: Rodar testes**
 
 ```bash
-pnpm --filter @kaleido/core exec vitest run src/shell/run-command.test.ts -v
-pnpm --filter @kaleido/core run test
+pnpm --filter @kaleido-xlm/core exec vitest run src/shell/run-command.test.ts -v
+pnpm --filter @kaleido-xlm/core run test
 ```
 
 Expected: PASS.
@@ -289,7 +289,7 @@ Ajustar `baseConfig` / `tmpDir` / wasm existente como nos testes atuais do arqui
 Run:
 
 ```bash
-pnpm --filter @kaleido/core exec vitest run src/contracts/build-contract.test.ts -v
+pnpm --filter @kaleido-xlm/core exec vitest run src/contracts/build-contract.test.ts -v
 ```
 
 Expected: FAIL até a implementação existir.
@@ -312,7 +312,7 @@ Preferir checagem determinística: se o projeto já tiver helper, reutilizar; se
 - [ ] **Step 3: Rodar testes e commit**
 
 ```bash
-pnpm --filter @kaleido/core exec vitest run src/contracts/build-contract.test.ts -v
+pnpm --filter @kaleido-xlm/core exec vitest run src/contracts/build-contract.test.ts -v
 git add packages/core/src/contracts/build-contract.ts packages/core/src/contracts/build-contract.test.ts
 git commit -m "feat: surface missing wasm target as KALEIDO_RUST_TARGET_NOT_FOUND"
 ```
@@ -349,7 +349,7 @@ Manter `TEMPLATE_INCOMPATIBLE` apenas para versão de template / core incompatí
 - [ ] **Step 4: Testes + commit**
 
 ```bash
-pnpm --filter @kaleido/core exec vitest run src/templates/create-project-from-template.test.ts -v
+pnpm --filter @kaleido-xlm/core exec vitest run src/templates/create-project-from-template.test.ts -v
 git add packages/core/src/templates/create-project-from-template.ts packages/core/src/templates/create-project-from-template.test.ts docs/errors.md
 git commit -m "fix: classify invalid template manifests as KALEIDO_INVALID_TEMPLATE_MANIFEST"
 ```
@@ -368,7 +368,7 @@ git commit -m "fix: classify invalid template manifests as KALEIDO_INVALID_TEMPL
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "@kaleido/core";
+import { KaleidoErrorCode } from "@kaleido-xlm/core";
 import { buildXdr } from "./build-xdr.js";
 
 describe("buildXdr", () => {
@@ -433,7 +433,7 @@ Manter teste com objeto de retorno vazio `{}` que deve disparar o código (ajust
 - [ ] **Step 5: Rodar testes do client**
 
 ```bash
-pnpm --filter @kaleido/client run test
+pnpm --filter @kaleido-xlm/client run test
 ```
 
 - [ ] **Step 6: Commit**
@@ -483,7 +483,7 @@ Com `failureCode` já implementado, um teste em `run-command.test.ts` **sem** `f
 Run:
 
 ```bash
-pnpm --filter @kaleido/core run test
+pnpm --filter @kaleido-xlm/core run test
 ```
 
 - [ ] **Step 5: Commit**
@@ -595,7 +595,7 @@ Manter teste existente que proíbe `,"KALEIDO_` literal (força `KaleidoErrorCod
 - [ ] **Step 3: Rodar**
 
 ```bash
-pnpm --filter @kaleido/core run test
+pnpm --filter @kaleido-xlm/core run test
 ```
 
 - [ ] **Step 4: Commit**

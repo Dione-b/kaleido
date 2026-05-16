@@ -10,14 +10,14 @@ Accepted
 
 ## Context
 
-Official and community templates need a **declared contract** against `@kaleido/core` / CLI versions. Without a manifest, `kaleido init` relies on implicit directory layout and human documentation, which drifts and breaks semver intent.
+Official and community templates need a **declared contract** against `@kaleido-xlm/core` / CLI versions. Without a manifest, `kaleido init` relies on implicit directory layout and human documentation, which drifts and breaks semver intent.
 
 ## Decision
 
 Each template must include **`kaleido.template.json`**, including:
 
 - Template name and semver.
-- **`kaleido.compatibleCore`** (or equivalent) range for supported `@kaleido/core` versions.
+- **`kaleido.compatibleCore`** (or equivalent) range for supported `@kaleido-xlm/core` versions.
 - Declared paths: contracts root, `kaleido.config.ts`, `kaleido.artifacts.json`, frontend kind (`vite-react`, etc.).
 
 `kaleido init` validates compatibility before copy and fails with:

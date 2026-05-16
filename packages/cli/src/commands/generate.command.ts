@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { generateBindings, loadConfig } from "@kaleido/core";
+import { generateBindings, loadConfig } from "@kaleido-xlm/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 

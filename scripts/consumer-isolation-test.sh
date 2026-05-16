@@ -33,8 +33,8 @@ npm init -y >/dev/null
 export KALEIDO_TEMPLATES_DIR="$ROOT_DIR/packages/templates"
 npm install "$PACKED_DIR"/kaleido-core-*.tgz "$PACKED_DIR"/kaleido-client-*.tgz "$PACKED_DIR"/kaleido-cli-*.tgz
 
-node --input-type=module -e 'import { defineConfig } from "@kaleido/core"; console.log(typeof defineConfig)'
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido/client"; console.log(typeof createKaleidoClient)'
+node --input-type=module -e 'import { defineConfig } from "@kaleido-xlm/core"; console.log(typeof defineConfig)'
+node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
 npx kaleido --version
 npx kaleido init test-app --template react-vite-counter
 test -f test-app/kaleido.config.ts
@@ -57,13 +57,13 @@ export KALEIDO_PATCH_CLI="file:$(realpath "${_kcli[0]}")"
 node --input-type=module -e "
 import { readFileSync, writeFileSync } from \"node:fs\";
 const pj = JSON.parse(readFileSync(\"package.json\", \"utf8\"));
-pj.dependencies[\"@kaleido/core\"] = process.env.KALEIDO_PATCH_CORE;
-pj.dependencies[\"@kaleido/client\"] = process.env.KALEIDO_PATCH_CLIENT;
-if (pj.devDependencies && Object.prototype.hasOwnProperty.call(pj.devDependencies, \"@kaleido/cli\")) {
-  pj.devDependencies[\"@kaleido/cli\"] = process.env.KALEIDO_PATCH_CLI;
+pj.dependencies[\"@kaleido-xlm/core\"] = process.env.KALEIDO_PATCH_CORE;
+pj.dependencies[\"@kaleido-xlm/client\"] = process.env.KALEIDO_PATCH_CLIENT;
+if (pj.devDependencies && Object.prototype.hasOwnProperty.call(pj.devDependencies, \"@kaleido-xlm/cli\")) {
+  pj.devDependencies[\"@kaleido-xlm/cli\"] = process.env.KALEIDO_PATCH_CLI;
 }
-if (pj.dependencies && Object.prototype.hasOwnProperty.call(pj.dependencies, \"@kaleido/cli\")) {
-  pj.dependencies[\"@kaleido/cli\"] = process.env.KALEIDO_PATCH_CLI;
+if (pj.dependencies && Object.prototype.hasOwnProperty.call(pj.dependencies, \"@kaleido-xlm/cli\")) {
+  pj.dependencies[\"@kaleido-xlm/cli\"] = process.env.KALEIDO_PATCH_CLI;
 }
 writeFileSync(\"package.json\", JSON.stringify(pj, null, 2) + \"\\n\");
 "

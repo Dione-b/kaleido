@@ -28,11 +28,11 @@ kaleido invoke counter.increment --network testnet --source <identity-or-G-addre
 
 ## Browser Client
 
-After running `kaleido generate`, wire the generated bindings with `@kaleido/client`:
+After running `kaleido generate`, wire the generated bindings with `@kaleido-xlm/client`:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 

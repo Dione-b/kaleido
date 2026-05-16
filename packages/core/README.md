@@ -1,10 +1,10 @@
-# @kaleido/core
+# @kaleido-xlm/core
 
 Core config, artifacts, command orchestration, and error primitives for Kaleido.
 
 ## Supported Use
 
-`@kaleido/core` is primarily an internal package for the Kaleido CLI and templates; direct use beyond the documented config/template helpers is advanced and less stable than the CLI contract.
+`@kaleido-xlm/core` is primarily an internal package for the Kaleido CLI and templates; direct use beyond the documented config/template helpers is advanced and less stable than the CLI contract.
 
 ## What Is In This Package
 
@@ -16,18 +16,18 @@ Core config, artifacts, command orchestration, and error primitives for Kaleido.
 
 ## Consumer Guidance
 
-If you want the supported end-user workflow, use `@kaleido/cli`.
+If you want the supported end-user workflow, use `@kaleido-xlm/cli`.
 
-If you are authoring a Kaleido project, importing `defineConfig` from `@kaleido/core` in `kaleido.config.ts` is part of the intended template/config surface.
+If you are authoring a Kaleido project, importing `defineConfig` from `@kaleido-xlm/core` in `kaleido.config.ts` is part of the intended template/config surface.
 
-Reach for broader `@kaleido/core` APIs directly only when you are building advanced tooling on top of Kaleido internals and are prepared to track lower-level package changes more closely than a CLI consumer.
+Reach for broader `@kaleido-xlm/core` APIs directly only when you are building advanced tooling on top of Kaleido internals and are prepared to track lower-level package changes more closely than a CLI consumer.
 
 ## Stability Posture
 
 Being published does not make every export a first-class end-user contract. The stable consumer surfaces are:
 
-- the documented CLI workflow in `@kaleido/cli`
-- the documented `@kaleido/client` APIs
-- the narrow `@kaleido/core` config/template surface used by generated projects, including `defineConfig`
+- the documented CLI workflow in `@kaleido-xlm/cli`
+- the documented `@kaleido-xlm/client` APIs
+- the narrow `@kaleido-xlm/core` config/template surface used by generated projects, including `defineConfig`
 
-Direct `@kaleido/core` usage should be treated as advanced integration with a narrower support posture than the CLI package.
+Direct `@kaleido-xlm/core` usage should be treated as advanced integration with a narrower support posture than the CLI package.

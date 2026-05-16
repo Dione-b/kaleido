@@ -50,7 +50,7 @@ Somente se não houver mudanças; caso contrário pule. Não há commit neste ta
 
 ---
 
-### Task 2: Ativar `noUnusedLocals` / `noUnusedParameters` e corrigir violações em `@kaleido/core`
+### Task 2: Ativar `noUnusedLocals` / `noUnusedParameters` e corrigir violações em `@kaleido-xlm/core`
 
 **Files:**
 - Modify: `tsconfig.base.json`

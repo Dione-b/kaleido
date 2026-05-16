@@ -144,7 +144,7 @@ describe("createProjectFromTemplate", () => {
       devDependencies?: Record<string, string>;
     };
 
-    expect(packageJson.dependencies?.["@kaleido/client"]).toBe("^0.1.0");
+    expect(packageJson.dependencies?.["@kaleido-xlm/client"]).toBe("^0.1.0");
     expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
   });
 });

@@ -68,9 +68,9 @@ Populate `## Interface Contract` with the published packages and supported surfa
 ```md
 ### Published Packages
 
-- `@kaleido/cli`
-- `@kaleido/core`
-- `@kaleido/client`
+- `@kaleido-xlm/cli`
+- `@kaleido-xlm/core`
+- `@kaleido-xlm/client`
 
 ### Supported CLI Flow
 
@@ -197,21 +197,21 @@ Expected: commit succeeds with only the readiness and README changes staged.
 Replace `packages/cli/README.md` with sections matching this structure:
 
 ```md
-# @kaleido/cli
+# @kaleido-xlm/cli
 
 ## Install
 ## Requirements
 ## Commands
 ## Supported Inputs
 ## Error Behavior
-## Relationship To `@kaleido/core`
+## Relationship To `@kaleido-xlm/core`
 ## Versioning And Stability
 ```
 
 Include this install and smoke block:
 
 ```bash
-npm install -g @kaleido/cli
+npm install -g @kaleido-xlm/cli
 kaleido --help
 ```
 
@@ -220,7 +220,7 @@ kaleido --help
 Replace `packages/client/README.md` with sections matching this structure:
 
 ```md
-# @kaleido/client
+# @kaleido-xlm/client
 
 ## Install
 ## What It Solves
@@ -235,18 +235,18 @@ Replace `packages/client/README.md` with sections matching this structure:
 Include this import example:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 ```
 
-- [ ] **Step 3: Clarify whether `@kaleido/core` is a direct-consumer package**
+- [ ] **Step 3: Clarify whether `@kaleido-xlm/core` is a direct-consumer package**
 
 Update `packages/core/README.md` to explicitly choose one of these positions:
 
 ```md
 ## Supported Use
 
-`@kaleido/core` is supported for advanced programmatic integration.
+`@kaleido-xlm/core` is supported for advanced programmatic integration.
 ```
 
 or
@@ -254,7 +254,7 @@ or
 ```md
 ## Supported Use
 
-`@kaleido/core` is primarily an internal package for the Kaleido CLI and templates; direct use is advanced and less stable than the CLI contract.
+`@kaleido-xlm/core` is primarily an internal package for the Kaleido CLI and templates; direct use is advanced and less stable than the CLI contract.
 ```
 
 Do not leave this ambiguous.
@@ -426,9 +426,9 @@ Create `.changeset/release-readiness-docs.md` with:
 
 ```md
 ---
-'@kaleido/cli': patch
-'@kaleido/client': patch
-'@kaleido/core': patch
+'@kaleido-xlm/cli': patch
+'@kaleido-xlm/client': patch
+'@kaleido-xlm/core': patch
 ---
 
 Publish consumer-facing package documentation and release-process alignment for the first public release track.

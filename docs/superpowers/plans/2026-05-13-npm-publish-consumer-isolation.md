@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Garantir que `@kaleido/cli`, `@kaleido/core` e `@kaleido/client` funcionem fora do monorepo antes do publish, com validação de pack, ausência de `workspace:*` nos tarballs, teste de consumidor real e checagem de bundlers para o client.
+**Goal:** Garantir que `@kaleido-xlm/cli`, `@kaleido-xlm/core` e `@kaleido-xlm/client` funcionem fora do monorepo antes do publish, com validação de pack, ausência de `workspace:*` nos tarballs, teste de consumidor real e checagem de bundlers para o client.
 
 **Architecture:** Manter Changesets e `turbo` como hoje; estender scripts bash de isolamento (`scripts/`), adicionar um script só de CI que gera um changeset efêmero + `changeset version --snapshot smoke` antes do pack para espelhar o release; fixtures mínimas de consumidor Vite/webpack sob `scripts/consumer-client-bundlers/` instaladas via `npm install` apontando para `.tgz` em `packed/`; CI passa a executar pack pós-snapshot, grep em `package.json` extraídos, `pnpm publish -r --dry-run`, e o fluxo de consumidor estendido (install + build no app gerado).
 
@@ -14,7 +14,7 @@
 |---------|------------------|
 | `scripts/ci-snapshot-pack.sh` | Gera changeset efêmero, roda `pnpm changeset version --snapshot smoke`, `pnpm pack` nos três pacotes, extrai `package/package.json` de cada `.tgz` para um diretório temporário e falha se houver `workspace:*`, `link:`, ou `file:` |
 | `scripts/consumer-isolation-test.sh` | Fluxo completo de consumidor: build, pack (ou recebe `PACKED_DIR`), grep nos `.tgz`, projeto em `/tmp`, `npm install` dos `.tgz`, smoke imports, `npx kaleido`, `init`, `cd` app, `npm install`, `npm run build` |
-| `scripts/consumer-client-bundlers-test.sh` | Para cada fixture (Vite, webpack), copia para temp, `npm install` com caminhos absolutos dos `.tgz` de `@kaleido/core` e `@kaleido/client`, `npm run build` |
+| `scripts/consumer-client-bundlers-test.sh` | Para cada fixture (Vite, webpack), copia para temp, `npm install` com caminhos absolutos dos `.tgz` de `@kaleido-xlm/core` e `@kaleido-xlm/client`, `npm run build` |
 | `scripts/consumer-client-bundlers/vite/` | App Vite mínimo que importa `createKaleidoClient` |
 | `scripts/consumer-client-bundlers/webpack/` | App webpack mínimo que importa `createKaleidoClient` |
 | `package.json` (raiz) | Scripts `test:consumer`, `test:consumer:client-bundlers`, `ci:snapshot-pack`, `publish:dry-run` |
@@ -52,7 +52,7 @@ Adicionar um `it` que valida o bloco `exports["./freighter"]` com `types`, `impo
 
 - [ ] **Step 2: Run test**
 
-Run: `pnpm --filter @kaleido/core exec vitest run src/release/package-manifest.test.ts -v`
+Run: `pnpm --filter @kaleido-xlm/core exec vitest run src/release/package-manifest.test.ts -v`
 
 Expected: PASS (o manifest já está correto; o teste documenta o contrato de publish).
 
@@ -93,7 +93,7 @@ fi
 
 cat > "$ROOT_DIR/.changeset/__ci_snapshot__.md" <<'EOF'
 ---
-"@kaleido/cli": patch
+"@kaleido-xlm/cli": patch
 ---
 
 chore: ci snapshot for pack validation (do not commit)
@@ -237,7 +237,7 @@ git commit -m "test: extend consumer isolation with template npm build"
 
 ---
 
-### Task 5: Fixtures + script — Vite e webpack consumindo `@kaleido/client` empacotado
+### Task 5: Fixtures + script — Vite e webpack consumindo `@kaleido-xlm/client` empacotado
 
 **Files:**
 
@@ -265,8 +265,8 @@ git commit -m "test: extend consumer isolation with template npm build"
     "build": "vite build"
   },
   "dependencies": {
-    "@kaleido/client": "0.0.0-placeholder",
-    "@kaleido/core": "0.0.0-placeholder"
+    "@kaleido-xlm/client": "0.0.0-placeholder",
+    "@kaleido-xlm/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
@@ -283,7 +283,7 @@ import { defineConfig } from "vite";
 export default defineConfig({});
 ```
 
-(App SPA: `vite build` usa `index.html` → `src/main.ts` e empacota `@kaleido/client` no bundle.)
+(App SPA: `vite build` usa `index.html` → `src/main.ts` e empacota `@kaleido-xlm/client` no bundle.)
 
 `scripts/consumer-client-bundlers/vite/index.html`:
 
@@ -298,7 +298,7 @@ export default defineConfig({});
 `scripts/consumer-client-bundlers/vite/src/main.ts`:
 
 ```typescript
-import { createKaleidoClient } from "@kaleido/client";
+import { createKaleidoClient } from "@kaleido-xlm/client";
 
 console.log(typeof createKaleidoClient);
 ```
@@ -331,8 +331,8 @@ console.log(typeof createKaleidoClient);
     "build": "webpack --config webpack.config.cjs"
   },
   "dependencies": {
-    "@kaleido/client": "0.0.0-placeholder",
-    "@kaleido/core": "0.0.0-placeholder"
+    "@kaleido-xlm/client": "0.0.0-placeholder",
+    "@kaleido-xlm/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "webpack": "^5.97.1",
@@ -368,7 +368,7 @@ module.exports = {
 `scripts/consumer-client-bundlers/webpack/src/index.js`:
 
 ```javascript
-import { createKaleidoClient } from "@kaleido/client";
+import { createKaleidoClient } from "@kaleido-xlm/client";
 
 console.log(typeof createKaleidoClient);
 ```
@@ -414,7 +414,7 @@ mkdir -p "$BARE_TMP"
 cd "$BARE_TMP"
 npm init -y >/dev/null
 npm install "${CORE_TGZ[0]}" "${CLIENT_TGZ[0]}"
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido/client"; console.log(typeof createKaleidoClient)'
+node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
 cd "$ROOT_DIR"
 rm -rf "$BARE_TMP"
 

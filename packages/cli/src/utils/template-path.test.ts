@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode } from "@kaleido/core";
+import { KaleidoErrorCode } from "@kaleido-xlm/core";
 
 const accessMock = vi.hoisted(() => vi.fn());
 

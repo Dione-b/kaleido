@@ -1,6 +1,6 @@
 # Getting Started
 
-Kaleido alpha supports the CLI path first, then optional browser/client integration through `@kaleido/client`.
+Kaleido alpha supports the CLI path first, then optional browser/client integration through `@kaleido-xlm/client`.
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ Kaleido alpha supports the CLI path first, then optional browser/client integrat
 - `wasm32v1-none` Rust target
 - Stellar CLI
 - A local Stellar CLI identity for CLI deploy/invoke, for example `alice`
-- Optional: Freighter or another wallet adapter for browser-side `@kaleido/client` calls
+- Optional: Freighter or another wallet adapter for browser-side `@kaleido-xlm/client` calls
 
 ```bash
 rustc --version
@@ -23,7 +23,7 @@ stellar --version
 ```bash
 pnpm install
 pnpm build
-pnpm --filter @kaleido/cli dev init my-dapp
+pnpm --filter @kaleido-xlm/cli dev init my-dapp
 ```
 
 ## Generated app flow
@@ -41,11 +41,11 @@ Use a Stellar CLI identity alias or a public `G...` account for `--source`. Kale
 
 ## Browser client flow
 
-After `generate`, register the generated bindings with `@kaleido/client`:
+After `generate`, register the generated bindings with `@kaleido-xlm/client`:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 

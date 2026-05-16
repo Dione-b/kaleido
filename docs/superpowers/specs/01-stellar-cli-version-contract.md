@@ -27,7 +27,7 @@ Kaleido must not assume untested Stellar CLI versions are safe.
 
 ## Required decisions
 
-Set these constants in `@kaleido/core`:
+Set these constants in `@kaleido-xlm/core`:
 
 ```ts
 export const STELLAR_CLI_MIN_VERSION = "x.y.z";

@@ -17,9 +17,9 @@ Guarantee that packages work outside the monorepo before npm publish.
 Validate:
 
 ```txt
-@kaleido/cli
-@kaleido/core
-@kaleido/client
+@kaleido-xlm/cli
+@kaleido-xlm/core
+@kaleido-xlm/client
 ```
 
 Add later:
@@ -51,7 +51,7 @@ Each package must define:
 }
 ```
 
-For `@kaleido/cli`:
+For `@kaleido-xlm/cli`:
 
 ```json
 {
@@ -111,7 +111,7 @@ consumer-runtime-test: Rust/Stellar required
 
 ## Browser package test
 
-`@kaleido/client` must pass:
+`@kaleido-xlm/client` must pass:
 
 ```txt
 Vite consumer test
@@ -122,7 +122,7 @@ bare ESM import test
 Minimum test:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
+import { createKaleidoClient } from "@kaleido-xlm/client";
 console.log(typeof createKaleidoClient);
 ```
 
@@ -167,8 +167,8 @@ pnpm publish -r --access public --provenance
 
 ```txt
 all packages have valid exports/types/files
-@kaleido/cli works through npx from packed tarball
-@kaleido/client imports in clean Vite project
+@kaleido-xlm/cli works through npx from packed tarball
+@kaleido-xlm/client imports in clean Vite project
 no published package contains workspace:* dependency
 release workflow publishes with provenance
 pnpm publish dry run emits no warnings

@@ -25,7 +25,7 @@ When adding parser behavior:
 3. Include at least one failure fixture.
 4. Assert the public `KALEIDO_*` error code.
 
-When adding `@kaleido/client` behavior:
+When adding `@kaleido-xlm/client` behavior:
 
 1. Use mocked generated bindings.
 2. Use mocked wallet adapters.

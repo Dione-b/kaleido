@@ -4,7 +4,7 @@
 
 **Goal:** Implement the five required v1 viability specs: Stellar CLI version contract, complete `KALEIDO_*` error surface, npm publish consumer isolation, live testnet smoke CI, and experimental multi-contract dependency deploy.
 
-**Architecture:** Keep `@kaleido/cli` thin and put runtime behavior in `@kaleido/core`; keep `@kaleido/client` package validation isolated to packaging/browser-consumer tests. Add dependency deploy as explicit graph resolution plus safe placeholder substitution, not shell/env interpolation.
+**Architecture:** Keep `@kaleido-xlm/cli` thin and put runtime behavior in `@kaleido-xlm/core`; keep `@kaleido-xlm/client` package validation isolated to packaging/browser-consumer tests. Add dependency deploy as explicit graph resolution plus safe placeholder substitution, not shell/env interpolation.
 
 **Tech Stack:** TypeScript, pnpm 9, Turbo, Vitest, Zod, semver, tsup, GitHub Actions, Changesets, Stellar CLI.
 
@@ -136,7 +136,7 @@ describe("Stellar CLI version contract", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
 ```
 
 Expected: FAIL because `./version.js` and new error codes do not exist.
@@ -209,7 +209,7 @@ export * from "./stellar-cli/version.js";
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
 ```
 
 Expected: PASS.
@@ -282,7 +282,7 @@ describe("checkStellarCliVersion", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/stellar-cli/run-command-version.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/run-command-version.test.ts
 ```
 
 Expected: FAIL because `check-stellar-cli-version.ts` does not exist and `runCommand` has no `skipStellarVersionCheck` option.
@@ -426,7 +426,7 @@ Do not add this flag to CI workflows.
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts packages/core/src/stellar-cli/run-command-version.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts packages/core/src/stellar-cli/run-command-version.test.ts
 pnpm typecheck
 ```
 
@@ -518,7 +518,7 @@ Run:
 
 ```bash
 git diff --check
-pnpm --filter @kaleido/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/stellar-cli/check-stellar-cli-version.test.ts
 ```
 
 Expected: both commands exit 0.
@@ -611,7 +611,7 @@ function collectTsFiles(path: string): string[] {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/errors/error-surface.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/errors/error-surface.test.ts
 ```
 
 Expected: FAIL until all spec-required codes exist and docs are complete.
@@ -677,7 +677,7 @@ For every code in `KaleidoErrorCode`, add a row with a concrete CI recommendatio
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/errors/error-codes.test.ts packages/core/src/errors/error-surface.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/errors/error-codes.test.ts packages/core/src/errors/error-surface.test.ts
 pnpm typecheck
 ```
 
@@ -744,7 +744,7 @@ describe("publish package manifests", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/release/package-manifest.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/release/package-manifest.test.ts
 ```
 
 Expected: FAIL because manifests do not yet have CJS exports/files and contain `workspace:*`.
@@ -755,7 +755,7 @@ For each package, use this shape. Example for `packages/core/package.json`:
 
 ```json
 {
-  "name": "@kaleido/core",
+  "name": "@kaleido-xlm/core",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -777,7 +777,7 @@ For each package, use this shape. Example for `packages/core/package.json`:
 }
 ```
 
-For `@kaleido/client`, preserve `./freighter` export and add require/types:
+For `@kaleido-xlm/client`, preserve `./freighter` export and add require/types:
 
 ```json
 "./freighter": {
@@ -790,7 +790,7 @@ For `@kaleido/client`, preserve `./freighter` export and add require/types:
 Replace internal published dependencies:
 
 ```json
-"@kaleido/core": "^0.1.0"
+"@kaleido-xlm/core": "^0.1.0"
 ```
 
 Keep `workspace:*` only if a prepack or Changesets step rewrites it before packing; otherwise the consumer isolation test must fail.
@@ -800,7 +800,7 @@ Keep `workspace:*` only if a prepack or Changesets step rewrites it before packi
 If package-level README/LICENSE files are missing, create small package README files and copy/link license content. Minimum `packages/core/README.md`:
 
 ```md
-# @kaleido/core
+# @kaleido-xlm/core
 
 Core config, artifacts, command orchestration, and error primitives for Kaleido.
 ```
@@ -816,7 +816,7 @@ pnpm build
 test -f packages/core/dist/index.js
 test -f packages/core/dist/index.cjs
 test -f packages/client/dist/freighter.cjs
-pnpm --filter @kaleido/core test -- --run packages/core/src/release/package-manifest.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/release/package-manifest.test.ts
 ```
 
 Expected: all commands exit 0.
@@ -846,7 +846,7 @@ Create `.changeset/config.json`:
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [["@kaleido/cli", "@kaleido/core", "@kaleido/client"]],
+  "fixed": [["@kaleido-xlm/cli", "@kaleido-xlm/core", "@kaleido-xlm/client"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
@@ -860,11 +860,11 @@ Modify root `package.json`:
 ```json
 "scripts": {
   "build": "turbo build",
-  "dev": "pnpm --filter @kaleido/cli dev",
+  "dev": "pnpm --filter @kaleido-xlm/cli dev",
   "test": "turbo test",
   "typecheck": "turbo typecheck",
   "changeset": "changeset",
-  "pack:packages": "pnpm -r --filter @kaleido/cli --filter @kaleido/core --filter @kaleido/client pack --pack-destination ./packed",
+  "pack:packages": "pnpm -r --filter @kaleido-xlm/cli --filter @kaleido-xlm/core --filter @kaleido-xlm/client pack --pack-destination ./packed",
   "test:consumer": "bash scripts/consumer-isolation-test.sh"
 }
 ```
@@ -885,7 +885,7 @@ rm -rf "$PACKED_DIR" "$TMP_DIR"
 mkdir -p "$PACKED_DIR" "$TMP_DIR"
 
 pnpm --dir "$ROOT_DIR" build
-pnpm --dir "$ROOT_DIR" -r --filter @kaleido/core --filter @kaleido/client --filter @kaleido/cli pack --pack-destination "$PACKED_DIR"
+pnpm --dir "$ROOT_DIR" -r --filter @kaleido-xlm/core --filter @kaleido-xlm/client --filter @kaleido-xlm/cli pack --pack-destination "$PACKED_DIR"
 
 if tar -xOf "$PACKED_DIR"/*.tgz package/package.json | grep -E 'workspace:\*|link:|file:'; then
   echo "Packed package contains a monorepo-only dependency reference." >&2
@@ -896,8 +896,8 @@ cd "$TMP_DIR"
 npm init -y >/dev/null
 npm install "$PACKED_DIR"/kaleido-core-*.tgz "$PACKED_DIR"/kaleido-client-*.tgz "$PACKED_DIR"/kaleido-cli-*.tgz
 
-node --input-type=module -e 'import { defineConfig } from "@kaleido/core"; console.log(typeof defineConfig)'
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido/client"; console.log(typeof createKaleidoClient)'
+node --input-type=module -e 'import { defineConfig } from "@kaleido-xlm/core"; console.log(typeof defineConfig)'
+node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
 npx kaleido --version
 npx kaleido init test-app --template react-vite-counter
 test -f test-app/kaleido.config.ts
@@ -1330,7 +1330,7 @@ it("accepts dependency metadata in version 1 artifacts", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
 ```
 
 Expected: FAIL because schema does not accept the new fields.
@@ -1380,7 +1380,7 @@ Modify `docs/config.md` with a multi-contract example matching Spec 05.
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/config/config.schema.test.ts packages/core/src/artifacts/read-write-artifacts.test.ts
 pnpm typecheck
 ```
 
@@ -1535,7 +1535,7 @@ describe("resolveDeployArgs", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
 ```
 
 Expected: FAIL because modules do not exist.
@@ -1680,7 +1680,7 @@ export * from "./contracts/resolve-deploy-args.js";
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/resolve-deploy-order.test.ts packages/core/src/contracts/resolve-deploy-args.test.ts
 pnpm typecheck
 ```
 
@@ -1816,7 +1816,7 @@ describe("deployContractGraph", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts
 ```
 
 Expected: FAIL because deploy graph module does not exist.
@@ -1972,7 +1972,7 @@ export * from "./contracts/deploy-contract-graph.js";
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts packages/core/src/contracts/deploy-contract.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/contracts/deploy-contract-graph.test.ts packages/core/src/contracts/deploy-contract.test.ts
 pnpm typecheck
 ```
 
@@ -2020,7 +2020,7 @@ it("ships marketplace-with-token as a multi-contract dependency template", async
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
 ```
 
 Expected: FAIL because the template does not exist.
@@ -2058,7 +2058,7 @@ Create `packages/templates/marketplace-with-token/kaleido.template.json`:
 Create `packages/templates/marketplace-with-token/kaleido.config.ts`:
 
 ```ts
-import { defineConfig } from "@kaleido/core";
+import { defineConfig } from "@kaleido-xlm/core";
 
 export default defineConfig({
   project: "__PROJECT_NAME__",
@@ -2174,7 +2174,7 @@ Kaleido core owns `dependsOn`, topological deploy order, and `${contracts.<contr
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
+pnpm --filter @kaleido-xlm/core test -- --run packages/core/src/templates/create-project-from-template.test.ts
 git diff --check
 ```
 

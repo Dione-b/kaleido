@@ -8,7 +8,7 @@ Ship an internal `v0.1.0-alpha` release that proves Kaleido's first coherent pro
 init -> build -> deploy -> generate -> invoke
 ```
 
-plus the new `@kaleido/client` interop layer for generated bindings, artifacts, XDR visibility, and wallet signing.
+plus the new `@kaleido-xlm/client` interop layer for generated bindings, artifacts, XDR visibility, and wallet signing.
 
 The alpha is not a public npm launch. It is a tagged internal checkpoint that makes the supported surface auditable and repeatable.
 
@@ -36,9 +36,9 @@ The existing CLI/core flow already exposes:
 - `kaleido generate`
 - `kaleido invoke`
 
-It persists deployment facts in `kaleido.artifacts.json` and isolates Stellar CLI parsing in `@kaleido/core`.
+It persists deployment facts in `kaleido.artifacts.json` and isolates Stellar CLI parsing in `@kaleido-xlm/core`.
 
-### Current `@kaleido/client`
+### Current `@kaleido-xlm/client`
 
 The current client implementation adds:
 
@@ -51,9 +51,9 @@ The current client implementation adds:
 
 ### Rejected Alternatives
 
-#### Alpha without `@kaleido/client`
+#### Alpha without `@kaleido-xlm/client`
 
-Rejected because the user explicitly included `@kaleido/client` in the alpha scope. Cutting it would make the tag less representative of the project's current product direction.
+Rejected because the user explicitly included `@kaleido-xlm/client` in the alpha scope. Cutting it would make the tag less representative of the project's current product direction.
 
 #### Alpha with public npm publish
 
@@ -82,9 +82,9 @@ The tag represents an internal checkpoint, not a public stability guarantee.
 ### Included Packages
 
 ```txt
-@kaleido/cli
-@kaleido/core
-@kaleido/client
+@kaleido-xlm/cli
+@kaleido-xlm/core
+@kaleido-xlm/client
 packages/templates/react-vite-counter
 ```
 
@@ -127,7 +127,7 @@ The client must:
 
 The `react-vite-counter` template must remain buildable and aligned with the documented alpha workflow.
 
-For option B, the template must have a documented client smoke path. It does not need to make `@kaleido/client` the only or default UI path if doing so would require generated bindings or live wallet state during template CI.
+For option B, the template must have a documented client smoke path. It does not need to make `@kaleido-xlm/client` the only or default UI path if doing so would require generated bindings or live wallet state during template CI.
 
 ### Error Contract
 
@@ -164,7 +164,7 @@ The release also requires a local template smoke check:
 1. Generate or inspect the counter template.
 2. Confirm template config uses wasm32v1-none.
 3. Confirm docs describe init -> build -> deploy -> generate -> invoke.
-4. Confirm docs describe how @kaleido/client connects artifacts, generated bindings, and Freighter.
+4. Confirm docs describe how @kaleido-xlm/client connects artifacts, generated bindings, and Freighter.
 5. Confirm no default test requires testnet or Freighter.
 ```
 
@@ -228,7 +228,7 @@ It must not add `doctor`, CLI XDR, `generate --interop`, React hooks, or npm pub
 ## Acceptance Criteria
 
 ```txt
-1. @kaleido/client is included in the alpha scope.
+1. @kaleido-xlm/client is included in the alpha scope.
 2. README links CLI, client, config, templates, errors, and testing docs.
 3. docs/client.md documents counter usage with generated bindings, artifacts, and Freighter.
 4. docs/errors.md documents every public KaleidoErrorCode.

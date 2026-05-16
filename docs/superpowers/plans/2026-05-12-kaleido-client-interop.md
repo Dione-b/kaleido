@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `@kaleido/client`, a thin interop layer that connects generated Soroban TypeScript bindings, Kaleido artifacts, and wallet signing.
+**Goal:** Build `@kaleido-xlm/client`, a thin interop layer that connects generated Soroban TypeScript bindings, Kaleido artifacts, and wallet signing.
 
-**Architecture:** `@kaleido/client` owns orchestration only: artifact resolution, binding invocation, wallet signing, and normalized result shapes. It imports public types/errors from `@kaleido/core`, delegates transaction/XDR behavior to generated bindings, and exposes Freighter as a subpath adapter.
+**Architecture:** `@kaleido-xlm/client` owns orchestration only: artifact resolution, binding invocation, wallet signing, and normalized result shapes. It imports public types/errors from `@kaleido-xlm/core`, delegates transaction/XDR behavior to generated bindings, and exposes Freighter as a subpath adapter.
 
-**Tech Stack:** TypeScript ESM, pnpm workspace, tsup, Vitest, `@stellar/freighter-api`, `@kaleido/core`.
+**Tech Stack:** TypeScript ESM, pnpm workspace, tsup, Vitest, `@stellar/freighter-api`, `@kaleido-xlm/core`.
 
 ---
 
@@ -20,17 +20,17 @@
 
 - [ ] **Step 1: Write failing package presence check**
 
-Run: `pnpm --filter @kaleido/client typecheck`
+Run: `pnpm --filter @kaleido-xlm/client typecheck`
 
-Expected: FAIL because `@kaleido/client` does not exist.
+Expected: FAIL because `@kaleido-xlm/client` does not exist.
 
 - [ ] **Step 2: Create package manifest and base exports**
 
-Add `@kaleido/client` with ESM build, test, typecheck scripts, root export, and `./freighter` subpath export.
+Add `@kaleido-xlm/client` with ESM build, test, typecheck scripts, root export, and `./freighter` subpath export.
 
 - [ ] **Step 3: Verify package is discoverable**
 
-Run: `pnpm --filter @kaleido/client typecheck`
+Run: `pnpm --filter @kaleido-xlm/client typecheck`
 
 Expected: PASS after base files exist.
 
@@ -47,7 +47,7 @@ Test explicit `contractId`, artifact lookup by network/contract, and `KALEIDO_CO
 
 - [ ] **Step 2: Run resolver tests**
 
-Run: `pnpm --filter @kaleido/client test -- src/artifacts/resolve-contract-id.test.ts`
+Run: `pnpm --filter @kaleido-xlm/client test -- src/artifacts/resolve-contract-id.test.ts`
 
 Expected: FAIL because implementation is missing.
 
@@ -57,7 +57,7 @@ Use `explicitContractId` first, then `artifacts.networks[network].contracts[cont
 
 - [ ] **Step 4: Verify resolver tests**
 
-Run: `pnpm --filter @kaleido/client test -- src/artifacts/resolve-contract-id.test.ts`
+Run: `pnpm --filter @kaleido-xlm/client test -- src/artifacts/resolve-contract-id.test.ts`
 
 Expected: PASS.
 
@@ -74,7 +74,7 @@ Test missing `Client`, missing method, client construction arguments, and method
 
 - [ ] **Step 2: Run binding adapter tests**
 
-Run: `pnpm --filter @kaleido/client test -- src/bindings/default-binding-adapter.test.ts`
+Run: `pnpm --filter @kaleido-xlm/client test -- src/bindings/default-binding-adapter.test.ts`
 
 Expected: FAIL because implementation is missing.
 
@@ -84,7 +84,7 @@ Instantiate `new binding.Client(...)`; call the requested method with either no 
 
 - [ ] **Step 4: Verify adapter tests**
 
-Run: `pnpm --filter @kaleido/client test -- src/bindings/default-binding-adapter.test.ts`
+Run: `pnpm --filter @kaleido-xlm/client test -- src/bindings/default-binding-adapter.test.ts`
 
 Expected: PASS.
 
@@ -103,7 +103,7 @@ Test `invoke("increment")`, `buildXdr("increment")`, `debugXdr` disabled/enabled
 
 - [ ] **Step 2: Run client tests**
 
-Run: `pnpm --filter @kaleido/client test -- src/client/create-kaleido-client.test.ts`
+Run: `pnpm --filter @kaleido-xlm/client test -- src/client/create-kaleido-client.test.ts`
 
 Expected: FAIL because API is missing.
 
@@ -113,7 +113,7 @@ Resolve contract, get public key, create binding client, call method, extract un
 
 - [ ] **Step 4: Verify client tests**
 
-Run: `pnpm --filter @kaleido/client test -- src/client/create-kaleido-client.test.ts`
+Run: `pnpm --filter @kaleido-xlm/client test -- src/client/create-kaleido-client.test.ts`
 
 Expected: PASS.
 
@@ -139,7 +139,7 @@ Add the specified `KALEIDO_XDR_*`, `KALEIDO_BINDING_*`, `KALEIDO_WALLET_NOT_CONN
 
 - [ ] **Step 4: Verify public API**
 
-Run: `pnpm --filter @kaleido/client build` and `pnpm --filter @kaleido/core test -- src/errors/error-codes.test.ts`.
+Run: `pnpm --filter @kaleido-xlm/client build` and `pnpm --filter @kaleido-xlm/core test -- src/errors/error-codes.test.ts`.
 
 Expected: PASS.
 

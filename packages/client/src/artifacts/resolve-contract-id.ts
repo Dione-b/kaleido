@@ -1,4 +1,4 @@
-import { KaleidoError, KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido/core";
+import { KaleidoError, KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido-xlm/core";
 
 export function resolveContractId(input: {
   artifacts: KaleidoArtifacts;

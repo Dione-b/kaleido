@@ -1,4 +1,4 @@
-import type { KaleidoArtifacts } from "@kaleido/core";
+import type { KaleidoArtifacts } from "@kaleido-xlm/core";
 
 export interface KaleidoNetwork {
   name: string;

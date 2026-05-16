@@ -5,8 +5,8 @@
     "build": "webpack --config webpack.config.cjs"
   },
   "dependencies": {
-    "@kaleido/client": "0.0.0-placeholder",
-    "@kaleido/core": "0.0.0-placeholder"
+    "@kaleido-xlm/client": "0.0.0-placeholder",
+    "@kaleido-xlm/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "webpack": "^5.97.1",

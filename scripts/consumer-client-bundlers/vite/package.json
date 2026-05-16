@@ -6,8 +6,8 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@kaleido/client": "0.0.0-placeholder",
-    "@kaleido/core": "0.0.0-placeholder"
+    "@kaleido-xlm/client": "0.0.0-placeholder",
+    "@kaleido-xlm/core": "0.0.0-placeholder"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

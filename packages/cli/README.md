@@ -1,9 +1,9 @@
-# @kaleido/cli
+# @kaleido-xlm/cli
 
 ## Install
 
 ```bash
-npm install -g @kaleido/cli
+npm install -g @kaleido-xlm/cli
 kaleido --help
 ```
 
@@ -39,7 +39,7 @@ Unsupported input posture:
 
 ## Error Behavior
 
-`@kaleido/cli` emits documented `KALEIDO_*` error codes for automation. Consumers should match on the error code, not human-readable text.
+`@kaleido-xlm/cli` emits documented `KALEIDO_*` error codes for automation. Consumers should match on the error code, not human-readable text.
 
 Common codes include:
 
@@ -55,11 +55,11 @@ Common codes include:
 - `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`
 - `KALEIDO_TEMPLATE_INCOMPATIBLE`
 
-## Relationship To `@kaleido/core`
+## Relationship To `@kaleido-xlm/core`
 
-`@kaleido/cli` is the supported end-user entrypoint for Kaleido's command workflow. It intentionally stays thin and delegates config loading, artifacts, command orchestration, and shared error primitives to `@kaleido/core`.
+`@kaleido-xlm/cli` is the supported end-user entrypoint for Kaleido's command workflow. It intentionally stays thin and delegates config loading, artifacts, command orchestration, and shared error primitives to `@kaleido-xlm/core`.
 
-If you want the stable packaged workflow, prefer the CLI contract over importing `@kaleido/core` directly.
+If you want the stable packaged workflow, prefer the CLI contract over importing `@kaleido-xlm/core` directly.
 
 ## Versioning And Stability
 

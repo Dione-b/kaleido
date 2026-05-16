@@ -1,4 +1,4 @@
-import { toKaleidoError } from "@kaleido/core";
+import { toKaleidoError } from "@kaleido-xlm/core";
 import { logger } from "./logger.js";
 
 function printError(error: unknown): void {

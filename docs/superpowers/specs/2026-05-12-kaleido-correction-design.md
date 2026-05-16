@@ -141,7 +141,7 @@ Compatibility uses:
 semver.satisfies(coreVersion, manifest.kaleido.compatibleCore)
 ```
 
-`@kaleido/core` owns this dependency:
+`@kaleido-xlm/core` owns this dependency:
 
 - Runtime dependency: `semver`
 - Dev dependency: `@types/semver`

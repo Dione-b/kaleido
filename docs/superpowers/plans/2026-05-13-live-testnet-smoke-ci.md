@@ -4,9 +4,9 @@
 
 **Goal:** Garantir que o CI de smoke na testnet da Stellar cumpra a spec `04-live-testnet-smoke-ci.md`: fluxo completo `init → build → deploy → generate → invoke`, identidade só por alias, asserções explícitas, artefatos de diagnóstico, retry apenas para falha transitória de rede e documentação operacional para o gate de release (3 runs verdes consecutivos).
 
-**Architecture:** Manter o fluxo em `scripts/testnet-smoke.sh` orquestrando o CLI já empacotado no monorepo; extrair a política “transitório vs não-retry” para uma função pura em `@kaleido/core` (testada com Vitest) consumida pelo script via `node` após `pnpm build`. O workflow GitHub Actions grava `GITHUB_OUTPUT` quando o script sai com código `2` (transitório) para condicionar um único retry; saída `1` falha o job sem retry. Artefatos versionados e log consolidado ficam sob um diretório no repositório raiz antes do upload.
+**Architecture:** Manter o fluxo em `scripts/testnet-smoke.sh` orquestrando o CLI já empacotado no monorepo; extrair a política “transitório vs não-retry” para uma função pura em `@kaleido-xlm/core` (testada com Vitest) consumida pelo script via `node` após `pnpm build`. O workflow GitHub Actions grava `GITHUB_OUTPUT` quando o script sai com código `2` (transitório) para condicionar um único retry; saída `1` falha o job sem retry. Artefatos versionados e log consolidado ficam sob um diretório no repositório raiz antes do upload.
 
-**Tech Stack:** Bash, Node 20, pnpm, Vitest, GitHub Actions, `@kaleido/core` (tsup bundle via `src/index.ts`).
+**Tech Stack:** Bash, Node 20, pnpm, Vitest, GitHub Actions, `@kaleido-xlm/core` (tsup bundle via `src/index.ts`).
 
 ---
 
@@ -24,7 +24,7 @@
 
 ---
 
-### Task 1: Classificador de falha transitória (`@kaleido/core`)
+### Task 1: Classificador de falha transitória (`@kaleido-xlm/core`)
 
 **Files:**
 

@@ -3,7 +3,7 @@
 Kaleido projects use `kaleido.config.ts`.
 
 ```ts
-import { defineConfig } from "@kaleido/core";
+import { defineConfig } from "@kaleido-xlm/core";
 
 export default defineConfig({
   project: "my-dapp",

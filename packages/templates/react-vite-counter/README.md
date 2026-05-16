@@ -20,8 +20,8 @@ Use a Stellar CLI identity alias or public account address for `--source`; do no
 After `kaleido generate`, wire generated bindings to the client:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 

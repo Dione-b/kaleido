@@ -1,9 +1,9 @@
-# @kaleido/client
+# @kaleido-xlm/client
 
 ## Install
 
 ```bash
-pnpm add @kaleido/client
+pnpm add @kaleido-xlm/client
 ```
 
 If you are using Freighter, add the optional adapter dependency:
@@ -13,15 +13,15 @@ pnpm add @stellar/freighter-api
 ```
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 ```
 
-The `@kaleido/client/freighter` subpath is optional and only needed when you want the bundled Freighter adapter.
+The `@kaleido-xlm/client/freighter` subpath is optional and only needed when you want the bundled Freighter adapter.
 
 ## What It Solves
 
-`@kaleido/client` is the supported browser and Node integration layer for invoking generated Soroban bindings with Kaleido artifacts, network configuration, and a wallet adapter.
+`@kaleido-xlm/client` is the supported browser and Node integration layer for invoking generated Soroban bindings with Kaleido artifacts, network configuration, and a wallet adapter.
 
 It connects:
 
@@ -54,7 +54,7 @@ Supported type-only root exports:
 
 Supported subpath export:
 
-- `@kaleido/client/freighter` -> `freighterWalletAdapter` (optional)
+- `@kaleido-xlm/client/freighter` -> `freighterWalletAdapter` (optional)
 
 Primary flow:
 
@@ -65,8 +65,8 @@ Primary flow:
 ## Counter Example
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 
@@ -101,7 +101,7 @@ export interface KaleidoWalletAdapter {
 }
 ```
 
-The default Freighter adapter is exported from `@kaleido/client/freighter`.
+The default Freighter adapter is exported from `@kaleido-xlm/client/freighter`.
 
 ## Debug Output Rules
 
@@ -114,7 +114,7 @@ Consumers should treat debug fields as opt-in diagnostics, not part of the defau
 
 ## Errors
 
-`@kaleido/client` emits documented `KALEIDO_*` codes for public failures. Consumers should key automation on the code, not the message text.
+`@kaleido-xlm/client` emits documented `KALEIDO_*` codes for public failures. Consumers should key automation on the code, not the message text.
 
 Common codes include:
 

@@ -4,9 +4,9 @@
 
 **Goal:** Declarar, aplicar em runtime e testar um intervalo suportado de versões do Stellar CLI, com override local explícito e sem override em CI.
 
-**Architecture:** Constantes `STELLAR_CLI_MIN_VERSION` e `STELLAR_CLI_TESTED_MAX_VERSION` em `@kaleido/core` alimentam `parseStellarCliVersion` e `assertSupportedStellarCliVersion`. `checkStellarCliVersion` executa `stellar --version` via `runCommand` com `skipStellarVersionCheck: true` para evitar recursão. `runCommand` chama `checkStellarCliVersion` antes de qualquer outro `stellar` quando `skipStellarVersionCheck` é falso. O pacote `@kaleido/cli` expõe `--allow-untested-stellar-cli` e repassa `allowUntestedStellarCli` para funções de contrato que chamam `runCommand` / `checkBinary`.
+**Architecture:** Constantes `STELLAR_CLI_MIN_VERSION` e `STELLAR_CLI_TESTED_MAX_VERSION` em `@kaleido-xlm/core` alimentam `parseStellarCliVersion` e `assertSupportedStellarCliVersion`. `checkStellarCliVersion` executa `stellar --version` via `runCommand` com `skipStellarVersionCheck: true` para evitar recursão. `runCommand` chama `checkStellarCliVersion` antes de qualquer outro `stellar` quando `skipStellarVersionCheck` é falso. O pacote `@kaleido-xlm/cli` expõe `--allow-untested-stellar-cli` e repassa `allowUntestedStellarCli` para funções de contrato que chamam `runCommand` / `checkBinary`.
 
-**Tech Stack:** pnpm workspaces, TypeScript, Vitest, `semver`, `execa`, Commander (`@kaleido/cli`), pacote `@kaleido/core`.
+**Tech Stack:** pnpm workspaces, TypeScript, Vitest, `semver`, `execa`, Commander (`@kaleido-xlm/cli`), pacote `@kaleido-xlm/core`.
 
 **Nota de contexto:** A skill *writing-plans* recomenda worktree dedicado (brainstorming). Abra um worktree limpo antes de executar tarefas se a branch atual misturar outras mudanças.
 
@@ -53,7 +53,7 @@ Expected: exit code `0`, sem erros TypeScript.
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido/core test
+cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido-xlm/core test
 ```
 
 Expected: Vitest conclui com sucesso; em especial passam `packages/core/src/stellar-cli/check-stellar-cli-version.test.ts` e `packages/core/src/stellar-cli/run-command-version.test.ts`.
@@ -124,7 +124,7 @@ Expected: `2 passed` (ou equivalente), exit code `0`.
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido/core test
+cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido-xlm/core test
 ```
 
 Expected: todos os testes passam.
@@ -231,7 +231,7 @@ git commit -m "fix: export stellar CLI version helpers from core"
 
 | Requisito da spec | Tarefa |
 |-------------------|--------|
-| Constantes min / tested max em `@kaleido/core` | Baseline Task 1 — já em `version.ts` |
+| Constantes min / tested max em `@kaleido-xlm/core` | Baseline Task 1 — já em `version.ts` |
 | `parseStellarCliVersion` + erros | Baseline — `version.ts` + `KaleidoErrorCode` |
 | Check antes de shell stellar | Baseline — `run-command.ts` |
 | `--allow-untested-stellar-cli` só local | Baseline CLI + Task 4 |

@@ -34,7 +34,7 @@ mkdir -p "$BARE_TMP"
 cd "$BARE_TMP"
 npm init -y >/dev/null
 npm install "${CORE_TGZ[0]}" "${CLIENT_TGZ[0]}"
-node --input-type=module -e 'import { createKaleidoClient } from "@kaleido/client"; console.log(typeof createKaleidoClient)'
+node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
 cd "$ROOT_DIR"
 rm -rf "$BARE_TMP"
 

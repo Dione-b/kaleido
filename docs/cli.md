@@ -1,6 +1,6 @@
 # CLI
 
-The CLI is intentionally thin. It delegates config, artifacts, command execution, and parser behavior to `@kaleido/core`.
+The CLI is intentionally thin. It delegates config, artifacts, command execution, and parser behavior to `@kaleido-xlm/core`.
 
 ## `kaleido init <projectName>`
 

@@ -14,7 +14,7 @@ fi
 
 cat > "$ROOT_DIR/.changeset/__ci_snapshot__.md" <<'EOF'
 ---
-"@kaleido/cli": patch
+"@kaleido-xlm/cli": patch
 ---
 
 chore: ci snapshot for pack validation (do not commit)

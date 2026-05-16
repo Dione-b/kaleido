@@ -4,7 +4,7 @@
 
 **Goal:** Make the Kaleido repository compile, run CI, use the current Wasm target, expose only `KALEIDO_*` public error codes, validate template manifests during `init`, centralize the core version, and keep an initial Stellar CLI version parser contract.
 
-**Architecture:** Keep changes inside the existing packages and public contracts. Treat `KaleidoErrorCode` values as the public API, keep template validation in `@kaleido/core` before filesystem copy, and keep CLI command registration thin. Do not introduce B1 features beyond the initial parser/version-check foundation already present.
+**Architecture:** Keep changes inside the existing packages and public contracts. Treat `KaleidoErrorCode` values as the public API, keep template validation in `@kaleido-xlm/core` before filesystem copy, and keep CLI command registration thin. Do not introduce B1 features beyond the initial parser/version-check foundation already present.
 
 **Tech Stack:** pnpm 9, Node.js 20, TypeScript, Zod, Vitest, Turbo, GitHub Actions YAML, semver.
 
@@ -14,7 +14,7 @@
 
 The spec is supplied in the user request. Code may be read because the spec exists.
 
-Out of scope for this plan: `@kaleido/client`, `@kaleido/react`, `kaleido doctor`, multi-contract `dependsOn` expansion, testnet smoke CI, npm publish pipeline expansion, CLI XDR commands, and template registry.
+Out of scope for this plan: `@kaleido-xlm/client`, `@kaleido/react`, `kaleido doctor`, multi-contract `dependsOn` expansion, testnet smoke CI, npm publish pipeline expansion, CLI XDR commands, and template registry.
 
 Current-state observations to preserve:
 
@@ -94,7 +94,7 @@ export type TemplateManifest = z.infer<typeof TemplateManifestSchema>;
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/config/schema-type-exports.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/config/schema-type-exports.test.ts
 ```
 
 Expected: PASS. If it fails, the output lists the schema file and invalid export.
@@ -406,7 +406,7 @@ Expected: no `TEMPLATE_INVALID` or `KALEIDO_TEMPLATE_INVALID` occurrences. Other
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/errors/error-surface.test.ts src/errors/error-codes.test.ts src/templates/create-project-from-template.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/errors/error-surface.test.ts src/errors/error-codes.test.ts src/templates/create-project-from-template.test.ts
 ```
 
 Expected: PASS.
@@ -459,7 +459,7 @@ describe("KaleidoErrorCode", () => {
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- test/errors/kaleido-error-code.test.ts
+pnpm --filter @kaleido-xlm/core test -- test/errors/kaleido-error-code.test.ts
 ```
 
 Expected: PASS.
@@ -617,7 +617,7 @@ Both JSON syntax and schema invalid tests must expect:
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/templates/create-project-from-template.test.ts src/templates/template-manifest.schema.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/templates/create-project-from-template.test.ts src/templates/template-manifest.schema.test.ts
 ```
 
 Expected: PASS.
@@ -732,7 +732,7 @@ Expected: only `packages/core/src/version.ts` contains `= "0.1.0"` for the runti
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/templates/template-manifest.schema.test.ts src/templates/create-project-from-template.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/templates/template-manifest.schema.test.ts src/templates/create-project-from-template.test.ts
 ```
 
 Expected: PASS.
@@ -828,7 +828,7 @@ No new CLI command should be blocked in this task. The acceptable foundation is 
 Run:
 
 ```bash
-pnpm --filter @kaleido/core test -- src/stellar-cli/check-stellar-cli-version.test.ts src/stellar-cli/parse-stellar-cli-version.fixtures.test.ts src/stellar-cli/run-command-version.test.ts
+pnpm --filter @kaleido-xlm/core test -- src/stellar-cli/check-stellar-cli-version.test.ts src/stellar-cli/parse-stellar-cli-version.fixtures.test.ts src/stellar-cli/run-command-version.test.ts
 ```
 
 Expected: PASS.

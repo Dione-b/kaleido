@@ -1,4 +1,4 @@
-import { KaleidoError, KaleidoErrorCode } from "@kaleido/core";
+import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
 import type { KaleidoXdrBuildResult } from "../types.js";
 
 interface XdrTransactionLike {

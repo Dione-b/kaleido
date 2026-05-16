@@ -5,7 +5,7 @@
 <p>Developer toolkit for building dApps on <strong>Stellar / Soroban</strong>.</p>
 
 [![CI](https://img.shields.io/github/actions/workflow/status/Dione-b/kaleido/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Dione-b/kaleido/actions)
-[![npm](https://img.shields.io/npm/v/@kaleido/cli?label=%40kaleido%2Fcli)](https://www.npmjs.com/package/@kaleido/cli)
+[![npm](https://img.shields.io/npm/v/@kaleido-xlm/cli?label=%40kaleido%2Fcli)](https://www.npmjs.com/package/@kaleido-xlm/cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node 20+](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![pnpm 9+](https://img.shields.io/badge/pnpm-%3E%3D9-orange)](https://pnpm.io)
@@ -16,7 +16,7 @@
 
 Kaleido gives JS/TS teams a **predictable workflow** for Soroban contracts: init, build, deploy, generate TypeScript bindings, invoke — without copy-pasting contract IDs or manually serializing SCVal.
 
-It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather than replacing them, and layers on a few strong conventions: a typed `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, and a thin `@kaleido/client` that wires generated bindings, artifact lookup, and wallet signing in one place.
+It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather than replacing them, and layers on a few strong conventions: a typed `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, and a thin `@kaleido-xlm/client` that wires generated bindings, artifact lookup, and wallet signing in one place.
 
 > **Status:** Pre-v1 (`0.x` / `next`). The CLI surface is stable; see [v1 readiness](./docs/release/v1-readiness.md) for the remaining gates before `latest` is unfrozen.
 > See [v1 release spec](./docs/release/v1.0.0.md) for the public contract required before `latest`.
@@ -39,9 +39,9 @@ It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather tha
 | Without Kaleido | With Kaleido |
 |---|---|
 | Manually copy `contractId` into your frontend | `kaleido deploy` writes it to `kaleido.artifacts.json` automatically |
-| Hand-serialize SCVal for every invocation | `@kaleido/client` handles it via generated bindings |
+| Hand-serialize SCVal for every invocation | `@kaleido-xlm/client` handles it via generated bindings |
 | Scatter Stellar CLI flags across scripts | Single config in `kaleido.config.ts` |
-| Debug opaque CLI output by hand | Fragile parsing isolated in `@kaleido/core`, covered by versioned fixtures |
+| Debug opaque CLI output by hand | Fragile parsing isolated in `@kaleido-xlm/core`, covered by versioned fixtures |
 | XDR is a black box | `buildXdr()` / `debugXdr` expose unsigned, prepared, and signed XDR on demand |
 
 **Non-goals:** Kaleido does not store private keys, ship telemetry, or replace Stellar's own tooling. `--source` accepts an identity alias or a public `G…` address — secret keys and seed phrases are refused.
@@ -57,7 +57,7 @@ It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather tha
 ## Installation
 
 ```bash
-npm install -g @kaleido/cli   # or pnpm / yarn
+npm install -g @kaleido-xlm/cli   # or pnpm / yarn
 ```
 
 ## Quick Start
@@ -81,11 +81,11 @@ Use a Stellar CLI identity name (e.g. `alice`) or a public `G…` address for `-
 
 ## Browser Client
 
-`@kaleido/client` connects your generated bindings, artifacts, network config, and a wallet adapter with no manual plumbing:
+`@kaleido-xlm/client` connects your generated bindings, artifacts, network config, and a wallet adapter with no manual plumbing:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 
@@ -111,9 +111,9 @@ This is a **pnpm monorepo**. Each package has its own README.
 
 | Package | Description |
 |---|---|
-| [`@kaleido/cli`](./packages/cli) | Argument parsing, terminal output — delegates to core. |
-| [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), network/contract resolution, Stellar CLI orchestration (`execa` only here). |
-| [`@kaleido/client`](./packages/client) | Browser/client interop: generated bindings, artifact lookup, XDR visibility, wallet signing. |
+| [`@kaleido-xlm/cli`](./packages/cli) | Argument parsing, terminal output — delegates to core. |
+| [`@kaleido-xlm/core`](./packages/core) | Config and artifacts (Zod), network/contract resolution, Stellar CLI orchestration (`execa` only here). |
+| [`@kaleido-xlm/client`](./packages/client) | Browser/client interop: generated bindings, artifact lookup, XDR visibility, wallet signing. |
 | [`packages/templates`](./packages/templates) | Project templates copied by `kaleido init`. |
 
 ## CLI Reference
@@ -136,7 +136,7 @@ All commands accept `--network` (maps to a network defined in `kaleido.config.ts
 | [Architecture](./docs/architecture.md) | Promise, boundaries, roadmap, ADR index. |
 | [Getting started](./docs/getting-started.md) | Prerequisites and first commands. |
 | [CLI](./docs/cli.md) | Full command reference. |
-| [Client](./docs/client.md) | `@kaleido/client` API. |
+| [Client](./docs/client.md) | `@kaleido-xlm/client` API. |
 | [Config](./docs/config.md) | `kaleido.config.ts` schema. |
 | [Templates](./docs/templates.md) | Official templates and `kaleido.template.json`. |
 | [Errors](./docs/errors.md) | Public `KALEIDO_*` error codes. |
@@ -161,8 +161,8 @@ pnpm test
 ### Run the CLI from source
 
 ```bash
-pnpm --filter @kaleido/cli dev -- --help
-pnpm --filter @kaleido/cli dev init my-dapp
+pnpm --filter @kaleido-xlm/cli dev -- --help
+pnpm --filter @kaleido-xlm/cli dev init my-dapp
 ```
 
 ### Before opening a PR

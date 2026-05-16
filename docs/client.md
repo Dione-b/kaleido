@@ -1,6 +1,6 @@
-# Client (`@kaleido/client`)
+# Client (`@kaleido-xlm/client`)
 
-`@kaleido/client` is the alpha browser/client-side interop layer for generated Stellar CLI TypeScript bindings. It connects:
+`@kaleido-xlm/client` is the alpha browser/client-side interop layer for generated Stellar CLI TypeScript bindings. It connects:
 
 - generated contract bindings
 - `kaleido.artifacts.json`
@@ -34,14 +34,14 @@ Not included:
 ## Install
 
 ```bash
-pnpm add @kaleido/client @stellar/freighter-api
+pnpm add @kaleido-xlm/client @stellar/freighter-api
 ```
 
 ## Counter Example
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createKaleidoClient } from "@kaleido-xlm/client";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 import * as Counter from "./contracts/generated/counter";
 import artifacts from "../kaleido.artifacts.json";
 
@@ -160,7 +160,7 @@ export interface KaleidoWalletAdapter {
 The Freighter adapter is exported from:
 
 ```ts
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { freighterWalletAdapter } from "@kaleido-xlm/client/freighter";
 ```
 
 ## Binding Contract

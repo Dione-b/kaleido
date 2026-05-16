@@ -1,4 +1,4 @@
-import { KaleidoError, KaleidoErrorCode } from "@kaleido/core";
+import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
 import { KaleidoContractClient } from "./kaleido-contract-client.js";
 import type { KaleidoClientConfig } from "../types.js";
 

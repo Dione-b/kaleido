@@ -18,7 +18,7 @@ Soroban dApps need to know **which contract IDs** correspond to which logical na
    - `kaleido.config.ts` — project name, networks, contract paths/WASM paths, frontend binding output.
    - `kaleido.artifacts.json` — deployed `contractId`, `wasmHash`, timestamps, and paths, keyed by **network** (same logical contract may differ per network).
    - `contracts/` and **generated bindings** on disk — authoritative integration surface for the frontend.
-2. **No required central artifact registry** in core. Optional future services (hosted metadata, dashboards) must remain **optional** and must not be hard dependencies of `@kaleido/core` or `@kaleido/cli`.
+2. **No required central artifact registry** in core. Optional future services (hosted metadata, dashboards) must remain **optional** and must not be hard dependencies of `@kaleido-xlm/core` or `@kaleido-xlm/cli`.
 3. **Networks vs environments:** today’s model is **per-network** artifacts. A future **environment** dimension (e.g. staging vs production on the same testnet) is acknowledged; it will require a **versioned** artifacts or config evolution and a migration path—not silent overload of “network” semantics.
 
 ## Consequences

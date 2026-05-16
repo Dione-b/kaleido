@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoError, KaleidoErrorCode } from "@kaleido/core";
+import { KaleidoError, KaleidoErrorCode } from "@kaleido-xlm/core";
 import { createDefaultBindingAdapter } from "./default-binding-adapter.js";
 
 describe("createDefaultBindingAdapter", () => {

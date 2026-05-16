@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido/core";
+import { KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido-xlm/core";
 import type { KaleidoClientConfig } from "../types.js";
 import { createKaleidoClient } from "./create-kaleido-client.js";
 

@@ -31,7 +31,7 @@ Every template must include `kaleido.template.json`:
 }
 ```
 
-`compatibleCore` is checked against the current `@kaleido/core` version before files are copied. Missing manifests fail with `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`; invalid or incompatible manifests fail with `KALEIDO_TEMPLATE_INCOMPATIBLE`.
+`compatibleCore` is checked against the current `@kaleido-xlm/core` version before files are copied. Missing manifests fail with `KALEIDO_TEMPLATE_MANIFEST_NOT_FOUND`; invalid or incompatible manifests fail with `KALEIDO_TEMPLATE_INCOMPATIBLE`.
 
 Official templates are maintained in this repository. Community templates should be treated as executable source code: inspect the files before running install scripts or connecting wallets.
 
@@ -42,7 +42,7 @@ Generated projects include:
 - `kaleido.config.ts`
 - `kaleido.artifacts.json`
 - Vite and TypeScript config
-- dependencies for generated bindings, `@kaleido/client`, and Freighter smoke wiring
+- dependencies for generated bindings, `@kaleido-xlm/client`, and Freighter smoke wiring
 
 Set `KALEIDO_TEMPLATES_DIR` during local development to point the CLI at a custom templates directory.
 
@@ -51,6 +51,6 @@ Set `KALEIDO_TEMPLATES_DIR` during local development to point the CLI at a custo
 The official template documents both paths:
 
 1. CLI: `build -> deploy -> generate -> invoke`
-2. Browser/client: generated bindings + `kaleido.artifacts.json` + `@kaleido/client` + Freighter adapter
+2. Browser/client: generated bindings + `kaleido.artifacts.json` + `@kaleido-xlm/client` + Freighter adapter
 
 The template does not generate React hooks or `kaleido generate --interop` output in alpha.

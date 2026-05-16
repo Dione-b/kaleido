@@ -1,6 +1,6 @@
 import path from "node:path";
 import { Command } from "commander";
-import { createProjectFromTemplate } from "@kaleido/core";
+import { createProjectFromTemplate } from "@kaleido-xlm/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 import { resolveTemplateDir } from "../utils/template-path.js";

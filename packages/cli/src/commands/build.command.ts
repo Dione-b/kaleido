@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { buildContract, loadConfig } from "@kaleido/core";
+import { buildContract, loadConfig } from "@kaleido-xlm/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
