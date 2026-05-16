@@ -4,9 +4,9 @@
 
 **Goal:** Declarar, aplicar em runtime e testar um intervalo suportado de versões do Stellar CLI, com override local explícito e sem override em CI.
 
-**Architecture:** Constantes `STELLAR_CLI_MIN_VERSION` e `STELLAR_CLI_TESTED_MAX_VERSION` em `@kaleido/core` alimentam `parseStellarCliVersion` e `assertSupportedStellarCliVersion`. `checkStellarCliVersion` executa `stellar --version` via `runCommand` com `skipStellarVersionCheck: true` para evitar recursão. `runCommand` chama `checkStellarCliVersion` antes de qualquer outro `stellar` quando `skipStellarVersionCheck` é falso. O pacote `@kaleido/cli` expõe `--allow-untested-stellar-cli` e repassa `allowUntestedStellarCli` para funções de contrato que chamam `runCommand` / `checkBinary`.
+**Architecture:** Constantes `STELLAR_CLI_MIN_VERSION` e `STELLAR_CLI_TESTED_MAX_VERSION` em `@caatinga/core` alimentam `parseStellarCliVersion` e `assertSupportedStellarCliVersion`. `checkStellarCliVersion` executa `stellar --version` via `runCommand` com `skipStellarVersionCheck: true` para evitar recursão. `runCommand` chama `checkStellarCliVersion` antes de qualquer outro `stellar` quando `skipStellarVersionCheck` é falso. O pacote `@caatinga/cli` expõe `--allow-untested-stellar-cli` e repassa `allowUntestedStellarCli` para funções de contrato que chamam `runCommand` / `checkBinary`.
 
-**Tech Stack:** pnpm workspaces, TypeScript, Vitest, `semver`, `execa`, Commander (`@kaleido/cli`), pacote `@kaleido/core`.
+**Tech Stack:** pnpm workspaces, TypeScript, Vitest, `semver`, `execa`, Commander (`@caatinga/cli`), pacote `@caatinga/core`.
 
 **Nota de contexto:** A skill *writing-plans* recomenda worktree dedicado (brainstorming). Abra um worktree limpo antes de executar tarefas se a branch atual misturar outras mudanças.
 
@@ -17,10 +17,10 @@
 | Path | Responsibility |
 |------|----------------|
 | `packages/core/src/stellar-cli/version.ts` | Regex + `semver.valid`, `parseStellarCliVersion`, `assertSupportedStellarCliVersion`, constantes de range |
-| `packages/core/src/stellar-cli/check-stellar-cli-version.ts` | Orquestra `stellar --version` + assert; mapeia `ENOENT` → `KALEIDO_STELLAR_CLI_NOT_FOUND` |
+| `packages/core/src/stellar-cli/check-stellar-cli-version.ts` | Orquestra `stellar --version` + assert; mapeia `ENOENT` → `CAATINGA_STELLAR_CLI_NOT_FOUND` |
 | `packages/core/src/shell/run-command.ts` | Gate de versão antes de `execa` para comando `stellar` |
 | `packages/core/src/shell/check-binary.ts` | `stellar --version` / `rustc --version` via `runCommand` (herda gate stellar) |
-| `packages/core/src/errors/KaleidoError.ts` | Códigos `KALEIDO_STELLAR_CLI_*`, `KALEIDO_UNSUPPORTED_CLI_VERSION`, `KALEIDO_UNTESTED_CLI_VERSION` |
+| `packages/core/src/errors/CaatingaError.ts` | Códigos `CAATINGA_STELLAR_CLI_*`, `CAATINGA_UNSUPPORTED_CLI_VERSION`, `CAATINGA_UNTESTED_CLI_VERSION` |
 | `packages/core/src/contracts/build-contract.ts` (e deploy, invoke, generate-bindings) | Passam `allowUntestedStellarCli` para `checkBinary` / `runCommand` |
 | `packages/cli/src/commands/*.command.ts` | Flags `--allow-untested-stellar-cli` nas ações build/deploy/invoke/generate |
 | `docs/stellar-cli-version-contract.md` | Contrato público: range, upgrade, regra de CI |
@@ -43,7 +43,7 @@
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm typecheck
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm typecheck
 ```
 
 Expected: exit code `0`, sem erros TypeScript.
@@ -53,7 +53,7 @@ Expected: exit code `0`, sem erros TypeScript.
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido/core test
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm --filter @caatinga/core test
 ```
 
 Expected: Vitest conclui com sucesso; em especial passam `packages/core/src/stellar-cli/check-stellar-cli-version.test.ts` e `packages/core/src/stellar-cli/run-command-version.test.ts`.
@@ -114,7 +114,7 @@ describe("parseStellarCliVersion (checked-in fixtures)", () => {
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido/packages/core && pnpm exec vitest run src/stellar-cli/parse-stellar-cli-version.fixtures.test.ts -v
+cd /home/dionebastos/Documentos/PROJETOS/caatinga/packages/core && pnpm exec vitest run src/stellar-cli/parse-stellar-cli-version.fixtures.test.ts -v
 ```
 
 Expected: `2 passed` (ou equivalente), exit code `0`.
@@ -124,7 +124,7 @@ Expected: `2 passed` (ou equivalente), exit code `0`.
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && pnpm --filter @kaleido/core test
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && pnpm --filter @caatinga/core test
 ```
 
 Expected: todos os testes passam.
@@ -153,10 +153,10 @@ Após o parágrafo que menciona `--allow-untested-stellar-cli`, acrescente ao `d
 
 Execute apenas localmente, por exemplo:
 
-- `kaleido build counter --allow-untested-stellar-cli`
-- `kaleido deploy counter -s <identity> --allow-untested-stellar-cli`
-- `kaleido generate counter --allow-untested-stellar-cli`
-- `kaleido invoke counter.increment -s <identity> --allow-untested-stellar-cli` (substitua `<identity>` pelo alias ou endereço configurado no Stellar CLI)
+- `caatinga build counter --allow-untested-stellar-cli`
+- `caatinga deploy counter -s <identity> --allow-untested-stellar-cli`
+- `caatinga generate counter --allow-untested-stellar-cli`
+- `caatinga invoke counter.increment -s <identity> --allow-untested-stellar-cli` (substitua `<identity>` pelo alias ou endereço configurado no Stellar CLI)
 
 Use apenas em máquina de desenvolvimento quando aceitar risco de incompatibilidade de saída ou flags do Stellar CLI.
 ```
@@ -181,7 +181,7 @@ git commit -m "docs: add local examples for allow-untested-stellar-cli flag"
 Run:
 
 ```bash
-cd /home/dionebastos/Documentos/PROJETOS/kaleido && rg "allow-untested-stellar-cli" .github scripts packages --glob "*.yml" --glob "*.yaml" --glob "*.sh"
+cd /home/dionebastos/Documentos/PROJETOS/caatinga && rg "allow-untested-stellar-cli" .github scripts packages --glob "*.yml" --glob "*.yaml" --glob "*.sh"
 ```
 
 Expected: **nenhum** match em workflows ou scripts de CI; apenas em `packages/cli/src/commands/*.ts` e documentação.
@@ -231,11 +231,11 @@ git commit -m "fix: export stellar CLI version helpers from core"
 
 | Requisito da spec | Tarefa |
 |-------------------|--------|
-| Constantes min / tested max em `@kaleido/core` | Baseline Task 1 — já em `version.ts` |
-| `parseStellarCliVersion` + erros | Baseline — `version.ts` + `KaleidoErrorCode` |
+| Constantes min / tested max em `@caatinga/core` | Baseline Task 1 — já em `version.ts` |
+| `parseStellarCliVersion` + erros | Baseline — `version.ts` + `CaatingaErrorCode` |
 | Check antes de shell stellar | Baseline — `run-command.ts` |
 | `--allow-untested-stellar-cli` só local | Baseline CLI + Task 4 |
-| Códigos de erro listados | Baseline — `KaleidoError.ts` + `docs/errors.md` |
+| Códigos de erro listados | Baseline — `CaatingaError.ts` + `docs/errors.md` |
 | Testes: parse conhecido, old fail, untested default fail, override pass, run-command gate | Baseline — `check-stellar-cli-version.test.ts`, `run-command-version.test.ts` |
 | Fixtures com semver no nome | Parcial na spec (ex.: `deploy.v22…`); repo usa diretórios `v22.0.0/` e nomes mistos documentados em `docs/testing.md` — aceitável; Task 2 reforça **dois semvers** via fixtures existentes |
 | Docs: range, upgrade, flag, CI | Task 3 reforça exemplos; `docs/stellar-cli-version-contract.md` já cobre o restante |

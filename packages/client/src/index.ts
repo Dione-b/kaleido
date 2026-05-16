@@ -1,16 +1,16 @@
 export type {
-  KaleidoBindingAdapter,
-  KaleidoClientConfig,
-  KaleidoContractRegistration,
-  KaleidoInvokeOptions,
-  KaleidoInvokeResult,
-  KaleidoInvokeStatus,
-  KaleidoNetwork,
-  KaleidoWalletAdapter,
-  KaleidoXdrBuildResult
+  CaatingaBindingAdapter,
+  CaatingaClientConfig,
+  CaatingaContractRegistration,
+  CaatingaInvokeOptions,
+  CaatingaInvokeResult,
+  CaatingaInvokeStatus,
+  CaatingaNetwork,
+  CaatingaWalletAdapter,
+  CaatingaXdrBuildResult
 } from "./types.js";
 export { resolveContractId } from "./artifacts/resolve-contract-id.js";
 export { createDefaultBindingAdapter } from "./bindings/default-binding-adapter.js";
-export { createKaleidoClient } from "./client/create-kaleido-client.js";
-export { KaleidoContractClient } from "./client/kaleido-contract-client.js";
+export { createCaatingaClient } from "./client/create-caatinga-client.js";
+export { CaatingaContractClient } from "./client/caatinga-contract-client.js";
 export { buildXdr } from "./xdr/build-xdr.js";

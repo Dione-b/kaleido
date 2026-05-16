@@ -1,5 +1,6 @@
 import { execa, type Options } from "execa";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
+import type { CaatingaErrorCodeValue } from "../errors/CaatingaErrorCode.js";
 import { checkStellarCliVersion } from "../stellar-cli/check-stellar-cli-version.js";
 
 export type RunCommandResult = {
@@ -8,11 +9,12 @@ export type RunCommandResult = {
   all: string;
 };
 
-export type RunCommandOptions = {
+type RunCommandOptions = {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   allowUntestedStellarCli?: boolean;
   skipStellarVersionCheck?: boolean;
+  failureCode?: CaatingaErrorCodeValue;
 };
 
 export async function runCommand(
@@ -40,7 +42,7 @@ export async function runCommand(
       all: result.all ?? ""
     };
   } catch (error) {
-    if (error instanceof KaleidoError) {
+    if (error instanceof CaatingaError) {
       throw error;
     }
 
@@ -51,18 +53,18 @@ export async function runCommand(
       "code" in error &&
       error.code === "ENOENT"
     ) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         "Stellar CLI was not found.",
-        KaleidoErrorCode.STELLAR_CLI_NOT_FOUND,
-        "Install Stellar CLI before running Kaleido Stellar-backed commands.",
+        CaatingaErrorCode.STELLAR_CLI_NOT_FOUND,
+        "Install Stellar CLI before running Caatinga-backed commands.",
         error
       );
     }
 
     const output = typeof error === "object" && error && "all" in error ? String(error.all) : undefined;
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Command failed: ${command} ${args.join(" ")}`,
-      KaleidoErrorCode.COMMAND_FAILED,
+      options.failureCode ?? CaatingaErrorCode.COMMAND_FAILED,
       output || "Re-run the command with the underlying tool directly for full diagnostics.",
       error
     );

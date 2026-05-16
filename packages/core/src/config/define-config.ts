@@ -1,5 +1,5 @@
-import type { KaleidoConfig } from "./config.schema.js";
+import type { CaatingaConfig } from "./config.schema.js";
 
-export function defineConfig(config: KaleidoConfig): KaleidoConfig {
+export function defineConfig(config: CaatingaConfig): CaatingaConfig {
   return config;
 }

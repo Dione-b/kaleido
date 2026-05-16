@@ -1,10 +1,13 @@
 import { readArtifacts } from "../artifacts/read-artifacts.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
+import { buildStellarNetworkArgs } from "../stellar-cli/build-stellar-network-args.js";
 import { assertSafeSourceAccount } from "./source-account.js";
+
+const INVOKE_SIGNING_FAILURE_REGEX = /xdr processing error: xdr value invalid/i;
 
 export type InvokeTarget = {
   contractName: string;
@@ -12,7 +15,7 @@ export type InvokeTarget = {
 };
 
 export type InvokeContractOptions = {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   target: string;
   args?: string[];
   networkName?: string;
@@ -25,9 +28,9 @@ export function parseInvokeTarget(target: string): InvokeTarget {
   const [contractName, method, extra] = target.split(".");
 
   if (!contractName || !method || extra) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `Invalid invoke target "${target}".`,
-      KaleidoErrorCode.INVOKE_TARGET_INVALID,
+      CaatingaErrorCode.INVOKE_TARGET_INVALID,
       "Use the format contract.method, for example counter.increment."
     );
   }
@@ -44,35 +47,59 @@ export async function invokeContract(options: InvokeContractOptions) {
   const contractArtifact = artifacts.networks[network.name]?.contracts[target.contractName];
 
   if (!contractArtifact) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `No deployed artifact found for "${target.contractName}" on "${network.name}".`,
-      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
-      "Run kaleido deploy for this contract and network before invoking it."
+      CaatingaErrorCode.ARTIFACT_NOT_FOUND,
+      "Run caatinga deploy for this contract and network before invoking it."
     );
   }
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido invoke.", {
+  await checkBinary("stellar", "Install Stellar CLI before running caatinga invoke.", {
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
-  const result = await runCommand("stellar", [
-    "contract",
-    "invoke",
-    "--id",
-    contractArtifact.contractId,
-    "--source-account",
-    source,
-    "--rpc-url",
-    network.config.rpcUrl,
-    "--network-passphrase",
-    network.config.networkPassphrase,
-    "--",
-    target.method,
-    ...(options.args ?? [])
-  ], {
-    cwd,
-    allowUntestedStellarCli: options.allowUntestedStellarCli
-  });
+  let result: Awaited<ReturnType<typeof runCommand>>;
+
+  try {
+    result = await runCommand("stellar", [
+      "contract",
+      "invoke",
+      "--id",
+      contractArtifact.contractId,
+      "--source-account",
+      source,
+      ...buildStellarNetworkArgs(network),
+      "--",
+      target.method,
+      ...(options.args ?? [])
+    ], {
+      cwd,
+      allowUntestedStellarCli: options.allowUntestedStellarCli,
+      failureCode: CaatingaErrorCode.INVOKE_FAILED
+    });
+  } catch (error) {
+    if (
+      error instanceof CaatingaError
+      && error.code === CaatingaErrorCode.INVOKE_FAILED
+      && INVOKE_SIGNING_FAILURE_REGEX.test(`${error.message}\n${error.hint ?? ""}`)
+    ) {
+      throw new CaatingaError(
+        error.message,
+        error.code,
+        [
+          "Stellar CLI could not sign the invoke transaction (xdr value invalid).",
+          "Stellar CLI 22.x has a known invoke signing bug; upgrade to 23.0.0 or newer (25.2.0 recommended).",
+          "  stellar --version",
+          "Then retry with a funded identity, for example:",
+          "  stellar keys generate alice --fund --network testnet",
+          "  npx caatinga invoke counter.increment --network testnet --source alice"
+        ].join("\n"),
+        error
+      );
+    }
+
+    throw error;
+  }
 
   return {
     target,

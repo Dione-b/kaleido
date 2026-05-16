@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "./resolve-network.js";
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -35,13 +35,13 @@ describe("resolveNetwork", () => {
     expect(r.config.rpcUrl).toContain("mainnet");
   });
 
-  it("should_throw_KALEIDO_NETWORK_NOT_FOUND_when_name_missing", () => {
+  it("should_throw_CAATINGA_NETWORK_NOT_FOUND_when_name_missing", () => {
     try {
       resolveNetwork(baseConfig, "futurenet");
       expect.fail("expected throw");
     } catch (error) {
-      expect(error).toBeInstanceOf(KaleidoError);
-      expect((error as KaleidoError).code).toBe(KaleidoErrorCode.NETWORK_NOT_FOUND);
+      expect(error).toBeInstanceOf(CaatingaError);
+      expect((error as CaatingaError).code).toBe(CaatingaErrorCode.NETWORK_NOT_FOUND);
     }
   });
 });

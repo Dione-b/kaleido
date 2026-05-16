@@ -10,16 +10,16 @@ export const ContractArtifactSchema = z.object({
   resolvedDeployArgs: z.record(z.string().min(1), z.union([z.string(), z.number(), z.boolean()])).default({})
 });
 
-export const NetworkArtifactsSchema = z.object({
+const NetworkArtifactsSchema = z.object({
   contracts: z.record(z.string().min(1), ContractArtifactSchema).default({}),
   dependencyGraph: z.record(z.string().min(1), z.array(z.string().min(1))).default({})
 });
 
-export const KaleidoArtifactsSchema = z.object({
+export const CaatingaArtifactsSchema = z.object({
   project: z.string().min(1),
   version: z.literal(1),
   networks: z.record(z.string().min(1), NetworkArtifactsSchema).default({})
 });
 
 export type ContractArtifact = z.infer<typeof ContractArtifactSchema>;
-export type KaleidoArtifacts = z.infer<typeof KaleidoArtifactsSchema>;
+export type CaatingaArtifacts = z.infer<typeof CaatingaArtifactsSchema>;

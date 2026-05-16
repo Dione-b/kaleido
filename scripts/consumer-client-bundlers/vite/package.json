@@ -1,0 +1,16 @@
+{
+  "name": "caatinga-client-consumer-vite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@caatinga/client": "0.0.0-placeholder",
+    "@caatinga/core": "0.0.0-placeholder"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.6"
+  }
+}

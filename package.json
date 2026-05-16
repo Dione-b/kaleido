@@ -1,26 +1,29 @@
 {
-  "name": "kaleido",
+  "name": "caatinga",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "build": "turbo build",
-    "dev": "pnpm --filter @kaleido/cli dev",
+    "dev": "pnpm --filter @caatinga/cli dev",
+    "install:global": "pnpm build && NPM_CONFIG_PREFIX=\"$(dirname \"$(dirname \"$(command -v node)\")\")\" npm install -g ./packages/cli",
     "test": "turbo test",
     "typecheck": "turbo typecheck",
+    "knip": "knip --no-config-hints",
     "changeset": "changeset",
     "pack:packages": "( cd packages/core && pnpm pack --pack-destination ../../packed ) && ( cd packages/client && pnpm pack --pack-destination ../../packed ) && ( cd packages/cli && pnpm pack --pack-destination ../../packed )",
-    "test:consumer": "bash scripts/consumer-isolation-test.sh"
+    "test:consumer": "bash scripts/consumer-isolation-test.sh",
+    "test:consumer:client-bundlers": "bash scripts/consumer-client-bundlers-test.sh",
+    "ci:snapshot-pack": "bash scripts/ci-snapshot-pack.sh",
+    "publish:dry-run": "pnpm publish -r --access public --dry-run --no-git-checks --tag next",
+    "ci:publish-matrix": "pnpm build && pnpm test && pnpm ci:snapshot-pack && pnpm publish:dry-run && SKIP_PACK=1 PACKED_DIR=\"$PWD/packed\" pnpm test:consumer && PACKED_DIR=\"$PWD/packed\" pnpm test:consumer:client-bundlers"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
-    "@kaleido/cli": "workspace:*",
     "@types/node": "^22.10.2",
-    "tsup": "^8.3.5",
-    "tsx": "^4.19.2",
+    "knip": "5",
     "turbo": "^2.3.3",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "typescript": "^5.7.2"
   }
 }

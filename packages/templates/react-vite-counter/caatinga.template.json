@@ -1,0 +1,21 @@
+{
+  "name": "react-vite-counter",
+  "version": "0.1.0",
+  "description": "Minimal Vite + React + Soroban counter dApp.",
+  "caatinga": {
+    "compatibleCore": "^0.2.1",
+    "templateVersion": 1
+  },
+  "frontend": {
+    "framework": "vite-react",
+    "packageManager": "npm"
+  },
+  "contracts": {
+    "path": "contracts",
+    "default": "counter"
+  },
+  "files": {
+    "config": "caatinga.config.ts",
+    "artifacts": "caatinga.artifacts.json"
+  }
+}

@@ -1,9 +1,9 @@
 # Config
 
-Kaleido projects use `kaleido.config.ts`.
+Caatinga projects use `caatinga.config.ts`.
 
 ```ts
-import { defineConfig } from "@kaleido/core";
+import { defineConfig } from "@caatinga/core";
 
 export default defineConfig({
   project: "my-dapp",
@@ -11,7 +11,7 @@ export default defineConfig({
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./contracts/counter/target/wasm32v1-none/release/counter.wasm"
+      wasm: "./contracts/counter/target/wasm32-unknown-unknown/release/counter.wasm"
     }
   },
   networks: {
@@ -48,17 +48,17 @@ Current shape (optional fields omitted when empty):
 
 ### Multi-contract dependencies
 
-`dependsOn` lists contracts that must deploy before the current contract. `deployArgs` may use `${contracts.<name>.contractId}` placeholders, resolved from `kaleido.artifacts.json` after dependencies deploy:
+`dependsOn` lists contracts that must deploy before the current contract. `deployArgs` may use `${contracts.<name>.contractId}` placeholders, resolved from `caatinga.artifacts.json` after dependencies deploy:
 
 ```ts
 contracts: {
   token: {
     path: "./contracts/token",
-    wasm: "./contracts/token/target/wasm32v1-none/release/token.wasm"
+    wasm: "./contracts/token/target/wasm32-unknown-unknown/release/token.wasm"
   },
   marketplace: {
     path: "./contracts/marketplace",
-    wasm: "./contracts/marketplace/target/wasm32v1-none/release/marketplace.wasm",
+    wasm: "./contracts/marketplace/target/wasm32-unknown-unknown/release/marketplace.wasm",
     dependsOn: ["token"],
     deployArgs: {
       tokenContractId: "${contracts.token.contractId}"

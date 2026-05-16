@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { parseContractId } from "./parse-contract-id.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +20,12 @@ describe("parseContractId", () => {
     expect(parseContractId(output)).toBe(CONTRACT_ID);
   });
 
+  it("should_parse_contract_id_from_v22_deploy_success_fixture", async () => {
+    const output = await fixture("v22.0.0/deploy-success.txt");
+
+    expect(parseContractId(output)).toBe(CONTRACT_ID);
+  });
+
   it("should_parse_contract_id_from_minimal_unknown_fixture", async () => {
     const output = await fixture("unknown/deploy-success-minimal.txt");
 
@@ -30,7 +36,7 @@ describe("parseContractId", () => {
     const output = await fixture("unknown/deploy-success-no-contract-id.txt");
 
     expect(() => parseContractId(output)).toThrow(expect.objectContaining({
-      code: KaleidoErrorCode.CONTRACT_ID_NOT_FOUND
+      code: CaatingaErrorCode.CONTRACT_ID_NOT_FOUND
     }));
   });
 });

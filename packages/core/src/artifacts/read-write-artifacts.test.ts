@@ -1,9 +1,9 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
-import { KaleidoArtifactsSchema } from "./artifact.schema.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
+import { CaatingaArtifactsSchema } from "./artifact.schema.js";
 import { readArtifacts } from "./read-artifacts.js";
 import { createInitialArtifacts, writeArtifacts } from "./write-artifacts.js";
 
@@ -17,7 +17,7 @@ describe("writeArtifacts and readArtifacts", () => {
   });
 
   it("should_roundtrip_valid_artifacts_json", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-art-"));
     const initial = createInitialArtifacts("app");
     initial.networks.testnet = { contracts: {}, dependencyGraph: {} };
 
@@ -28,27 +28,27 @@ describe("writeArtifacts and readArtifacts", () => {
     expect(loaded.version).toBe(1);
     expect(loaded.networks.testnet?.contracts).toEqual({});
 
-    const raw = await readFile(path.join(tmpDir, "kaleido.artifacts.json"), "utf8");
+    const raw = await readFile(path.join(tmpDir, "caatinga.artifacts.json"), "utf8");
     expect(JSON.parse(raw).version).toBe(1);
   });
 
-  it("should_throw_KALEIDO_ARTIFACT_NOT_FOUND_when_file_missing", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
+  it("should_throw_CAATINGA_ARTIFACT_NOT_FOUND_when_file_missing", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-art-"));
     await expect(readArtifacts(tmpDir)).rejects.toMatchObject({
-      code: KaleidoErrorCode.ARTIFACT_NOT_FOUND
+      code: CaatingaErrorCode.ARTIFACT_NOT_FOUND
     });
   });
 
-  it("should_throw_KALEIDO_ARTIFACT_INVALID_when_json_malformed", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-art-"));
-    await writeFile(path.join(tmpDir, "kaleido.artifacts.json"), "{", "utf8");
+  it("should_throw_CAATINGA_ARTIFACT_INVALID_when_json_malformed", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-art-"));
+    await writeFile(path.join(tmpDir, "caatinga.artifacts.json"), "{", "utf8");
     await expect(readArtifacts(tmpDir)).rejects.toMatchObject({
-      code: KaleidoErrorCode.ARTIFACT_INVALID
+      code: CaatingaErrorCode.ARTIFACT_INVALID
     });
   });
 
   it("accepts dependency metadata in version 1 artifacts", () => {
-    const artifacts = KaleidoArtifactsSchema.parse({
+    const artifacts = CaatingaArtifactsSchema.parse({
       project: "marketplace-app",
       version: 1,
       networks: {

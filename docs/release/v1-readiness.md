@@ -1,22 +1,19 @@
 # v1 Readiness
 
-Do not tag `v1.0.0` until these specs are implemented and accepted:
+## Track A — Pre-v1 Public Publish (`0.x` / `next`)
 
-1. Stellar CLI version contract — **complete** (Tasks 1–3).
-2. Complete `KALEIDO_*` error surface — **complete** (Task 4).
-3. npm publish and consumer isolation — **complete** (Tasks 5–7).
-4. Live testnet smoke CI — **complete** (Task 8).
-5. Experimental multi-contract dependency deploy — **complete** (Tasks 9–12).
-
-Pre-v1 publishing is allowed only under `0.x`, `alpha`, `beta`, or `next`.
-
-Before `latest`, require:
-
+- package metadata valid
+- package READMEs complete
 - `pnpm typecheck`
 - `pnpm build`
 - `pnpm test`
 - `pnpm test:consumer`
-- three consecutive successful scheduled testnet smoke runs
-- no unretried testnet smoke failure in the last 7 days
+- release workflow aligned with pre-v1 `next` publishing policy in [`docs/release/v1.0.0.md`](./v1.0.0.md#dist-tag-policy)
 
-The v1 release requires three consecutive successful scheduled `Testnet Smoke` runs and no unretried smoke failure in the previous 7 days.
+## Track B — Stable Release (`v1.0.0` / `latest`)
+
+- live testnet smoke workflow configured with CI secrets; three consecutive green scheduled runs per [observability plan](./v1.0.0.md#observability-plan)
+- all five v1 specs implemented and accepted, as listed in [`docs/superpowers/specs/00-v1-viability-index.md`](../superpowers/specs/00-v1-viability-index.md)
+- three consecutive successful scheduled smoke runs, verified with the procedure in [`docs/release/v1.0.0.md`](./v1.0.0.md#observability-plan)
+- no unretried smoke failure in the last 7 days, verified with the procedure in [`docs/release/v1.0.0.md`](./v1.0.0.md#observability-plan)
+- release evidence captured in `docs/release/v1.0.0.md`

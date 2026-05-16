@@ -1,15 +1,7 @@
 import type { ContractConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 type VisitState = "visiting" | "visited";
-
-export function buildDependencyGraph(contracts: Record<string, ContractConfig>): Record<string, string[]> {
-  const graph: Record<string, string[]> = {};
-  for (const name of Object.keys(contracts)) {
-    graph[name] = [...contracts[name].dependsOn];
-  }
-  return graph;
-}
 
 export function resolveDeployOrder(input: {
   contracts: Record<string, ContractConfig>;
@@ -30,10 +22,10 @@ export function resolveDeployOrder(input: {
     const contract = input.contracts[contractName];
 
     if (!contract) {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Contract dependency "${contractName}" was not found.`,
-        KaleidoErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
-        "Add the dependency to kaleido.config.ts or remove it from dependsOn."
+        CaatingaErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
+        "Add the dependency to caatinga.config.ts or remove it from dependsOn."
       );
     }
 
@@ -42,9 +34,9 @@ export function resolveDeployOrder(input: {
     }
 
     if (state.get(contractName) === "visiting") {
-      throw new KaleidoError(
+      throw new CaatingaError(
         `Contract dependency cycle detected: ${[...stack, contractName].join(" -> ")}.`,
-        KaleidoErrorCode.CONTRACT_DEPENDENCY_CYCLE,
+        CaatingaErrorCode.CONTRACT_DEPENDENCY_CYCLE,
         "Remove the cycle from dependsOn."
       );
     }
@@ -58,10 +50,10 @@ export function resolveDeployOrder(input: {
     } else if (contract.dependsOn.length > 0 && input.selectedContract === contractName) {
       for (const dependency of contract.dependsOn) {
         if (!input.contracts[dependency]) {
-          throw new KaleidoError(
+          throw new CaatingaError(
             `Contract dependency "${dependency}" was not found.`,
-            KaleidoErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
-            "Add the dependency to kaleido.config.ts or remove it from dependsOn."
+            CaatingaErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND,
+            "Add the dependency to caatinga.config.ts or remove it from dependsOn."
           );
         }
       }

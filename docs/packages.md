@@ -1,0 +1,25 @@
+# Packages
+
+| Package | Role |
+|---------|------|
+| `@caatinga/cli` | End-user CLI (`caatinga` binary) |
+| `@caatinga/core` | Config, artifacts, Stellar CLI orchestration |
+| `@caatinga/client` | Browser/client interop over generated bindings |
+
+Install for end users:
+
+```bash
+npm install -g @caatinga/cli
+```
+
+Monorepo development:
+
+```bash
+pnpm install
+pnpm build
+pnpm dev -- init my-app
+```
+
+The last command runs the CLI from source via `tsx` in `packages/cli`.
+
+Future names such as `@caatinga/react` are reserved in architecture docs and are not published yet.

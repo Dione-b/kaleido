@@ -1,132 +1,112 @@
-# Kaleido
+<div align="center">
 
-**Kaleido** is an alpha developer toolkit for building dApps on **Stellar / Soroban**. It keeps a **predictable workflow**—create a project, build contracts, deploy, generate TypeScript bindings, invoke, and wire a browser client—while isolating Stellar CLI details inside [`@kaleido/core`](./packages/core).
+<h1>Caatinga</h1>
 
-Kaleido does **not** replace Stellar CLI, Stellar SDK, Soroban SDK, generated bindings, or wallet signing. It **orchestrates** them and adds conventions: `kaleido.config.ts`, network-scoped `kaleido.artifacts.json`, templates tuned for JS/TS teams, and a thin `@kaleido/client` layer for artifact lookup, wallet signing, and XDR visibility.
+<p>CLI toolkit for Stellar / Soroban dApps — init, build, deploy, generate bindings, invoke.</p>
 
-Current release target: **pre-v1** (`0.x` / `next`). Publication layout and CI gates are aligned with [v1 readiness](./docs/release/v1-readiness.md); `latest` remains intentionally strict.
+[![CI](https://img.shields.io/github/actions/workflow/status/Dione-b/caatinga/ci.yml?branch=main&label=CI&logo=github)](https://github.com/Dione-b/caatinga/actions)
+[![npm](https://img.shields.io/npm/v/@caatinga/cli?label=%40caatinga%2Fcli)](https://www.npmjs.com/package/@caatinga/cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-## Features
+</div>
 
-- **Stable CLI surface:** `init`, `build`, `deploy`, `generate`, `invoke` (plus `dev` as a placeholder until the opinionated dev server lands).
-- **Artifacts per network:** deployed `contractId`, WASM hash, and paths—no manual copy-paste into the frontend for the happy path.
-- **Client interop:** `@kaleido/client` connects generated bindings, artifacts, network config, and wallet adapters without manually serializing SCVal or storing private keys.
-- **XDR observability:** `buildXdr()` and explicit `debugXdr` expose unsigned/prepared/signed XDR only when requested.
-- **Template compatibility:** official templates ship a `kaleido.template.json` manifest and are checked against the current core version before copy.
-- **Stellar CLI parser hardening:** fragile CLI output parsing is isolated in `@kaleido/core` and covered by versioned fixtures.
-- **Public error codes:** failures expose documented `KALEIDO_*` codes that are safe for CI parsing.
-- **Official template:** `react-vite-counter` (Vite + React + Soroban counter contract).
-- **Security by default:** no private key storage, no telemetry in core; deploy/invoke use `--source` (Stellar CLI identity alias or public address only—secrets rejected).
-
-## Not in scope (yet)
-
-- `kaleido doctor`
-- CLI XDR commands
-- `kaleido generate --interop`
-- React hooks in `@kaleido/client`
-
-Experimental multi-contract deploy, Stellar CLI version gating, consumer isolation packaging checks, and live testnet smoke CI exist in-repo; tagging `v1.0.0` still follows [v1 readiness](./docs/release/v1-readiness.md).
-
-## Monorepo
-
-| Package | Role |
-|---------|------|
-| [`@kaleido/cli`](./packages/cli) | Argument parsing, terminal output, delegates to core. |
-| [`@kaleido/core`](./packages/core) | Config and artifacts (Zod), networks/contracts resolution, Stellar CLI orchestration (`execa` only here). |
-| [`@kaleido/client`](./packages/client) | Thin browser/client interop layer for generated bindings, artifacts, XDR visibility, and wallet signing. |
-| [`packages/templates`](./packages/templates) | Templates copied by `kaleido init`. |
-
-Requirements: **Node 20+**, **pnpm 9+**, **Rust 1.84.0+** + `wasm32v1-none`, **Stellar CLI**, and a local Stellar identity for CLI deploy/invoke.
-
-## Quick start (contributors)
-
-From the repository root:
+## Install
 
 ```bash
-pnpm install
-pnpm build
-pnpm test
+npm install -g @caatinga/cli
 ```
 
-Run the CLI from source:
+**You also need:**
+
+- Node.js 20+
+- [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) 23.x–25.2.x on your `PATH` (22.x breaks `caatinga invoke`)
+- Rust + `wasm32-unknown-unknown` (to compile contracts)
+- A funded Stellar CLI identity (e.g. `alice`)
 
 ```bash
-pnpm --filter @kaleido/cli dev -- --help
-pnpm --filter @kaleido/cli dev init my-dapp
+stellar keys generate alice --fund --network testnet
 ```
 
-CI runs the same default checks:
+## Quick start
 
 ```bash
-pnpm typecheck
-pnpm build
-pnpm test
-```
-
-## Quick start (generated app)
-
-After `kaleido init my-dapp`:
-
-```bash
+caatinga init my-dapp
 cd my-dapp
-npm install   # or pnpm / yarn
-npx kaleido build counter
-npx kaleido deploy counter --network testnet --source <identity-or-G-address>
-npx kaleido generate counter --network testnet
-npx kaleido invoke counter.increment --network testnet --source <identity-or-G-address>
+npm install
+
+npx caatinga build counter
+npx caatinga deploy counter --network testnet --source alice
+npx caatinga generate counter --network testnet
+npx caatinga invoke counter.increment --network testnet --source alice
 ```
 
-Use a Stellar CLI identity name (e.g. `alice`) or a **public** `G…` address for `--source`. Secret keys and seed phrases are refused.
+`deploy` writes the contract ID to `caatinga.artifacts.json`. `generate` creates TypeScript bindings under `contracts/generated/`.
 
-For browser-side calls, use `@kaleido/client` with generated bindings, `kaleido.artifacts.json`, and a wallet adapter:
+## Commands
+
+| Command | What it does |
+|---|---|
+| `caatinga init <dir>` | Create a project from a template |
+| `caatinga build [contract]` | Compile contract WASM (default: `counter`) |
+| `caatinga deploy [contract] --source <identity> --network <name>` | Deploy and save `contractId` to artifacts |
+| `caatinga generate <contract> --network <name>` | Generate TS bindings from a deployed contract |
+| `caatinga invoke <contract.method> --source <identity> --network <name>` | Call a contract method |
+
+**Common flags**
+
+- `--source` — Stellar CLI identity that can sign (e.g. `alice`). Public `G…` addresses are not accepted.
+- `--network` — Network from `caatinga.config.ts` (e.g. `testnet`)
+- `--force` — Redeploy even if artifacts already have a contract ID
+
+## Browser apps
+
+Use `@caatinga/client` with generated bindings, `caatinga.artifacts.json`, and a wallet adapter (Freighter):
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createCaatingaClient } from "@caatinga/client";
+import { freighterWalletAdapter } from "@caatinga/client/freighter";
 import * as Counter from "./contracts/generated/counter";
-import artifacts from "../kaleido.artifacts.json";
+import artifacts from "../caatinga.artifacts.json";
 
-const client = createKaleidoClient({
+const client = createCaatingaClient({
   network: {
     name: "testnet",
     rpcUrl: "https://soroban-testnet.stellar.org",
-    networkPassphrase: "Test SDF Network ; September 2015"
+    networkPassphrase: "Test SDF Network ; September 2015",
   },
   artifacts,
   wallet: freighterWalletAdapter,
-  contracts: {
-    counter: { binding: Counter }
-  }
+  contracts: { counter: { binding: Counter } },
 });
 
 await client.contract("counter").invoke("increment");
 ```
 
-## Documentation
+## Project layout
 
-- **[Architecture & product stance](./docs/architecture.md)** — promise, boundaries, roadmap, ADR index.
-- **[Getting started](./docs/getting-started.md)** — prerequisites and commands.
-- **[CLI](./docs/cli.md)** · **[Client](./docs/client.md)** · **[Config](./docs/config.md)** · **[Templates](./docs/templates.md)**
-- **[Errors](./docs/errors.md)** — public `KALEIDO_*` codes.
-- **[Testing](./docs/testing.md)** — fixture strategy and no-testnet default CI policy.
-- **[Stellar CLI version contract](./docs/stellar-cli-version-contract.md)** — supported Stellar CLI range and override policy.
-- **[v1 readiness](./docs/release/v1-readiness.md)** — release gates before `v1.0.0`.
-- **[v0.1.0-alpha release notes](./docs/release/v0.1.0-alpha.md)** — internal alpha scope and verification gates.
+After `init`, you typically work with:
 
-## Scripts
+- `caatinga.config.ts` — contracts, WASM paths, networks
+- `caatinga.artifacts.json` — deployed contract IDs per network
+- `contracts/` — Rust Soroban contracts
+- `contracts/generated/` — bindings (after `generate`)
 
-| Command | Description |
-|---------|-------------|
-| `pnpm build` | Turbo build for all packages. |
-| `pnpm test` | Turbo test (`@kaleido/core`, `@kaleido/client`, `@kaleido/cli`). |
-| `pnpm typecheck` | Typecheck across the workspace. |
-| `pnpm test:consumer` | Pack tarballs, install outside the monorepo, and smoke-import CLI and client. |
-| `pnpm dev` | Run `@kaleido/cli` in dev mode (`tsx`). |
+## Docs
 
-## Contributing
+- [Getting started](./docs/getting-started.md)
+- [CLI reference](./docs/cli.md)
+- [Config](./docs/config.md)
+- [Client](./docs/client.md)
+- [Errors](./docs/errors.md)
 
-Read [`docs/architecture.md`](./docs/architecture.md) and the ADRs under [`docs/adr/`](./docs/adr/) before large changes—especially anything that touches Stellar CLI parsing, public error codes, artifact shape, or template contracts.
+## Develop this repo
 
-## Repository
+```bash
+git clone https://github.com/Dione-b/caatinga.git && cd caatinga
+pnpm install && pnpm build && pnpm test
+pnpm --filter @caatinga/cli dev init my-dapp   # run CLI from source
+```
 
-<https://github.com/Dione-b/kaleido>
+## License
+
+MIT

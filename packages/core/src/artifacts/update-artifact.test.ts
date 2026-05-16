@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { updateArtifact } from "./update-artifact.js";
-import type { KaleidoArtifacts } from "./artifact.schema.js";
+import type { CaatingaArtifacts } from "./artifact.schema.js";
 
 describe("updateArtifact", () => {
   it("preserves artifacts from other networks", () => {
-    const artifacts: KaleidoArtifacts = {
+    const artifacts: CaatingaArtifacts = {
       project: "app",
       version: 1,
       networks: {

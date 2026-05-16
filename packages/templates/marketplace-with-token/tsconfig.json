@@ -7,5 +7,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "kaleido.config.ts"]
+  "include": ["src", "caatinga.config.ts"]
 }

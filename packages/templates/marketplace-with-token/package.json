@@ -4,14 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "kaleido:build": "kaleido build token && kaleido build marketplace",
-    "kaleido:deploy": "kaleido deploy --network testnet"
+    "caatinga:build": "caatinga build token && caatinga build marketplace",
+    "caatinga:deploy": "caatinga deploy --network testnet"
   },
   "dependencies": {
-    "@kaleido/core": "^0.1.0"
+    "@caatinga/core": "^0.2.1"
   },
   "devDependencies": {
-    "@kaleido/cli": "^0.1.0",
+    "@caatinga/cli": "^0.2.1",
     "typescript": "^5.7.2"
   }
 }
