@@ -6,7 +6,7 @@ export default defineConfig({
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./contracts/counter/target/wasm32v1-none/release/counter.wasm"
+      wasm: "./contracts/counter/target/wasm32-unknown-unknown/release/counter.wasm"
     }
   },
   networks: {
