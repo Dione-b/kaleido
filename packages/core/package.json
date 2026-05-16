@@ -1,8 +1,16 @@
 {
   "name": "@kaleido-xlm/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core config, artifacts, command orchestration, and error primitives for Kaleido Stellar/Soroban toolkit",
-  "keywords": ["stellar", "soroban", "dapp", "smart-contracts", "blockchain", "artifacts", "kaleido"],
+  "keywords": [
+    "stellar",
+    "soroban",
+    "dapp",
+    "smart-contracts",
+    "blockchain",
+    "artifacts",
+    "kaleido"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dione-b/kaleido.git",
@@ -25,7 +33,11 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "test": "vitest run --pool=threads",

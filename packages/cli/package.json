@@ -1,8 +1,17 @@
 {
   "name": "@kaleido-xlm/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Developer toolkit CLI for building dApps on Stellar/Soroban",
-  "keywords": ["stellar", "soroban", "cli", "dapp", "smart-contracts", "blockchain", "web3", "kaleido"],
+  "keywords": [
+    "stellar",
+    "soroban",
+    "cli",
+    "dapp",
+    "smart-contracts",
+    "blockchain",
+    "web3",
+    "kaleido"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dione-b/kaleido.git",
@@ -27,7 +36,12 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "templates", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean && rm -rf ./templates && cp -r ../templates ./templates",
     "dev": "tsx src/index.ts",
@@ -35,7 +49,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kaleido-xlm/core": "^0.1.0",
+    "@kaleido-xlm/core": "^0.1.1",
     "chalk": "^5.4.1",
     "commander": "^12.1.0"
   },
