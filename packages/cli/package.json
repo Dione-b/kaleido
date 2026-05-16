@@ -27,9 +27,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": ["dist", "templates", "README.md", "LICENSE"],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean",
+    "build": "tsup src/index.ts --format esm --dts --clean && rm -rf ./templates && cp -r ../templates ./templates",
     "dev": "tsx src/index.ts",
     "test": "vitest run --pool=threads",
     "typecheck": "tsc --noEmit"
