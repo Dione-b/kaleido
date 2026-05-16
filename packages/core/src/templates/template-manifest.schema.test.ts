@@ -23,7 +23,7 @@ describe("isCoreVersionCompatible", () => {
   });
 
   it("uses the centralized core version by default", () => {
-    expect(CAATINGA_CORE_VERSION).toBe("0.2.0");
+    expect(CAATINGA_CORE_VERSION).toBe("0.2.1");
     expect(isCoreVersionCompatible(defaultCompatibleCoreRange())).toBe(true);
   });
 });

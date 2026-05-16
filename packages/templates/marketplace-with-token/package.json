@@ -8,10 +8,10 @@
     "caatinga:deploy": "caatinga deploy --network testnet"
   },
   "dependencies": {
-    "@caatinga/core": "^0.2.0"
+    "@caatinga/core": "^0.2.1"
   },
   "devDependencies": {
-    "@caatinga/cli": "^0.2.0",
+    "@caatinga/cli": "^0.2.1",
     "typescript": "^5.7.2"
   }
 }
