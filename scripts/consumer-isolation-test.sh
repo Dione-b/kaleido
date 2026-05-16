@@ -31,7 +31,7 @@ done
 cd "$TMP_DIR"
 npm init -y >/dev/null
 export KALEIDO_TEMPLATES_DIR="$ROOT_DIR/packages/templates"
-npm install "$PACKED_DIR"/kaleido-core-*.tgz "$PACKED_DIR"/kaleido-client-*.tgz "$PACKED_DIR"/kaleido-cli-*.tgz
+npm install "$PACKED_DIR"/kaleido-xlm-core-*.tgz "$PACKED_DIR"/kaleido-xlm-client-*.tgz "$PACKED_DIR"/kaleido-xlm-cli-*.tgz
 
 node --input-type=module -e 'import { defineConfig } from "@kaleido-xlm/core"; console.log(typeof defineConfig)'
 node --input-type=module -e 'import { createKaleidoClient } from "@kaleido-xlm/client"; console.log(typeof createKaleidoClient)'
@@ -42,9 +42,9 @@ test -f test-app/kaleido.artifacts.json
 
 cd test-app
 
-_kcore=( "$PACKED_DIR"/kaleido-core-*.tgz )
-_kclient=( "$PACKED_DIR"/kaleido-client-*.tgz )
-_kcli=( "$PACKED_DIR"/kaleido-cli-*.tgz )
+_kcore=( "$PACKED_DIR"/kaleido-xlm-core-*.tgz )
+_kclient=( "$PACKED_DIR"/kaleido-xlm-client-*.tgz )
+_kcli=( "$PACKED_DIR"/kaleido-xlm-cli-*.tgz )
 if [[ ${#_kcore[@]} -eq 0 || ${#_kclient[@]} -eq 0 || ${#_kcli[@]} -eq 0 ]]; then
   echo "Missing packed tarballs in $PACKED_DIR" >&2
   exit 1

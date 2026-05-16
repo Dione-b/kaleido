@@ -5,8 +5,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PACKED_DIR="${PACKED_DIR:-$ROOT_DIR/packed}"
 
 shopt -s nullglob
-CORE_TGZ=( "$PACKED_DIR"/kaleido-core-*.tgz )
-CLIENT_TGZ=( "$PACKED_DIR"/kaleido-client-*.tgz )
+CORE_TGZ=( "$PACKED_DIR"/kaleido-xlm-core-*.tgz )
+CLIENT_TGZ=( "$PACKED_DIR"/kaleido-xlm-client-*.tgz )
 if [[ ${#CORE_TGZ[@]} -eq 0 || ${#CLIENT_TGZ[@]} -eq 0 ]]; then
   echo "Missing packed tarballs in $PACKED_DIR (run pnpm ci:snapshot-pack or pnpm test:consumer first)." >&2
   exit 1
