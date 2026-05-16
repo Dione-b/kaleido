@@ -60,10 +60,10 @@ describe("Stellar CLI version contract", () => {
   it("accepts the tested maximum version boundary", () => {
     expect(
       assertSupportedStellarCliVersion({
-        version: "22.0.1",
+        version: "25.2.0",
         allowUntested: false
       })
-    ).toBe("22.0.1");
+    ).toBe("25.2.0");
   });
 
   it("rejects versions above the tested maximum by default", () => {
@@ -82,7 +82,7 @@ describe("Stellar CLI version contract", () => {
   it("rejects the adjacent version above the tested maximum by default", () => {
     expect(() =>
       assertSupportedStellarCliVersion({
-        version: "22.0.2",
+        version: "25.2.1",
         allowUntested: false
       })
     ).toThrowError(
@@ -123,6 +123,6 @@ describe("Stellar CLI version contract", () => {
 
   it("declares concrete supported range constants", () => {
     expect(STELLAR_CLI_MIN_VERSION).toBe("22.0.0");
-    expect(STELLAR_CLI_TESTED_MAX_VERSION).toBe("22.0.1");
+    expect(STELLAR_CLI_TESTED_MAX_VERSION).toBe("25.2.0");
   });
 });

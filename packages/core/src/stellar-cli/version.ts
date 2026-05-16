@@ -2,7 +2,7 @@ import semver from "semver";
 import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
 
 export const STELLAR_CLI_MIN_VERSION = "22.0.0";
-export const STELLAR_CLI_TESTED_MAX_VERSION = "22.0.1";
+export const STELLAR_CLI_TESTED_MAX_VERSION = "25.2.0";
 
 const STELLAR_CLI_SEMVER_REGEX = /\b(\d+\.\d+\.\d+(?:-[0-9A-Za-z-.]+)?(?:\+[0-9A-Za-z-.]+)?)\b/;
 
