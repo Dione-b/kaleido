@@ -148,7 +148,7 @@ describe("createProjectFromTemplate", () => {
     expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
   });
 
-  it("ships a counter contract compatible with the supported Stellar CLI 22 build target", async () => {
+  it("ships a counter contract compatible with the supported wasm32-unknown-unknown build target", async () => {
     const templatePath = path.resolve(__dirname, "../../../templates/react-vite-counter");
     const config = await readFile(path.join(templatePath, "kaleido.config.ts"), "utf8");
     const cargoToml = await readFile(path.join(templatePath, "contracts/counter/Cargo.toml"), "utf8");

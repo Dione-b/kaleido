@@ -6,11 +6,11 @@ export default defineConfig({
   contracts: {
     token: {
       path: "./contracts/token",
-      wasm: "./contracts/token/target/wasm32v1-none/release/token.wasm"
+      wasm: "./contracts/token/target/wasm32-unknown-unknown/release/token.wasm"
     },
     marketplace: {
       path: "./contracts/marketplace",
-      wasm: "./contracts/marketplace/target/wasm32v1-none/release/marketplace.wasm",
+      wasm: "./contracts/marketplace/target/wasm32-unknown-unknown/release/marketplace.wasm",
       dependsOn: ["token"],
       deployArgs: {
         tokenContractId: "${contracts.token.contractId}"

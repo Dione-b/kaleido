@@ -50,7 +50,7 @@ It orchestrates **Stellar CLI**, **Stellar SDK**, and **Soroban SDK** rather tha
 
 - **Node.js** ≥ 20
 - **pnpm** ≥ 9
-- **Rust** with the `wasm32-unknown-unknown` target for the currently supported Stellar CLI 22.x toolchain
+- **Rust** with the `wasm32-unknown-unknown` target for the supported Stellar CLI 22.x flow
 - **[Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli)**
 - A local Stellar identity for CLI deploy/invoke operations
 

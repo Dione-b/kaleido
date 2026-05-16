@@ -6,15 +6,15 @@ Kaleido alpha supports the CLI path first, then optional browser/client integrat
 
 - Node.js 20+
 - pnpm 9+ for repository development
-- Rust 1.84.0+
-- `wasm32v1-none` Rust target
+- Rust stable
+- `wasm32-unknown-unknown` Rust target
 - Stellar CLI
 - A local Stellar CLI identity for CLI deploy/invoke, for example `alice`
 - Optional: Freighter or another wallet adapter for browser-side `@kaleido-xlm/client` calls
 
 ```bash
 rustc --version
-rustup target add wasm32v1-none
+rustup target add wasm32-unknown-unknown
 stellar --version
 ```
 

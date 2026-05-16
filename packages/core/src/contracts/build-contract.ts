@@ -12,7 +12,7 @@ export type BuildContractOptions = {
   allowUntestedStellarCli?: boolean;
 };
 
-const RUST_WASM_TARGET = "wasm32v1-none";
+const RUST_WASM_TARGET = "wasm32-unknown-unknown";
 
 const MISSING_WASM_TARGET_HINT_SUBSTRINGS = [
   "not installed",

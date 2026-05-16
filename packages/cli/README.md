@@ -10,7 +10,7 @@ kaleido --help
 ## Requirements
 
 - Node.js `>=20`
-- Stellar CLI `>=22.0.0` and `<=22.0.1` available on `PATH`
+- Stellar CLI `>=22.0.0` and `<=25.2.0` available on `PATH`
 - A Kaleido project with `kaleido.config.ts` for project commands such as `build`, `deploy`, `generate`, and `invoke`
 
 If your local machine is on a newer Stellar CLI, `--allow-untested-stellar-cli` is the local-only escape hatch. CI and release workflows should stay on the supported range.

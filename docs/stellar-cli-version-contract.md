@@ -5,7 +5,7 @@ Kaleido shells out to Stellar CLI for current build, deploy, bindings, and invok
 ## Supported Range
 
 - Minimum: `22.0.0`
-- Tested maximum: `22.0.1`
+- Tested maximum: `25.2.0`
 
 Runtime behavior:
 
