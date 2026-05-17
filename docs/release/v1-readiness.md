@@ -19,3 +19,13 @@
 - three consecutive successful scheduled smoke runs, verified with the procedure in [`docs/release/v1.0.0.md`](./v1.0.0.md#observability-plan)
 - no unretried smoke failure in the last 7 days, verified with the procedure in [`docs/release/v1.0.0.md`](./v1.0.0.md#observability-plan)
 - release evidence captured in `docs/release/v1.0.0.md`
+
+## Verification Log
+
+2026-05-17 operational stability gate:
+- `pnpm typecheck`: pass via `rtk proxy pnpm typecheck` (the `rtk pnpm typecheck` wrapper printed `TypeScript: No errors found` but exited 1)
+- `pnpm build`: pass
+- `pnpm test`: pass
+- `pnpm test:consumer`: pass
+- `pnpm test:consumer:client-bundlers`: pass
+- `pnpm ci:publish-matrix`: pass
