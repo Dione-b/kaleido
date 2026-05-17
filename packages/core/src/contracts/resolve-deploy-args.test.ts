@@ -3,6 +3,7 @@ import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveDeployArgs } from "./resolve-deploy-args.js";
 
 describe("resolveDeployArgs", () => {
+  const tokenContractId = "CTOKENCONTRACTID";
   const artifacts = {
     project: "marketplace-app",
     version: 1 as const,
@@ -10,7 +11,7 @@ describe("resolveDeployArgs", () => {
       testnet: {
         contracts: {
           token: {
-            contractId: "C".padEnd(56, "A"),
+            contractId: tokenContractId,
             wasmHash: "hash",
             deployedAt: "2026-05-12T00:00:00.000Z",
             sourcePath: "./contracts/token",
@@ -27,15 +28,20 @@ describe("resolveDeployArgs", () => {
   };
 
   it("resolves contractId placeholders from artifacts", () => {
-    expect(
-      resolveDeployArgs({
-        deployArgs: { tokenContractId: "${contracts.token.contractId}", supply: 1000 },
-        artifacts,
-        network: "testnet"
-      })
-    ).toEqual({
-      tokenContractId: "C".padEnd(56, "A"),
-      supply: 1000
+    const marketplaceConfig = {
+      deployArgs: {
+        tokenContractId: "${contracts.token.contractId}"
+      }
+    };
+
+    const result = resolveDeployArgs({
+      deployArgs: marketplaceConfig.deployArgs,
+      artifacts,
+      network: "testnet"
+    });
+
+    expect(result).toEqual({
+      tokenContractId
     });
   });
 

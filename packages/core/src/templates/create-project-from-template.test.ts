@@ -227,12 +227,12 @@ describe("createProjectFromTemplate", () => {
     expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
   });
 
-  it("ships a counter contract compatible with the supported wasm32-unknown-unknown build target", async () => {
+  it("ships a counter contract compatible with the supported wasm32v1-none build target", async () => {
     const templatePath = path.resolve(__dirname, "../../../templates/react-vite-counter");
     const config = await readFile(path.join(templatePath, "caatinga.config.ts"), "utf8");
     const cargoToml = await readFile(path.join(templatePath, "contracts/counter/Cargo.toml"), "utf8");
 
-    expect(config).toContain("target/wasm32-unknown-unknown/release/counter.wasm");
+    expect(config).toContain("target/wasm32v1-none/release/counter.wasm");
     expect(cargoToml).toContain('soroban-sdk = "22.0.1"');
     expect(cargoToml).toContain('soroban-sdk = { version = "22.0.1", features = ["testutils"] }');
   });

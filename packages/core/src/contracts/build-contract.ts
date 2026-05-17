@@ -12,7 +12,7 @@ export type BuildContractOptions = {
   allowUntestedStellarCli?: boolean;
 };
 
-const RUST_WASM_TARGET = "wasm32-unknown-unknown";
+const RUST_WASM_TARGET = "wasm32v1-none";
 
 const MISSING_WASM_TARGET_HINT_SUBSTRINGS = [
   "not installed",
@@ -66,7 +66,7 @@ export async function buildContract(options: BuildContractOptions) {
       throw new CaatingaError(
         `Required Rust wasm target "${RUST_WASM_TARGET}" is missing.`,
         CaatingaErrorCode.RUST_TARGET_NOT_FOUND,
-        `Run \`rustup target add ${RUST_WASM_TARGET}\` and retry the build.`,
+        `Run \`rustup target add ${RUST_WASM_TARGET}\` and retry.`,
         error
       );
     }

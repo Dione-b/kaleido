@@ -92,7 +92,7 @@ describe("buildContract", () => {
     });
   });
 
-  it("should_throw_RUST_TARGET_NOT_FOUND_when_stellar_build_reports_missing_wasm32_unknown_unknown", async () => {
+  it("should_throw_RUST_TARGET_NOT_FOUND_when_stellar_build_reports_missing_wasm32v1_none", async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-build-"));
     const sourceDir = path.join(tmpDir, "contracts", "counter");
     await mkdir(sourceDir, { recursive: true });
@@ -102,8 +102,8 @@ describe("buildContract", () => {
         throw new CaatingaError(
           "Command failed: stellar contract build",
           CaatingaErrorCode.BUILD_FAILED,
-          "the wasm32-unknown-unknown target may not be installed",
-          new Error("error: the wasm32-unknown-unknown target is not installed. run `rustup target add wasm32-unknown-unknown`")
+          "the wasm32v1-none target may not be installed",
+          new Error("error: the wasm32v1-none target is not installed. run `rustup target add wasm32v1-none`")
         );
       }
 

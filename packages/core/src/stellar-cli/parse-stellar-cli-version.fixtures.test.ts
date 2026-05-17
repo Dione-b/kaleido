@@ -17,6 +17,16 @@ describe("parseStellarCliVersion (checked-in fixtures)", () => {
     expect(parseStellarCliVersion(output)).toBe("22.0.0");
   });
 
+  it("should_parse_semver_from_v24_0_0_version_fixture", async () => {
+    const output = await readFixture("v24.0.0/version.v24.0.0.fixture.txt");
+    expect(parseStellarCliVersion(output)).toBe("24.0.0");
+  });
+
+  it("should_parse_semver_from_v25_2_0_version_fixture", async () => {
+    const output = await readFixture("v25.2.0/version.v25.2.0.fixture.txt");
+    expect(parseStellarCliVersion(output)).toBe("25.2.0");
+  });
+
   it("should_parse_semver_from_v26_0_0_version_fixture", async () => {
     const output = await readFixture("v26.0.0/version.txt");
     expect(parseStellarCliVersion(output)).toBe("26.0.0");

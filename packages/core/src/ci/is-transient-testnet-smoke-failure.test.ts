@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 import { isTransientTestnetSmokeFailure } from "./is-transient-testnet-smoke-failure.js";
 
 describe("isTransientTestnetSmokeFailure", () => {
-  it("should_return_true_when_log_contains_network_timeout", () => {
-    expect(isTransientTestnetSmokeFailure("request i/o timeout")).toBe(true);
+  it("should_return_true_when_log_contains_horizon_connection_timeout", () => {
+    expect(isTransientTestnetSmokeFailure("timeout while connecting to horizon")).toBe(true);
   });
 
-  it("should_return_true_when_log_contains_503", () => {
-    expect(isTransientTestnetSmokeFailure("upstream returned 503")).toBe(true);
+  it("should_return_true_when_log_contains_503_service_unavailable", () => {
+    expect(isTransientTestnetSmokeFailure("503 Service Unavailable")).toBe(true);
+  });
+
+  it("should_return_true_when_log_contains_connection_reset", () => {
+    expect(isTransientTestnetSmokeFailure("ECONNRESET")).toBe(true);
   });
 
   it("should_return_false_when_log_contains_unsupported_cli_code", () => {

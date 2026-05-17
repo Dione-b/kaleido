@@ -5,8 +5,10 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PATH="$ROOT_DIR/node_modules/.bin:$PATH"
 CORE_INDEX="${ROOT_DIR}/packages/core/dist/index.js"
 
+: "${CAATINGA_CI_IDENTITY_ALIAS:?Set CAATINGA_CI_IDENTITY_ALIAS to a Stellar CLI identity alias provisioned in the runner config.}"
+CI_IDENTITY="$CAATINGA_CI_IDENTITY_ALIAS"
+
 APP_NAME="${1:-smoke-app}"
-IDENTITY_ALIAS="${CAATINGA_CI_IDENTITY_ALIAS:?CAATINGA_CI_IDENTITY_ALIAS is required}"
 ARTIFACT_DIR="$ROOT_DIR/smoke-ci-out"
 LOG_FILE="$ARTIFACT_DIR/${APP_NAME}-smoke.log"
 CAATINGA_VERSION_FILE="$ARTIFACT_DIR/${APP_NAME}-caatinga-version.txt"
@@ -74,15 +76,16 @@ run_step "init" caatinga init "$APP_NAME" --template react-vite-counter
 cd "$ROOT_DIR/$APP_NAME"
 
 run_step "build" caatinga build counter
-run_step "deploy" caatinga deploy counter --network testnet --source "$IDENTITY_ALIAS"
+run_step "deploy" caatinga deploy counter --network testnet --source "$CI_IDENTITY"
 
-test -f caatinga.artifacts.json
+run_step "artifacts-exists" test -f caatinga.artifacts.json
 
 log "=== artifacts-contract-id ==="
 set +e
 node --input-type=module -e '
 import fs from "node:fs";
 const artifacts = JSON.parse(fs.readFileSync("caatinga.artifacts.json", "utf8"));
+// Schema path: packages/core/src/artifacts/artifact.schema.ts -> networks.<network>.contracts.<contract>.contractId
 const contractId = artifacts.networks?.testnet?.contracts?.counter?.contractId;
 if (!/^C[A-Z0-9]{55}$/.test(contractId ?? "")) {
   console.error(`Invalid contractId: ${contractId}`);
@@ -96,11 +99,11 @@ if [[ "$ec_art" -ne 0 ]]; then
 fi
 
 run_step "generate" caatinga generate counter --network testnet
-test -d src/contracts/generated
+run_step "generated-bindings-exists" test -d src/contracts/generated
 
-set +e
 INVOKE_OUT="$(mktemp)"
-caatinga invoke counter.increment --network testnet --source "$IDENTITY_ALIAS" 2>&1 | tee "$INVOKE_OUT" | tee -a "$LOG_FILE"
+set +e
+caatinga invoke counter.increment --network testnet --source "$CI_IDENTITY" 2>&1 | tee "$INVOKE_OUT" | tee -a "$LOG_FILE"
 INV_EC=${PIPESTATUS[0]}
 set -e
 if [[ "$INV_EC" -ne 0 ]]; then

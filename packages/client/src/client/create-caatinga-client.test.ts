@@ -14,7 +14,7 @@ const artifacts: CaatingaArtifacts = {
           wasmHash: "hash",
           deployedAt: "2026-05-12T00:00:00.000Z",
           sourcePath: "contracts/counter",
-          wasmPath: "target/wasm32-unknown-unknown/release/counter.wasm",
+          wasmPath: "target/wasm32v1-none/release/counter.wasm",
           dependencies: [],
           resolvedDeployArgs: {}
         }

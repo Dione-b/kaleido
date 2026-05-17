@@ -123,4 +123,27 @@ describe("runCommand Stellar CLI version gate", () => {
     });
     expect(execaMock).not.toHaveBeenCalled();
   });
+
+  it("blocks deploy when stellar --version reports a newer untested CLI", async () => {
+    vi.doUnmock("./check-stellar-cli-version.js");
+    const { runCommand } = await import("../shell/run-command.js");
+    execaMock.mockResolvedValueOnce({
+      stdout: "stellar 26.0.0",
+      stderr: "",
+      all: "stellar 26.0.0"
+    });
+
+    await expect(runCommand("stellar", ["contract", "deploy"])).rejects.toMatchObject({
+      code: CaatingaErrorCode.UNTESTED_CLI_VERSION,
+      message: expect.stringContaining("newer than the tested maximum 25.2.0")
+    });
+
+    expect(execaMock).toHaveBeenCalledTimes(1);
+    expect(execaMock).toHaveBeenCalledWith("stellar", ["--version"], {
+      cwd: undefined,
+      env: undefined,
+      all: true,
+      reject: true
+    });
+  });
 });
