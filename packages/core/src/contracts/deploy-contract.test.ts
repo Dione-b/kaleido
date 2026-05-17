@@ -36,6 +36,26 @@ const baseConfig: CaatingaConfig = {
   frontend: { framework: "vite-react", bindingsOutput: "./out" }
 };
 
+const multiContractConfig: CaatingaConfig = {
+  ...baseConfig,
+  contracts: {
+    token: {
+      path: "./contracts/token",
+      wasm: "./rel/token.wasm",
+      dependsOn: [],
+      deployArgs: {}
+    },
+    marketplace: {
+      path: "./contracts/marketplace",
+      wasm: "./rel/marketplace.wasm",
+      dependsOn: ["token"],
+      deployArgs: {
+        tokenContractId: "${contracts.token.contractId}"
+      }
+    }
+  }
+};
+
 describe("deployContract", () => {
   let tmpDir: string;
 
@@ -77,6 +97,54 @@ describe("deployContract", () => {
     const saved = JSON.parse(await readFile(path.join(tmpDir, "caatinga.artifacts.json"), "utf8"));
     expect(saved.networks.testnet.contracts.counter.contractId).toBe(CONTRACT_ID);
     expect(saved.networks.testnet.contracts.counter.wasmHash).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("should_persist_dependency_metadata_and_resolved_deploy_args", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-deploy-deps-"));
+    const tokenWasmPath = path.join(tmpDir, "rel", "token.wasm");
+    const marketplaceWasmPath = path.join(tmpDir, "rel", "marketplace.wasm");
+    await mkdir(path.dirname(tokenWasmPath), { recursive: true });
+    await writeFile(tokenWasmPath, Buffer.from("token-wasm-bytes"), "utf8");
+    await writeFile(marketplaceWasmPath, Buffer.from("marketplace-wasm-bytes"), "utf8");
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        token: {
+          contractId: "C".padEnd(56, "T"),
+          wasmHash: "a".repeat(64),
+          deployedAt: "2026-05-12T00:00:00.000Z",
+          sourcePath: "./contracts/token",
+          wasmPath: "./rel/token.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: { token: [], marketplace: ["token"] }
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    await deployContract({
+      config: multiContractConfig,
+      contractName: "marketplace",
+      networkName: "testnet",
+      source: "alice",
+      cwd: tmpDir,
+      resolvedDeployArgs: { tokenContractId: "CTOKENCONTRACTID" },
+      dependencies: ["token"]
+    });
+
+    const saved = JSON.parse(await readFile(path.join(tmpDir, "caatinga.artifacts.json"), "utf8"));
+    expect(saved.networks.testnet.contracts.marketplace).toMatchObject({
+      contractId: CONTRACT_ID,
+      sourcePath: "./contracts/marketplace",
+      wasmPath: "./rel/marketplace.wasm",
+      dependencies: ["token"],
+      resolvedDeployArgs: { tokenContractId: "CTOKENCONTRACTID" }
+    });
+    expect(saved.networks.testnet.contracts.marketplace.wasmHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(saved.networks.testnet.contracts.marketplace.deployedAt).toEqual(expect.any(String));
+    expect(saved.networks.testnet.dependencyGraph.marketplace).toEqual(["token"]);
   });
 
   it("should_parse_contract_id_from_stdout_when_combined_output_is_empty", async () => {

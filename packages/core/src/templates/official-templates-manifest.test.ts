@@ -41,6 +41,7 @@ describe("official template manifests", () => {
   it("should_keep_each_official_template_manifest_compatible_with_core", async () => {
     const templateNames = await listOfficialTemplateNames();
     expect(templateNames.length).toBeGreaterThan(0);
+    expect(templateNames).toContain("marketplace-with-token");
 
     for (const templateName of templateNames) {
       const manifestPath = path.join(officialTemplatesDir, templateName, "caatinga.template.json");

@@ -52,6 +52,11 @@ describe("deployContractGraph", () => {
   });
 
   it("deploys dependencies before dependents", async () => {
+    const deployCalls: Array<{
+      contractName: string;
+      resolvedDeployArgs: Record<string, string | number | boolean>;
+      dependencies: string[];
+    }> = [];
     const store: {
       networks: {
         testnet: { contracts: Record<string, { contractId: string }>; dependencyGraph: Record<string, string[]> };
@@ -68,9 +73,19 @@ describe("deployContractGraph", () => {
       networks: store.networks
     }));
 
-    deployContractMock.mockImplementation(async (opts: { contractName: string }) => {
+    deployContractMock.mockImplementation(async (opts: {
+      contractName: string;
+      resolvedDeployArgs: Record<string, string | number | boolean>;
+      dependencies: string[];
+    }) => {
+      deployCalls.push({
+        contractName: opts.contractName,
+        resolvedDeployArgs: opts.resolvedDeployArgs,
+        dependencies: opts.dependencies
+      });
       const id = opts.contractName === "token" ? "C".padEnd(56, "A") : "C".padEnd(56, "B");
       store.networks.testnet.contracts[opts.contractName] = { contractId: id };
+      store.networks.testnet.dependencyGraph[opts.contractName] = opts.dependencies;
       return { contractId: id, contract: { name: opts.contractName } };
     });
 
@@ -85,6 +100,8 @@ describe("deployContractGraph", () => {
     });
 
     expect(result.deployedContracts.map((contract) => contract.name)).toEqual(["token", "marketplace"]);
+    expect(deployCalls.map((call) => call.contractName)).toEqual(["token", "marketplace"]);
+    expect(store.networks.testnet.dependencyGraph.marketplace).toEqual(["token"]);
     expect(deployContractMock).toHaveBeenNthCalledWith(1, expect.objectContaining({ contractName: "token" }));
     expect(deployContractMock).toHaveBeenNthCalledWith(
       2,
