@@ -36,6 +36,17 @@ Recent history uses Conventional Commits: `fix:`, `fix(core):`, `docs:`, `test:`
 
 Pull requests should include motivation, behavior, tests, and release impact. Link issues or specs. For publish/version changes, keep each package `package.json` aligned with intended published versions and internal ranges, then update and commit `pnpm-lock.yaml`; CI uses frozen lockfile installs.
 
+### Version alignment before commit
+
+Before committing changes that touch tooling, dependencies, or CI, verify that versions stay consistent across the repo. Mismatches often pass locally but fail in GitHub Actions.
+
+- **pnpm**: Root `package.json` declares the canonical version in `packageManager` (currently `pnpm@9.15.4`). Do not also pin a different pnpm version in `.github/workflows/*` (for example `pnpm/action-setup` with `version: 9`); `pnpm/action-setup@v4` reads `packageManager` and errors on duplicate sources.
+- **Node.js**: Workflows use Node 20; keep `engines` and any `.nvmrc` / `node-version` inputs aligned with that baseline.
+- **Lockfile**: After dependency or `packageManager` changes, run `pnpm install` and commit `pnpm-lock.yaml` so CI `--frozen-lockfile` installs match.
+- **Workspace packages**: When bumping published versions or internal `workspace:*` ranges, update all affected `package.json` files in the same change.
+
+When in doubt, grep for version pins (`packageManager`, `version:`, `node-version`, `engines`) before pushing.
+
 ## Security & Configuration Tips
 
 Do not commit secrets, wallet keys, private artifacts, or local `.env` files. Treat `caatinga.artifacts.json`, template manifests, exported package paths, and documented error codes as public contracts; changing them requires a compatibility note and rollback plan.
