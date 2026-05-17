@@ -52,4 +52,11 @@ describe("publish package manifests", () => {
     const packageJson = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
     expect(packageJson.scripts["publish:dry-run"]).toContain("--tag next");
   });
+
+  it("release matrix checks the pinned Stellar CLI before publish gates", () => {
+    const packageJson = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
+    expect(packageJson.scripts["ci:publish-matrix"]).toMatch(
+      /^bash scripts\/check-ci-stellar-pin\.sh && /
+    );
+  });
 });

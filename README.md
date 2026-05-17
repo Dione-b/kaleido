@@ -24,8 +24,12 @@ npm install -g @caatinga/cli
 - A funded Stellar CLI identity (e.g. `alice`)
 
 ```bash
+cargo install --locked stellar-cli --version 25.2.0
+stellar --version
 stellar keys generate alice --fund --network testnet
 ```
+
+Caatinga supports Stellar CLI 23.0.0 through 25.2.0. Versions below 23.0.0 fail with CAATINGA_UNSUPPORTED_CLI_VERSION. Versions above 25.2.0 fail with CAATINGA_UNTESTED_CLI_VERSION unless --allow-untested-stellar-cli is explicitly used for local experiments. Release and CI gates must not use that override.
 
 ## Quick start
 

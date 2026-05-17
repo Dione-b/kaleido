@@ -25,12 +25,13 @@ describe("Stellar CLI version contract", () => {
   it("rejects versions below the minimum", () => {
     expect(() =>
       assertSupportedStellarCliVersion({
-        version: "0.1.0",
+        version: "22.0.1",
         allowUntested: false
       })
     ).toThrowError(
       expect.objectContaining({
-        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION,
+        message: expect.stringContaining("below the supported minimum 23.0.0")
       })
     );
   });
@@ -82,12 +83,13 @@ describe("Stellar CLI version contract", () => {
   it("rejects versions above the tested maximum by default", () => {
     expect(() =>
       assertSupportedStellarCliVersion({
-        version: "99.0.0",
+        version: "26.0.0",
         allowUntested: false
       })
     ).toThrowError(
       expect.objectContaining({
-        code: CaatingaErrorCode.UNTESTED_CLI_VERSION
+        code: CaatingaErrorCode.UNTESTED_CLI_VERSION,
+        message: expect.stringContaining("newer than the tested maximum 25.2.0")
       })
     );
   });

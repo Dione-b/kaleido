@@ -4,6 +4,7 @@
 
 - package metadata valid
 - package READMEs complete
+- Stellar CLI contract documented: Caatinga supports Stellar CLI 23.0.0 through 25.2.0. Versions below 23.0.0 fail with CAATINGA_UNSUPPORTED_CLI_VERSION. Versions above 25.2.0 fail with CAATINGA_UNTESTED_CLI_VERSION unless --allow-untested-stellar-cli is explicitly used for local experiments. Release and CI gates must not use that override.
 - `pnpm typecheck`
 - `pnpm build`
 - `pnpm test`
