@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const packages = ["core", "client"];
 const repoRoot = join(__dirname, "../../../..");
+const monorepoOnlyDependencyPattern = /(?:workspace|link|file):/;
 
 describe("publish package manifests", () => {
   for (const packageName of packages) {
@@ -16,8 +17,17 @@ describe("publish package manifests", () => {
       expect(packageJson.main).toBe("./dist/index.cjs");
       expect(packageJson.module).toBe("./dist/index.js");
       expect(packageJson.types).toBe("./dist/index.d.ts");
+      expect(packageJson.exports["."]).toEqual({
+        types: "./dist/index.d.ts",
+        import: "./dist/index.js",
+        require: "./dist/index.cjs"
+      });
       expect(packageJson.files).toEqual(expect.arrayContaining(["dist", "README.md", "LICENSE"]));
-      expect(JSON.stringify(packageJson)).not.toContain("workspace:*");
+      expect(JSON.stringify(packageJson)).not.toMatch(monorepoOnlyDependencyPattern);
+
+      if (packageName === "client") {
+        expect(packageJson.dependencies["@caatinga/core"]).toBe("^0.2.1");
+      }
     });
   }
 
@@ -33,8 +43,10 @@ describe("publish package manifests", () => {
         import: "./dist/index.js"
       }
     });
+    expect(packageJson.files).toEqual(expect.arrayContaining(["dist", "templates", "README.md", "LICENSE"]));
+    expect(packageJson.dependencies["@caatinga/core"]).toBe("^0.2.1");
     expect(packageJson.scripts.build).toContain("tsup src/index.ts");
-    expect(JSON.stringify(packageJson)).not.toContain("workspace:*");
+    expect(JSON.stringify(packageJson)).not.toMatch(monorepoOnlyDependencyPattern);
   });
 
   it("client exposes freighter subpath", () => {

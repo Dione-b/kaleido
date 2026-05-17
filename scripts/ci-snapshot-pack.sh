@@ -25,6 +25,7 @@ cleanup() {
   local backup_path
 
   rm -rf "$EXTRACT_DIR"
+  rm -rf "$ROOT_DIR/packages/cli/templates"
 
   for file in "${SNAPSHOT_RESTORE_FILES[@]}"; do
     backup_path="$BACKUP_DIR/${file#$ROOT_DIR/}"
@@ -37,6 +38,13 @@ cleanup() {
     backup_path="$BACKUP_DIR/${template_pkg#$ROOT_DIR/}"
     if [[ -f "$backup_path" ]]; then
       cp "$backup_path" "$template_pkg"
+    fi
+  done
+
+  for template_manifest in "$TEMPLATES_DIR"/*/caatinga.template.json; do
+    backup_path="$BACKUP_DIR/${template_manifest#$ROOT_DIR/}"
+    if [[ -f "$backup_path" ]]; then
+      cp "$backup_path" "$template_manifest"
     fi
   done
 
@@ -88,6 +96,11 @@ pnpm --dir "$ROOT_DIR" exec changeset version --snapshot smoke
 for template_pkg in "$TEMPLATES_DIR"/*/package.json; do
   mkdir -p "$BACKUP_DIR/$(dirname "${template_pkg#$ROOT_DIR/}")"
   cp "$template_pkg" "$BACKUP_DIR/${template_pkg#$ROOT_DIR/}"
+done
+
+for template_manifest in "$TEMPLATES_DIR"/*/caatinga.template.json; do
+  mkdir -p "$BACKUP_DIR/$(dirname "${template_manifest#$ROOT_DIR/}")"
+  cp "$template_manifest" "$BACKUP_DIR/${template_manifest#$ROOT_DIR/}"
 done
 
 node --input-type=module -e '
@@ -173,6 +186,18 @@ echo "CLI template package evidence: $cli_template_package_json_path"
 packed_core_version="$(tar -xOf "${core_tarball[0]}" package/package.json | node --input-type=module -e 'import { readFileSync } from "node:fs"; const pkg = JSON.parse(readFileSync(0, "utf8")); process.stdout.write(pkg.version);')"
 packed_client_version="$(tar -xOf "${client_tarball[0]}" package/package.json | node --input-type=module -e 'import { readFileSync } from "node:fs"; const pkg = JSON.parse(readFileSync(0, "utf8")); process.stdout.write(pkg.version);')"
 packed_cli_version="$(tar -xOf "${cli_tarball[0]}" package/package.json | node --input-type=module -e 'import { readFileSync } from "node:fs"; const pkg = JSON.parse(readFileSync(0, "utf8")); process.stdout.write(pkg.version);')"
+core_runtime_version="$(node --input-type=module -e '
+import { readFileSync } from "node:fs";
+
+const source = readFileSync(process.argv[1], "utf8");
+const match = source.match(/CAATINGA_CORE_VERSION\s*=\s*"([^"]+)"/);
+if (!match) {
+  console.error("Could not read CAATINGA_CORE_VERSION.");
+  process.exit(1);
+}
+
+process.stdout.write(match[1]);
+' "$ROOT_DIR/packages/core/src/version.ts")"
 
 export EXPECTED_PACKED_INTERNAL_VERSIONS="$(node --input-type=module -e '
 import { readFileSync } from "node:fs";
@@ -337,7 +362,7 @@ if (templateVersion !== 1) {
   );
   process.exit(1);
 }
-' "$packed_core_version" "$template_name"; then
+' "$core_runtime_version" "$template_name"; then
     echo "Bundled CLI template manifest failed compatibility validation." >&2
     tar -xOf "${cli_tarball[0]}" "package/templates/${template_name}/caatinga.template.json" >&2 || true
     exit 1

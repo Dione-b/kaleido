@@ -10,6 +10,7 @@ NPM_USERCONFIG="$TMP_DIR/.npmrc"
 RESOLVE_ABS_PATH_CMD='import path from "node:path"; process.stdout.write(path.resolve(process.argv[1]));'
 
 cleanup() {
+  rm -rf "$ROOT_DIR/packages/cli/templates"
   rm -rf "$TMP_DIR"
 }
 
@@ -36,6 +37,8 @@ if [[ "$SKIP_PACK" != "1" ]]; then
   rm -rf "$PACKED_DIR"
   mkdir -p "$PACKED_DIR"
   pnpm --dir "$ROOT_DIR" build
+  rm -rf "$ROOT_DIR/packages/cli/templates"
+  cp -r "$ROOT_DIR/packages/templates" "$ROOT_DIR/packages/cli/templates"
   ( cd "$ROOT_DIR/packages/core" && pnpm pack --pack-destination "$PACKED_DIR" )
   ( cd "$ROOT_DIR/packages/client" && pnpm pack --pack-destination "$PACKED_DIR" )
   ( cd "$ROOT_DIR/packages/cli" && pnpm pack --pack-destination "$PACKED_DIR" )
