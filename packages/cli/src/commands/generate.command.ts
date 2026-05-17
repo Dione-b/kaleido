@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { generateBindings, loadConfig } from "@kaleido/core";
+import { generateBindings, loadConfig } from "@caatinga/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
@@ -9,7 +9,7 @@ export function registerGenerateCommand(program: Command): void {
     .description("Generate TypeScript bindings for a deployed contract")
     .argument("<contract>", "Contract name")
     .option("-n, --network <network>", "Configured network name")
-    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
     .action((contractName: string, options: {
       network?: string;
       allowUntestedStellarCli?: boolean;

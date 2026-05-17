@@ -1,29 +1,55 @@
 {
-  "name": "@kaleido/cli",
-  "version": "0.1.0",
+  "name": "@caatinga/cli",
+  "version": "0.2.1",
+  "description": "Caatinga CLI for building dApps on Stellar/Soroban",
+  "keywords": [
+    "stellar",
+    "soroban",
+    "cli",
+    "dapp",
+    "smart-contracts",
+    "blockchain",
+    "web3",
+    "caatinga"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dione-b/caatinga.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/Dione-b/caatinga#readme",
+  "author": "Caatinga contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "bin": {
-    "kaleido": "./dist/index.js"
+    "caatinga": "./dist/index.js"
   },
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "build": "tsup src/index.ts --format esm --dts --clean && rm -rf ./templates && cp -r ../templates ./templates",
     "dev": "tsx src/index.ts",
     "test": "vitest run --pool=threads",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kaleido/core": "^0.1.0",
+    "@caatinga/core": "workspace:^",
     "chalk": "^5.4.1",
     "commander": "^12.1.0"
   },

@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { loadConfig } from "./load-config.js";
 
 describe("loadConfig", () => {
@@ -14,16 +14,16 @@ describe("loadConfig", () => {
     }
   });
 
-  it("should_throw_KALEIDO_CONFIG_NOT_FOUND_when_config_missing", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+  it("should_throw_CAATINGA_CONFIG_NOT_FOUND_when_config_missing", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-load-"));
     await expect(loadConfig({ cwd: tmpDir })).rejects.toMatchObject({
-      code: KaleidoErrorCode.CONFIG_NOT_FOUND
+      code: CaatingaErrorCode.CONFIG_NOT_FOUND
     });
   });
 
   it("should_load_and_validate_exported_default_config", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
-    const configPath = path.join(tmpDir, "kaleido.config.ts");
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-load-"));
+    const configPath = path.join(tmpDir, "caatinga.config.ts");
     await writeFile(
       configPath,
       `export default {
@@ -49,22 +49,22 @@ describe("loadConfig", () => {
     expect(config.contracts.counter.path).toBe("./contracts/counter");
   });
 
-  it("should_throw_KALEIDO_INVALID_CONFIG_when_zod_validation_fails", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+  it("should_throw_CAATINGA_INVALID_CONFIG_when_zod_validation_fails", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-load-"));
     await writeFile(
-      path.join(tmpDir, "kaleido.config.ts"),
+      path.join(tmpDir, "caatinga.config.ts"),
       `export default { project: "" };
 `,
       "utf8"
     );
 
     await expect(loadConfig({ cwd: tmpDir })).rejects.toMatchObject({
-      code: KaleidoErrorCode.INVALID_CONFIG
+      code: CaatingaErrorCode.INVALID_CONFIG
     });
   });
 
   it("should_resolve_custom_config_path_relative_to_cwd", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-load-"));
     await mkdir(path.join(tmpDir, "cfg"), { recursive: true });
     await writeFile(
       path.join(tmpDir, "cfg", "k.custom.ts"),
@@ -89,9 +89,9 @@ describe("loadConfig", () => {
   });
 
   it("should_rethrow_non_zod_errors_from_loader", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-load-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-load-"));
     await writeFile(
-      path.join(tmpDir, "kaleido.config.ts"),
+      path.join(tmpDir, "caatinga.config.ts"),
       `throw new Error("syntax boom");
 `,
       "utf8"

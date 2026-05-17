@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveDeployOrder } from "./resolve-deploy-order.js";
 
 describe("resolveDeployOrder", () => {
@@ -47,7 +47,7 @@ describe("resolveDeployOrder", () => {
         },
         includeDependencies: true
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_NOT_FOUND }));
   });
 
   it("fails for dependency cycles", () => {
@@ -59,6 +59,6 @@ describe("resolveDeployOrder", () => {
         },
         includeDependencies: true
       })
-    ).toThrowError(expect.objectContaining({ code: KaleidoErrorCode.CONTRACT_DEPENDENCY_CYCLE }));
+    ).toThrowError(expect.objectContaining({ code: CaatingaErrorCode.CONTRACT_DEPENDENCY_CYCLE }));
   });
 });

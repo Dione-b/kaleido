@@ -3,10 +3,39 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { createProjectFromTemplate } from "./create-project-from-template.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+async function readPackageJson<T>(packageJsonPath: string): Promise<T> {
+  return JSON.parse(await readFile(packageJsonPath, "utf8")) as T;
+}
+
+function collectInternalDependencies(packageJson: {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+}): Record<string, { section: string; value: string }> {
+  const sections = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies"
+  ] as const;
+  const expectations: Record<string, { section: string; value: string }> = {};
+
+  for (const section of sections) {
+    for (const [name, value] of Object.entries(packageJson[section] ?? {})) {
+      if (name.startsWith("@caatinga/")) {
+        expectations[name] = { section, value };
+      }
+    }
+  }
+
+  return expectations;
+}
 
 describe("createProjectFromTemplate", () => {
   let tmpDir: string;
@@ -19,7 +48,7 @@ describe("createProjectFromTemplate", () => {
 
   it("should_copy_template_replace_project_placeholder_and_write_artifacts", async () => {
     const templateDir = path.resolve(__dirname, "../../../templates/react-vite-counter");
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-init-"));
     const targetDir = path.join(tmpDir, "my-dapp");
 
     const result = await createProjectFromTemplate({
@@ -31,18 +60,18 @@ describe("createProjectFromTemplate", () => {
     expect(result.template.name).toBe("react-vite-counter");
     expect(result.template.version).toBe("0.1.0");
 
-    const configText = await readFile(path.join(targetDir, "kaleido.config.ts"), "utf8");
+    const configText = await readFile(path.join(targetDir, "caatinga.config.ts"), "utf8");
     expect(configText).toContain('project: "my-dapp"');
     expect(configText).not.toContain("__PROJECT_NAME__");
 
-    const artifactsText = await readFile(path.join(targetDir, "kaleido.artifacts.json"), "utf8");
+    const artifactsText = await readFile(path.join(targetDir, "caatinga.artifacts.json"), "utf8");
     const artifacts = JSON.parse(artifactsText) as { project: string; version: number };
     expect(artifacts.project).toBe("my-dapp");
     expect(artifacts.version).toBe(1);
   });
 
   it("should_fail_when_template_manifest_is_missing", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-init-"));
     const templateDir = path.join(tmpDir, "template");
     await mkdir(templateDir);
 
@@ -51,18 +80,18 @@ describe("createProjectFromTemplate", () => {
       targetDir: path.join(tmpDir, "my-dapp"),
       templateDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.TEMPLATE_MANIFEST_NOT_FOUND
+      code: CaatingaErrorCode.TEMPLATE_MANIFEST_NOT_FOUND
     });
   });
 
   it("should_fail_when_template_requires_incompatible_core", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-init-"));
     const templateDir = path.join(tmpDir, "template");
     await mkdir(templateDir);
-    await writeFile(path.join(templateDir, "kaleido.template.json"), JSON.stringify({
+    await writeFile(path.join(templateDir, "caatinga.template.json"), JSON.stringify({
       name: "future-template",
       version: "1.0.0",
-      kaleido: {
+      caatinga: {
         compatibleCore: "^99.0.0",
         templateVersion: 1
       },
@@ -74,8 +103,8 @@ describe("createProjectFromTemplate", () => {
         path: "contracts"
       },
       files: {
-        config: "kaleido.config.ts",
-        artifacts: "kaleido.artifacts.json"
+        config: "caatinga.config.ts",
+        artifacts: "caatinga.artifacts.json"
       }
     }), "utf8");
 
@@ -84,15 +113,31 @@ describe("createProjectFromTemplate", () => {
       targetDir: path.join(tmpDir, "my-dapp"),
       templateDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.TEMPLATE_INCOMPATIBLE
+      code: CaatingaErrorCode.TEMPLATE_INCOMPATIBLE
+    });
+  });
+
+  it("should_fail_when_template_manifest_json_is_invalid", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-init-"));
+    const templateDir = path.join(tmpDir, "template");
+    await mkdir(templateDir);
+    await writeFile(path.join(templateDir, "caatinga.template.json"), "{ not json", "utf8");
+
+    await expect(createProjectFromTemplate({
+      projectName: "my-dapp",
+      targetDir: path.join(tmpDir, "my-dapp"),
+      templateDir
+    })).rejects.toMatchObject({
+      code: CaatingaErrorCode.INVALID_TEMPLATE_MANIFEST,
+      message: "Template manifest is invalid."
     });
   });
 
   it("should_fail_when_template_manifest_schema_is_invalid", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-init-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-init-"));
     const templateDir = path.join(tmpDir, "template");
     await mkdir(templateDir);
-    await writeFile(path.join(templateDir, "kaleido.template.json"), JSON.stringify({
+    await writeFile(path.join(templateDir, "caatinga.template.json"), JSON.stringify({
       name: "",
       version: "1.0.0"
     }), "utf8");
@@ -102,33 +147,93 @@ describe("createProjectFromTemplate", () => {
       targetDir: path.join(tmpDir, "my-dapp"),
       templateDir
     })).rejects.toMatchObject({
-      code: KaleidoErrorCode.TEMPLATE_INCOMPATIBLE,
-      message: "Template is not compatible with this Kaleido version."
+      code: CaatingaErrorCode.INVALID_TEMPLATE_MANIFEST,
+      message: "Template manifest is invalid."
     });
   });
 
   it("ships marketplace-with-token as a multi-contract dependency template", async () => {
     const templateRoot = path.resolve(__dirname, "../../../templates");
     const templatePath = path.join(templateRoot, "marketplace-with-token");
-    const manifest = JSON.parse(await readFile(path.join(templatePath, "kaleido.template.json"), "utf8"));
-    const config = await readFile(path.join(templatePath, "kaleido.config.ts"), "utf8");
+    const manifest = JSON.parse(await readFile(path.join(templatePath, "caatinga.template.json"), "utf8"));
+    const config = await readFile(path.join(templatePath, "caatinga.config.ts"), "utf8");
+    const mainSource = await readFile(path.join(templatePath, "src/main.ts"), "utf8");
 
     expect(manifest.name).toBe("marketplace-with-token");
     expect(config).toContain("dependsOn: [\"token\"]");
     expect(config).toContain("tokenContractId: \"${contracts.token.contractId}\"");
+    expect(mainSource).not.toContain("placeholder");
+    await expect(readFile(path.join(templatePath, "contracts/token/src/lib.rs"), "utf8")).resolves.toBeTruthy();
+    await expect(readFile(path.join(templatePath, "contracts/marketplace/src/lib.rs"), "utf8")).resolves.toBeTruthy();
   });
 
-  it("should_include_client_dependencies_in_react_vite_counter_template", async () => {
+  it("should_pin_internal_dependency_ranges_for_official_templates", async () => {
+    const templateRoot = path.resolve(__dirname, "../../../templates");
+    const packageVersions = await Promise.all([
+      readPackageJson<{ version: string }>(path.resolve(__dirname, "../../../client/package.json")),
+      readPackageJson<{ version: string }>(path.resolve(__dirname, "../../package.json")),
+      readPackageJson<{ version: string }>(path.resolve(__dirname, "../../../cli/package.json"))
+    ]);
+    const [clientPackageJson, corePackageJson, cliPackageJson] = packageVersions;
+    const expectedInternalDependencies = {
+      "@caatinga/client": {
+        section: "dependencies",
+        value: `^${clientPackageJson.version}`
+      },
+      "@caatinga/core": {
+        section: "dependencies",
+        value: `^${corePackageJson.version}`
+      },
+      "@caatinga/cli": {
+        section: "devDependencies",
+        value: `^${cliPackageJson.version}`
+      }
+    } satisfies Record<string, { section: string; value: string }>;
+
+    const templateExpectations = [
+      {
+        template: "react-vite-counter",
+        expected: expectedInternalDependencies
+      },
+      {
+        template: "marketplace-with-token",
+        expected: {
+          "@caatinga/core": expectedInternalDependencies["@caatinga/core"],
+          "@caatinga/cli": expectedInternalDependencies["@caatinga/cli"]
+        }
+      }
+    ];
+
+    for (const { template, expected } of templateExpectations) {
+      const packageJson = await readPackageJson<{
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+        peerDependencies?: Record<string, string>;
+        optionalDependencies?: Record<string, string>;
+      }>(path.join(templateRoot, template, "package.json"));
+      expect(collectInternalDependencies(packageJson)).toEqual(expected);
+    }
+  });
+
+  it("should_include_public_dependencies_in_react_vite_counter_template", async () => {
     const templatePackageJsonPath = path.resolve(
       __dirname,
       "../../../templates/react-vite-counter/package.json"
     );
-    const packageJson = JSON.parse(await readFile(templatePackageJsonPath, "utf8")) as {
+    const packageJson = await readPackageJson<{
       dependencies?: Record<string, string>;
-      devDependencies?: Record<string, string>;
-    };
+    }>(templatePackageJsonPath);
 
-    expect(packageJson.dependencies?.["@kaleido/client"]).toBe("^0.1.0");
     expect(packageJson.dependencies?.["@stellar/freighter-api"]).toBe("^4.0.0");
+  });
+
+  it("ships a counter contract compatible with the supported wasm32-unknown-unknown build target", async () => {
+    const templatePath = path.resolve(__dirname, "../../../templates/react-vite-counter");
+    const config = await readFile(path.join(templatePath, "caatinga.config.ts"), "utf8");
+    const cargoToml = await readFile(path.join(templatePath, "contracts/counter/Cargo.toml"), "utf8");
+
+    expect(config).toContain("target/wasm32-unknown-unknown/release/counter.wasm");
+    expect(cargoToml).toContain('soroban-sdk = "22.0.1"');
+    expect(cargoToml).toContain('soroban-sdk = { version = "22.0.1", features = ["testutils"] }');
   });
 });

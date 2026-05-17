@@ -2,9 +2,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaleidoConfig } from "../config/config.schema.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
 import { createInitialArtifacts, writeArtifacts } from "../artifacts/write-artifacts.js";
-import { KaleidoError } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 
 const runCommand = vi.hoisted(() => vi.fn());
 
@@ -16,7 +16,7 @@ import { invokeContract, parseInvokeTarget } from "./invoke-contract.js";
 
 const CONTRACT_ID = `C${"3".repeat(55)}`;
 
-const baseConfig: KaleidoConfig = {
+const baseConfig: CaatingaConfig = {
   project: "app",
   defaultNetwork: "testnet",
   contracts: {
@@ -45,8 +45,12 @@ describe("parseInvokeTarget", () => {
   });
 
   it("rejects invalid target shapes", () => {
-    expect(() => parseInvokeTarget("counter")).toThrow(KaleidoError);
-    expect(() => parseInvokeTarget("counter.increment.extra")).toThrow(KaleidoError);
+    expect(() => parseInvokeTarget("counter")).toThrow(
+      expect.objectContaining({ code: CaatingaErrorCode.INVOKE_TARGET_INVALID })
+    );
+    expect(() => parseInvokeTarget("counter.increment.extra")).toThrow(
+      expect.objectContaining({ code: CaatingaErrorCode.INVOKE_TARGET_INVALID })
+    );
   });
 });
 
@@ -70,7 +74,7 @@ describe("invokeContract", () => {
   });
 
   it("should_forward_method_and_args_to_stellar_when_artifact_exists", async () => {
-    tmpDir = await mkdtemp(path.join(os.tmpdir(), "kaleido-invoke-"));
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-invoke-"));
 
     const artifacts = createInitialArtifacts("app");
     artifacts.networks.testnet = {
@@ -108,12 +112,101 @@ describe("invokeContract", () => {
         CONTRACT_ID,
         "--source-account",
         "alice",
+        "--network",
+        "testnet",
         "--",
         "increment",
         "--arg1",
         "x"
       ]),
-      { cwd: tmpDir }
+      { cwd: tmpDir, failureCode: CaatingaErrorCode.INVOKE_FAILED }
     );
+  });
+
+  it("should_map_stellar_invoke_failure_to_INVOKE_FAILED", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-invoke-fail-"));
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "abc",
+          deployedAt: "2026-05-11T12:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: {}
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "invoke") {
+        throw new CaatingaError(
+          "Command failed: stellar contract invoke",
+          CaatingaErrorCode.INVOKE_FAILED,
+          "stellar stderr here"
+        );
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    await expect(
+      invokeContract({
+        config: baseConfig,
+        target: "counter.increment",
+        networkName: "testnet",
+        source: "alice",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({ code: CaatingaErrorCode.INVOKE_FAILED });
+  });
+
+  it("should_surface_actionable_hint_when_stellar_invoke_signing_fails", async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "caatinga-invoke-xdr-"));
+
+    const artifacts = createInitialArtifacts("app");
+    artifacts.networks.testnet = {
+      contracts: {
+        counter: {
+          contractId: CONTRACT_ID,
+          wasmHash: "abc",
+          deployedAt: "2026-05-11T12:00:00.000Z",
+          sourcePath: "./contracts/counter",
+          wasmPath: "./rel/counter.wasm",
+          dependencies: [],
+          resolvedDeployArgs: {}
+        }
+      },
+      dependencyGraph: {}
+    };
+    await writeArtifacts(artifacts, tmpDir);
+
+    runCommand.mockImplementation(async (command: string, args: string[]) => {
+      if (command === "stellar" && args[0] === "contract" && args[1] === "invoke") {
+        throw new CaatingaError(
+          "Command failed: stellar contract invoke",
+          CaatingaErrorCode.INVOKE_FAILED,
+          "error: xdr processing error: xdr value invalid"
+        );
+      }
+      return { stdout: "0.0.0", stderr: "", all: "0.0.0" };
+    });
+
+    await expect(
+      invokeContract({
+        config: baseConfig,
+        target: "counter.increment",
+        networkName: "testnet",
+        source: "alice",
+        cwd: tmpDir
+      })
+    ).rejects.toMatchObject({
+      code: CaatingaErrorCode.INVOKE_FAILED,
+      hint: expect.stringContaining("Stellar CLI 22.x")
+    });
   });
 });

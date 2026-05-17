@@ -2,6 +2,7 @@ node_modules
 .worktrees
 packed
 packed-unpacked-package-jsons
+.changeset/__ci_snapshot__.md
 dist
 .turbo
 *.log
@@ -12,3 +13,7 @@ coverage
 .vite
 .idea
 *.tsbuildinfo
+smoke-ci-out/
+smoke-app/
+smoke-app-retry/
+docs/superpowers/specs/

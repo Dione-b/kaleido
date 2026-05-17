@@ -1,12 +1,12 @@
 import { readArtifacts } from "../artifacts/read-artifacts.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { deployContract } from "./deploy-contract.js";
 import { resolveDeployArgs } from "./resolve-deploy-args.js";
 import { resolveDeployOrder } from "./resolve-deploy-order.js";
 
 export async function deployContractGraph(options: {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   contractName?: string;
   networkName?: string;
   source?: string;

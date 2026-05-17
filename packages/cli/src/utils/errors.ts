@@ -1,15 +1,15 @@
-import { toKaleidoError } from "@kaleido/core";
+import { toCaatingaError } from "@caatinga/core";
 import { logger } from "./logger.js";
 
 function printError(error: unknown): void {
-  const kaleidoError = toKaleidoError(error);
+  const caatingaError = toCaatingaError(error);
 
-  logger.error(`Error: ${kaleidoError.message}`);
+  logger.error(`Error: ${caatingaError.message}`);
   logger.info("");
-  logger.info(`Code: ${kaleidoError.code}`);
+  logger.info(`Code: ${caatingaError.code}`);
 
-  if (kaleidoError.hint) {
-    logger.info(`Hint: ${kaleidoError.hint}`);
+  if (caatingaError.hint) {
+    logger.info(`Hint: ${caatingaError.hint}`);
   }
 }
 

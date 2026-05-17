@@ -1,8 +1,9 @@
-export { KaleidoError, KaleidoErrorCode, toKaleidoError } from "./errors/KaleidoError.js";
+export { CaatingaError, CaatingaErrorCode, toCaatingaError } from "./errors/CaatingaError.js";
+export { CAATINGA_CORE_VERSION } from "./version.js";
 
 export {
-  KaleidoConfigSchema,
-  type KaleidoConfig,
+  CaatingaConfigSchema,
+  type CaatingaConfig,
   type ContractConfig,
   type NetworkConfig
 } from "./config/config.schema.js";
@@ -10,8 +11,8 @@ export { defineConfig } from "./config/define-config.js";
 export { loadConfig, type LoadConfigOptions } from "./config/load-config.js";
 
 export {
-  KaleidoArtifactsSchema,
-  type KaleidoArtifacts,
+  CaatingaArtifactsSchema,
+  type CaatingaArtifacts,
   type ContractArtifact
 } from "./artifacts/artifact.schema.js";
 export { readArtifacts } from "./artifacts/read-artifacts.js";
@@ -30,7 +31,8 @@ export { resolveContract, type ResolvedContract } from "./contracts/resolve-cont
 export { buildContract, type BuildContractOptions } from "./contracts/build-contract.js";
 export { deployContract, type DeployContractOptions } from "./contracts/deploy-contract.js";
 export { deployContractGraph } from "./contracts/deploy-contract-graph.js";
-export { resolveDeployOrder, buildDependencyGraph } from "./contracts/resolve-deploy-order.js";
+export { buildDependencyGraph } from "./contracts/dependency-graph.js";
+export { resolveDeployOrder } from "./contracts/resolve-deploy-order.js";
 export { resolveDeployArgs, type DeployArgValue } from "./contracts/resolve-deploy-args.js";
 export { generateBindings, type GenerateBindingsOptions } from "./contracts/generate-bindings.js";
 export {
@@ -47,3 +49,5 @@ export {
   TemplateManifestSchema,
   type TemplateManifest
 } from "./templates/template-manifest.schema.js";
+
+export { isTransientTestnetSmokeFailure } from "./ci/is-transient-testnet-smoke-failure.js";

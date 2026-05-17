@@ -24,10 +24,12 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  examples/counter: {}
+
   packages/cli:
     dependencies:
-      '@kaleido/core':
-        specifier: ^0.1.0
+      '@caatinga/core':
+        specifier: workspace:^
         version: link:../core
       chalk:
         specifier: ^5.4.1
@@ -51,8 +53,8 @@ importers:
 
   packages/client:
     dependencies:
-      '@kaleido/core':
-        specifier: ^0.1.0
+      '@caatinga/core':
+        specifier: workspace:^
         version: link:../core
       '@stellar/freighter-api':
         specifier: ^4.0.0

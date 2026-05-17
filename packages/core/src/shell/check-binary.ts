@@ -1,4 +1,4 @@
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { runCommand } from "./run-command.js";
 
 type CheckBinaryOptions = {
@@ -14,15 +14,15 @@ export async function checkBinary(
   try {
     await runCommand(binary, ["--version"], options);
   } catch (error) {
-    if (error instanceof KaleidoError) {
+    if (error instanceof CaatingaError) {
       throw error;
     }
 
     const code = binary === "stellar"
-      ? KaleidoErrorCode.STELLAR_CLI_NOT_FOUND
+      ? CaatingaErrorCode.STELLAR_CLI_NOT_FOUND
       : binary === "rustc"
-        ? KaleidoErrorCode.RUST_NOT_FOUND
-        : KaleidoErrorCode.COMMAND_FAILED;
-    throw new KaleidoError(`${binary} was not found.`, code, hint, error);
+        ? CaatingaErrorCode.RUST_NOT_FOUND
+        : CaatingaErrorCode.COMMAND_FAILED;
+    throw new CaatingaError(`${binary} was not found.`, code, hint, error);
   }
 }

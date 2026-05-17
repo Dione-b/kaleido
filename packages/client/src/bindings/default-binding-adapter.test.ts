@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoError, KaleidoErrorCode } from "@kaleido/core";
+import { CaatingaError, CaatingaErrorCode } from "@caatinga/core";
 import { createDefaultBindingAdapter } from "./default-binding-adapter.js";
 
 describe("createDefaultBindingAdapter", () => {
-  it("creates generated binding client with Kaleido connection inputs", () => {
+  it("creates generated binding client with Caatinga connection inputs", () => {
     class Client {
       constructor(public readonly input: unknown) {}
     }
@@ -68,7 +68,7 @@ describe("createDefaultBindingAdapter", () => {
         rpcUrl: "https://rpc.example",
         networkPassphrase: "Test SDF Network ; September 2015"
       })
-    ).toThrowError(KaleidoError);
+    ).toThrowError(CaatingaError);
 
     try {
       adapter.createClient({
@@ -78,7 +78,7 @@ describe("createDefaultBindingAdapter", () => {
         networkPassphrase: "Test SDF Network ; September 2015"
       });
     } catch (error) {
-      expect((error as KaleidoError).code).toBe(KaleidoErrorCode.BINDING_CLIENT_NOT_FOUND);
+      expect((error as CaatingaError).code).toBe(CaatingaErrorCode.BINDING_CLIENT_NOT_FOUND);
     }
   });
 
@@ -88,7 +88,7 @@ describe("createDefaultBindingAdapter", () => {
     const adapter = createDefaultBindingAdapter({ Client });
 
     await expect(adapter.callMethod({ client: new Client(), method: "increment" })).rejects.toMatchObject({
-      code: KaleidoErrorCode.BINDING_METHOD_NOT_FOUND
+      code: CaatingaErrorCode.BINDING_METHOD_NOT_FOUND
     });
   });
 });

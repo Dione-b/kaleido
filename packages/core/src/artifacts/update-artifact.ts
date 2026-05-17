@@ -1,12 +1,12 @@
-import type { ContractArtifact, KaleidoArtifacts } from "./artifact.schema.js";
+import type { ContractArtifact, CaatingaArtifacts } from "./artifact.schema.js";
 
 export function updateArtifact(
-  artifacts: KaleidoArtifacts,
+  artifacts: CaatingaArtifacts,
   networkName: string,
   contractName: string,
   contractArtifact: ContractArtifact,
   networkExtras?: { dependencyGraph?: Record<string, string[]> }
-): KaleidoArtifacts {
+): CaatingaArtifacts {
   const existingNetwork = artifacts.networks[networkName] ?? { contracts: {}, dependencyGraph: {} };
 
   return {

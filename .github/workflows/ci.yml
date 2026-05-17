@@ -3,9 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
       - main
-      - developer
   pull_request:
 
 jobs:
@@ -18,14 +16,18 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
+
+      - name: Install Stellar CLI
+        uses: stellar/stellar-cli@v25.2.0
+
+      - name: Verify Stellar CLI version
+        run: stellar --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -39,5 +41,8 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Consumer isolation
-        run: pnpm test:consumer
+      - name: Stellar CLI parser fixtures
+        run: >-
+          pnpm --filter @caatinga/core exec vitest run
+          src/stellar-cli/parse-stellar-cli-version.fixtures.test.ts
+          src/stellar-cli/parse-contract-id.test.ts

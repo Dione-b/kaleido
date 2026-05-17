@@ -1,7 +1,7 @@
 import { getAddress, signTransaction } from "@stellar/freighter-api";
-import type { KaleidoWalletAdapter } from "../types.js";
+import type { CaatingaWalletAdapter } from "../types.js";
 
-export const freighterWalletAdapter: KaleidoWalletAdapter = {
+export const freighterWalletAdapter: CaatingaWalletAdapter = {
   async getPublicKey() {
     const response = await getAddress();
     return response.address;

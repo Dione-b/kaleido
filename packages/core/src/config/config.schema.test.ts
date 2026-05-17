@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoConfigSchema } from "./config.schema.js";
+import { CaatingaConfigSchema } from "./config.schema.js";
 
 const minimalValid = {
   project: "my-dapp",
@@ -7,7 +7,7 @@ const minimalValid = {
   contracts: {
     counter: {
       path: "./contracts/counter",
-      wasm: "./target/wasm32v1-none/release/counter.wasm"
+      wasm: "./target/wasm32-unknown-unknown/release/counter.wasm"
     }
   },
   networks: {
@@ -22,9 +22,9 @@ const minimalValid = {
   }
 };
 
-describe("KaleidoConfigSchema", () => {
+describe("CaatingaConfigSchema", () => {
   it("should_parse_valid_config_when_all_required_fields_present", () => {
-    const parsed = KaleidoConfigSchema.parse(minimalValid);
+    const parsed = CaatingaConfigSchema.parse(minimalValid);
     expect(parsed.project).toBe("my-dapp");
     expect(parsed.defaultNetwork).toBe("testnet");
     expect(parsed.contracts.counter.path).toContain("counter");
@@ -32,13 +32,13 @@ describe("KaleidoConfigSchema", () => {
 
   it("should_apply_default_network_when_omitted", () => {
     const { defaultNetwork, ...rest } = minimalValid;
-    const parsed = KaleidoConfigSchema.parse(rest);
+    const parsed = CaatingaConfigSchema.parse(rest);
     expect(parsed.defaultNetwork).toBe("testnet");
   });
 
   it("should_apply_default_framework_when_omitted", () => {
     const { frontend, ...rest } = minimalValid;
-    const parsed = KaleidoConfigSchema.parse({
+    const parsed = CaatingaConfigSchema.parse({
       ...rest,
       frontend: { bindingsOutput: "./out" }
     });
@@ -47,7 +47,7 @@ describe("KaleidoConfigSchema", () => {
 
   it("should_reject_when_contracts_record_empty", () => {
     expect(() =>
-      KaleidoConfigSchema.parse({
+      CaatingaConfigSchema.parse({
         ...minimalValid,
         contracts: {}
       })
@@ -56,7 +56,7 @@ describe("KaleidoConfigSchema", () => {
 
   it("should_reject_when_networks_record_empty", () => {
     expect(() =>
-      KaleidoConfigSchema.parse({
+      CaatingaConfigSchema.parse({
         ...minimalValid,
         networks: {}
       })
@@ -64,17 +64,17 @@ describe("KaleidoConfigSchema", () => {
   });
 
   it("accepts contract dependencies and deploy args", () => {
-    const result = KaleidoConfigSchema.parse({
+    const result = CaatingaConfigSchema.parse({
       project: "marketplace-app",
       defaultNetwork: "testnet",
       contracts: {
         token: {
           path: "./contracts/token",
-          wasm: "./contracts/token/target/wasm32v1-none/release/token.wasm"
+          wasm: "./contracts/token/target/wasm32-unknown-unknown/release/token.wasm"
         },
         marketplace: {
           path: "./contracts/marketplace",
-          wasm: "./contracts/marketplace/target/wasm32v1-none/release/marketplace.wasm",
+          wasm: "./contracts/marketplace/target/wasm32-unknown-unknown/release/marketplace.wasm",
           dependsOn: ["token"],
           deployArgs: {
             tokenContractId: "${contracts.token.contractId}"

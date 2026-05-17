@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { deployContractGraph, KaleidoError, KaleidoErrorCode, loadConfig } from "@kaleido/core";
+import { deployContractGraph, CaatingaError, CaatingaErrorCode, loadConfig } from "@caatinga/core";
 import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
@@ -9,10 +9,10 @@ export function registerDeployCommand(program: Command): void {
     .description("Deploy one or all configured Soroban contracts")
     .argument("[contract]", "Contract name")
     .option("-n, --network <network>", "Configured network name")
-    .requiredOption("-s, --source <source>", "Stellar CLI identity alias or public account address")
+    .requiredOption("-s, --source <source>", "Stellar CLI identity alias that can sign (for example alice)")
     .option("--force", "Redeploy contracts even if artifacts already contain contract IDs")
     .option("--no-deps", "Do not deploy missing dependencies for a selected contract")
-    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Kaleido's tested maximum")
+    .option("--allow-untested-stellar-cli", "Allow local use of a Stellar CLI version newer than Caatinga's tested maximum")
     .action((contractName: string | undefined, options: {
       network?: string;
       source: string;
@@ -21,9 +21,9 @@ export function registerDeployCommand(program: Command): void {
       allowUntestedStellarCli?: boolean;
     }) => runCliAction(async () => {
       if (options.deps === false && !contractName) {
-        throw new KaleidoError(
+        throw new CaatingaError(
           "`--no-deps` requires a contract name.",
-          KaleidoErrorCode.INVALID_CONFIG,
+          CaatingaErrorCode.INVALID_CONFIG,
           "Select a single contract or omit `--no-deps` to deploy the full graph."
         );
       }
@@ -46,6 +46,6 @@ export function registerDeployCommand(program: Command): void {
         logger.info(`Contract: ${contract.name}`);
         logger.info(`Contract ID: ${contract.contractId}`);
       }
-      logger.info("Artifacts updated: kaleido.artifacts.json");
+      logger.info("Artifacts updated: caatinga.artifacts.json");
     }));
 }

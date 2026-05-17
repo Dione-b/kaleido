@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoErrorCode } from "../errors/KaleidoError.js";
+import { CaatingaErrorCode } from "../errors/CaatingaError.js";
 import {
   STELLAR_CLI_MIN_VERSION,
   STELLAR_CLI_TESTED_MAX_VERSION,
@@ -17,7 +17,7 @@ describe("Stellar CLI version contract", () => {
   it("fails when version output has no semver", () => {
     expect(() => parseStellarCliVersion("stellar dev build")).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED
+        code: CaatingaErrorCode.STELLAR_CLI_VERSION_PARSE_FAILED
       })
     );
   });
@@ -30,7 +30,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });
@@ -43,7 +43,20 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
+      })
+    );
+  });
+
+  it("rejects 22.x because invoke signing is broken below 23.0.0", () => {
+    expect(() =>
+      assertSupportedStellarCliVersion({
+        version: "22.8.1",
+        allowUntested: false
+      })
+    ).toThrowError(
+      expect.objectContaining({
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });
@@ -51,19 +64,19 @@ describe("Stellar CLI version contract", () => {
   it("accepts the minimum supported version boundary", () => {
     expect(
       assertSupportedStellarCliVersion({
-        version: "22.0.0",
+        version: "23.0.0",
         allowUntested: false
       })
-    ).toBe("22.0.0");
+    ).toBe("23.0.0");
   });
 
   it("accepts the tested maximum version boundary", () => {
     expect(
       assertSupportedStellarCliVersion({
-        version: "22.0.1",
+        version: "25.2.0",
         allowUntested: false
       })
-    ).toBe("22.0.1");
+    ).toBe("25.2.0");
   });
 
   it("rejects versions above the tested maximum by default", () => {
@@ -74,7 +87,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+        code: CaatingaErrorCode.UNTESTED_CLI_VERSION
       })
     );
   });
@@ -82,12 +95,12 @@ describe("Stellar CLI version contract", () => {
   it("rejects the adjacent version above the tested maximum by default", () => {
     expect(() =>
       assertSupportedStellarCliVersion({
-        version: "22.0.2",
+        version: "25.2.1",
         allowUntested: false
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNTESTED_CLI_VERSION
+        code: CaatingaErrorCode.UNTESTED_CLI_VERSION
       })
     );
   });
@@ -112,7 +125,7 @@ describe("Stellar CLI version contract", () => {
       })
     ).toThrowError(
       expect.objectContaining({
-        code: KaleidoErrorCode.UNSUPPORTED_CLI_VERSION
+        code: CaatingaErrorCode.UNSUPPORTED_CLI_VERSION
       })
     );
   });
@@ -122,7 +135,7 @@ describe("Stellar CLI version contract", () => {
   });
 
   it("declares concrete supported range constants", () => {
-    expect(STELLAR_CLI_MIN_VERSION).toBe("22.0.0");
-    expect(STELLAR_CLI_TESTED_MAX_VERSION).toBe("22.0.1");
+    expect(STELLAR_CLI_MIN_VERSION).toBe("23.0.0");
+    expect(STELLAR_CLI_TESTED_MAX_VERSION).toBe("25.2.0");
   });
 });

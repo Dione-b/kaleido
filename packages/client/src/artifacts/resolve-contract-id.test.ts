@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { KaleidoError, KaleidoErrorCode, type KaleidoArtifacts } from "@kaleido/core";
+import { CaatingaError, CaatingaErrorCode, type CaatingaArtifacts } from "@caatinga/core";
 import { resolveContractId } from "./resolve-contract-id.js";
 
-const artifacts: KaleidoArtifacts = {
+const artifacts: CaatingaArtifacts = {
   project: "counter-app",
   version: 1,
   networks: {
@@ -13,7 +13,7 @@ const artifacts: KaleidoArtifacts = {
           wasmHash: "hash",
           deployedAt: "2026-05-12T00:00:00.000Z",
           sourcePath: "contracts/counter",
-          wasmPath: "target/wasm32v1-none/release/counter.wasm",
+          wasmPath: "target/wasm32-unknown-unknown/release/counter.wasm",
           dependencies: [],
           resolvedDeployArgs: {}
         }
@@ -52,13 +52,13 @@ describe("resolveContractId", () => {
         network: "testnet",
         contract: "token"
       })
-    ).toThrowError(KaleidoError);
+    ).toThrowError(CaatingaError);
 
     try {
       resolveContractId({ artifacts, network: "testnet", contract: "token" });
     } catch (error) {
-      expect(error).toBeInstanceOf(KaleidoError);
-      expect((error as KaleidoError).code).toBe(KaleidoErrorCode.CONTRACT_ARTIFACT_NOT_FOUND);
+      expect(error).toBeInstanceOf(CaatingaError);
+      expect((error as CaatingaError).code).toBe(CaatingaErrorCode.CONTRACT_ARTIFACT_NOT_FOUND);
     }
   });
 });

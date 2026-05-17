@@ -19,8 +19,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,11 +28,11 @@ jobs:
 
       - name: Restore Stellar CLI config
         env:
-          KALEIDO_CI_STELLAR_CONFIG_B64: ${{ secrets.KALEIDO_CI_STELLAR_CONFIG_B64 }}
+          CAATINGA_CI_STELLAR_CONFIG_B64: ${{ secrets.CAATINGA_CI_STELLAR_CONFIG_B64 }}
         run: |
-          test -n "$KALEIDO_CI_STELLAR_CONFIG_B64"
+          test -n "$CAATINGA_CI_STELLAR_CONFIG_B64"
           mkdir -p "$HOME/.config/stellar"
-          echo "$KALEIDO_CI_STELLAR_CONFIG_B64" | base64 --decode > "$HOME/.config/stellar/config.toml"
+          echo "$CAATINGA_CI_STELLAR_CONFIG_B64" | base64 --decode > "$HOME/.config/stellar/config.toml"
           chmod 600 "$HOME/.config/stellar/config.toml"
 
       - name: Install dependencies
@@ -47,14 +45,29 @@ jobs:
         id: smoke1
         continue-on-error: true
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app
 
       - name: Smoke retry
-        if: steps.smoke1.outcome == 'failure'
+        id: smokeretry
+        if: steps.smoke1.outcome == 'failure' && steps.smoke1.outputs.transient == 'true'
         env:
-          KALEIDO_CI_IDENTITY_ALIAS: ${{ secrets.KALEIDO_CI_IDENTITY_ALIAS }}
+          CAATINGA_CI_IDENTITY_ALIAS: ${{ secrets.CAATINGA_CI_IDENTITY_ALIAS }}
         run: bash scripts/testnet-smoke.sh smoke-app-retry
+
+      - name: Smoke gate
+        if: always()
+        run: |
+          s1="${{ steps.smoke1.outcome }}"
+          tr="${{ steps.smoke1.outputs.transient }}"
+          sr="${{ steps.smokeretry.outcome }}"
+          if [[ "$s1" == "success" ]]; then
+            exit 0
+          fi
+          if [[ "$s1" == "failure" && "$tr" == "true" && "$sr" == "success" ]]; then
+            exit 0
+          fi
+          exit 1
 
       - name: Upload smoke artifacts
         if: always()
@@ -62,8 +75,9 @@ jobs:
         with:
           name: testnet-smoke-artifacts
           path: |
-            smoke-app/kaleido.artifacts.json
-            smoke-app-retry/kaleido.artifacts.json
+            smoke-ci-out/
+            smoke-app/caatinga.artifacts.json
+            smoke-app-retry/caatinga.artifacts.json
           if-no-files-found: ignore
 
       - name: Remove Stellar CLI config

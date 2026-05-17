@@ -1,12 +1,12 @@
-import type { KaleidoArtifacts } from "@kaleido/core";
+import type { CaatingaArtifacts } from "@caatinga/core";
 
-export interface KaleidoNetwork {
+export interface CaatingaNetwork {
   name: string;
   rpcUrl: string;
   networkPassphrase: string;
 }
 
-export interface KaleidoWalletAdapter {
+export interface CaatingaWalletAdapter {
   getPublicKey(): Promise<string>;
   signTransaction(input: {
     xdr: string;
@@ -14,19 +14,19 @@ export interface KaleidoWalletAdapter {
   }): Promise<string>;
 }
 
-export interface KaleidoContractRegistration {
+export interface CaatingaContractRegistration {
   binding: unknown;
   contractId?: string;
 }
 
-export interface KaleidoClientConfig {
-  network: KaleidoNetwork;
-  artifacts: KaleidoArtifacts;
-  wallet: KaleidoWalletAdapter;
-  contracts: Record<string, KaleidoContractRegistration>;
+export interface CaatingaClientConfig {
+  network: CaatingaNetwork;
+  artifacts: CaatingaArtifacts;
+  wallet: CaatingaWalletAdapter;
+  contracts: Record<string, CaatingaContractRegistration>;
 }
 
-export type KaleidoInvokeStatus =
+export type CaatingaInvokeStatus =
   | "built"
   | "prepared"
   | "signed"
@@ -34,13 +34,13 @@ export type KaleidoInvokeStatus =
   | "confirmed"
   | "failed";
 
-export interface KaleidoInvokeOptions {
+export interface CaatingaInvokeOptions {
   debugXdr?: boolean;
   debugRaw?: boolean;
 }
 
-export interface KaleidoInvokeResult<T = unknown> {
-  status: KaleidoInvokeStatus;
+export interface CaatingaInvokeResult<T = unknown> {
+  status: CaatingaInvokeStatus;
   contract: string;
   method: string;
   contractId: string;
@@ -54,7 +54,7 @@ export interface KaleidoInvokeResult<T = unknown> {
   raw?: unknown;
 }
 
-export interface KaleidoXdrBuildResult {
+export interface CaatingaXdrBuildResult {
   contract: string;
   method: string;
   contractId: string;
@@ -63,7 +63,7 @@ export interface KaleidoXdrBuildResult {
   raw?: unknown;
 }
 
-export interface KaleidoBindingAdapter {
+export interface CaatingaBindingAdapter {
   createClient(input: {
     contractId: string;
     publicKey: string;

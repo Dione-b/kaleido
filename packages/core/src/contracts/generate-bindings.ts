@@ -1,14 +1,15 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { readArtifacts } from "../artifacts/read-artifacts.js";
-import type { KaleidoConfig } from "../config/config.schema.js";
-import { KaleidoError, KaleidoErrorCode } from "../errors/KaleidoError.js";
+import type { CaatingaConfig } from "../config/config.schema.js";
+import { CaatingaError, CaatingaErrorCode } from "../errors/CaatingaError.js";
 import { resolveNetwork } from "../networks/resolve-network.js";
 import { checkBinary } from "../shell/check-binary.js";
 import { runCommand } from "../shell/run-command.js";
+import { buildStellarNetworkArgs } from "../stellar-cli/build-stellar-network-args.js";
 
 export type GenerateBindingsOptions = {
-  config: KaleidoConfig;
+  config: CaatingaConfig;
   contractName: string;
   networkName?: string;
   cwd?: string;
@@ -22,14 +23,14 @@ export async function generateBindings(options: GenerateBindingsOptions) {
   const contractArtifact = artifacts.networks[network.name]?.contracts[options.contractName];
 
   if (!contractArtifact) {
-    throw new KaleidoError(
+    throw new CaatingaError(
       `No deployed artifact found for "${options.contractName}" on "${network.name}".`,
-      KaleidoErrorCode.ARTIFACT_NOT_FOUND,
-      "Run kaleido deploy for this contract and network before generating bindings."
+      CaatingaErrorCode.ARTIFACT_NOT_FOUND,
+      "Run caatinga deploy for this contract and network before generating bindings."
     );
   }
 
-  await checkBinary("stellar", "Install Stellar CLI before running kaleido generate.", {
+  await checkBinary("stellar", "Install Stellar CLI before running caatinga generate.", {
     allowUntestedStellarCli: options.allowUntestedStellarCli
   });
 
@@ -45,13 +46,11 @@ export async function generateBindings(options: GenerateBindingsOptions) {
     "--output-dir",
     outputDir,
     "--overwrite",
-    "--rpc-url",
-    network.config.rpcUrl,
-    "--network-passphrase",
-    network.config.networkPassphrase
+    ...buildStellarNetworkArgs(network)
   ], {
     cwd,
-    allowUntestedStellarCli: options.allowUntestedStellarCli
+    allowUntestedStellarCli: options.allowUntestedStellarCli,
+    failureCode: CaatingaErrorCode.BINDINGS_FAILED
   });
 
   return {

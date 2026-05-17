@@ -3,11 +3,16 @@ import { runCliAction } from "../utils/errors.js";
 import { logger } from "../utils/logger.js";
 
 export function registerDevCommand(program: Command): void {
-  program
-    .command("dev")
-    .description("Run the local Kaleido development workflow")
+  const dev = program
+    .command("dev", { hidden: true })
+    .description("Reserved — not available in pre-v1")
     .action(() => runCliAction(async () => {
-      logger.warn("kaleido dev is not implemented in the MVP.");
-      logger.info("Use kaleido build, deploy, generate, and invoke directly.");
+      logger.error(
+        "caatinga dev is not available yet. Use: caatinga build, deploy, generate, invoke."
+      );
+      process.exitCode = 1;
     }));
+
+  dev.helpOption(false);
+  dev.configureHelp({ visibleOptions: () => [] });
 }

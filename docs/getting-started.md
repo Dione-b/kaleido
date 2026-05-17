@@ -1,20 +1,20 @@
 # Getting Started
 
-Kaleido alpha supports the CLI path first, then optional browser/client integration through `@kaleido/client`.
+Caatinga alpha supports the CLI path first, then optional browser/client integration through `@caatinga/client`.
 
 ## Prerequisites
 
 - Node.js 20+
 - pnpm 9+ for repository development
-- Rust 1.84.0+
-- `wasm32v1-none` Rust target
+- Rust stable
+- `wasm32-unknown-unknown` Rust target
 - Stellar CLI
 - A local Stellar CLI identity for CLI deploy/invoke, for example `alice`
-- Optional: Freighter or another wallet adapter for browser-side `@kaleido/client` calls
+- Optional: Freighter or another wallet adapter for browser-side `@caatinga/client` calls
 
 ```bash
 rustc --version
-rustup target add wasm32v1-none
+rustup target add wasm32-unknown-unknown
 stellar --version
 ```
 
@@ -23,7 +23,7 @@ stellar --version
 ```bash
 pnpm install
 pnpm build
-pnpm --filter @kaleido/cli dev init my-dapp
+pnpm --filter @caatinga/cli dev init my-dapp
 ```
 
 ## Generated app flow
@@ -31,25 +31,25 @@ pnpm --filter @kaleido/cli dev init my-dapp
 ```bash
 cd my-dapp
 npm install
-npx kaleido build counter
-npx kaleido deploy counter --network testnet --source alice
-npx kaleido generate counter --network testnet
-npx kaleido invoke counter.increment --network testnet --source alice
+npx caatinga build counter
+npx caatinga deploy counter --network testnet --source alice
+npx caatinga generate counter --network testnet
+npx caatinga invoke counter.increment --network testnet --source alice
 ```
 
-Use a Stellar CLI identity alias or a public `G...` account for `--source`. Kaleido rejects likely secret keys and seed phrases.
+Use a Stellar CLI identity alias or a public `G...` account for `--source`. Caatinga rejects likely secret keys and seed phrases.
 
 ## Browser client flow
 
-After `generate`, register the generated bindings with `@kaleido/client`:
+After `generate`, register the generated bindings with `@caatinga/client`:
 
 ```ts
-import { createKaleidoClient } from "@kaleido/client";
-import { freighterWalletAdapter } from "@kaleido/client/freighter";
+import { createCaatingaClient } from "@caatinga/client";
+import { freighterWalletAdapter } from "@caatinga/client/freighter";
 import * as Counter from "./contracts/generated/counter";
-import artifacts from "../kaleido.artifacts.json";
+import artifacts from "../caatinga.artifacts.json";
 
-const client = createKaleidoClient({
+const client = createCaatingaClient({
   network: {
     name: "testnet",
     rpcUrl: "https://soroban-testnet.stellar.org",
