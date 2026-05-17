@@ -23,7 +23,8 @@ Each template must include **`caatinga.template.json`**, including:
 `caatinga init` validates compatibility before copy and fails with:
 
 - `CAATINGA_TEMPLATE_MANIFEST_NOT_FOUND` when the manifest is missing.
-- `CAATINGA_TEMPLATE_INCOMPATIBLE` when the manifest is invalid or incompatible with the current core version.
+- `CAATINGA_INVALID_TEMPLATE_MANIFEST` when the manifest JSON/schema is invalid.
+- `CAATINGA_TEMPLATE_INCOMPATIBLE` when the manifest is valid but incompatible with the current core version.
 
 ## Consequences
 
